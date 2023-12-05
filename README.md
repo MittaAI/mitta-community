@@ -15,10 +15,10 @@ The PR will be more likely to be added quickly if the following is true:
 4. Prompts, variables, comments and other named objects should be reasonable.
 5. The pipeline runs successfully.
 5. A `README.md` file that clearly explains how to use the pipeline.
-6. Any supporting materials, organzied by reasonable directory structure.
+6. Any supporting materials, organized by reasonable directory structure.
 
 ## Getting Started Video
-Be sure to watch the getting started video guide. This guide will famialrize you with callbacks, storage and pipeline use.
+Be sure to watch the getting started video guide. This guide will familiarize you with callbacks, storage and pipeline use.
 
 [![Getting Started](https://img.youtube.com/vi/ntLqz38hC60/0.jpg)](https://www.youtube.com/watch?v=ntLqz38hC60)
 
