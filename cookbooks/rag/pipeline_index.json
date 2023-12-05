@@ -46,7 +46,7 @@
             "node": {
                 "created": "Fri, 01 Dec 2023 17:20:58 GMT",
                 "extras": {
-                    "iterate_field": "chunks",
+                    "iterate_field": "texts",
                     "model": "gpt-3.5-turbo-1106",
                     "num_keyterms": "5",
                     "openai_token": "[openai_token]",
@@ -61,7 +61,7 @@
             "template": {
                 "created": "Fri, 01 Dec 2023 17:20:58 GMT",
                 "extras": {
-                    "iterate_field": "chunks",
+                    "iterate_field": "texts",
                     "model": "gpt-3.5-turbo-1106",
                     "num_keyterms": 5,
                     "openai_token": "[openai_token]",
@@ -69,7 +69,7 @@
                 },
                 "input_fields": [
                     {
-                        "name": "chunks",
+                        "name": "texts",
                         "type": "strings"
                     }
                 ],
@@ -82,7 +82,7 @@
                 ],
                 "processor": "aidict",
                 "template_id": "mufWPNffrfnv6",
-                "text": "{# Use this template to drive an OpenAI keyterm processor! #}\n\n{# Define the input_fields used in this template: #}\ninput_fields = [{'name': \"chunks\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template: #}\noutput_fields = [{'name': \"keyterms\", 'type': \"strings\"}]\n\n{# Extras #}\nextras = {'openai_token': None, 'model': 'gpt-3.5-turbo-1106', 'processor': 'aidict', 'num_keyterms': 5, 'iterate_field': \"chunks\"}\n\n{# Process the input string: #}\n# complete dict task by following step by step\n1. Inspect the following text:\n\"\"\"\n{{ chunks[outer_index] }}\n\"\"\"\n2. The required key for the dictionary is: 'keyterms'\n3. The required value for 'keyterms' is an array of ({num_keyterms}) strings.\n4. Create a concise list of ({{num_keyterms}}) keyterms from the text in step 1 and then follow step 2 and 3 to build the dictionary:\nai_dict = \n\n",
+                "text": "{# Use this template to drive an OpenAI keyterm processor! #}\n\n{# Define the input_fields used in this template: #}\ninput_fields = [{'name': \"texts\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template: #}\noutput_fields = [{'name': \"keyterms\", 'type': \"strings\"}]\n\n{# Extras #}\nextras = {'openai_token': None, 'model': 'gpt-3.5-turbo-1106', 'processor': 'aidict', 'num_keyterms': 5, 'iterate_field': \"texts\"}\n\n{# Process the input string: #}\n# complete dict task by following step by step\n1. Inspect the following text:\n\"\"\"\n{{ texts[outer_index] }}\n\"\"\"\n2. The required key for the dictionary is: 'keyterms'\n3. The required value for 'keyterms' is an array of ({num_keyterms}) strings.\n4. Create a concise list of ({{num_keyterms}}) keyterms from the text in step 1 and then follow step 2 and 3 to build the dictionary:\nai_dict = \n\n",
                 "uid": "r2lAJyPcFb8owj6Ks"
             }
         },

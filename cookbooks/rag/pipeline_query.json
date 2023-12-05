@@ -44,7 +44,7 @@
                 "created": "Sat, 02 Dec 2023 00:16:28 GMT",
                 "extras": {
                     "processor": "read_fb",
-                    "sql": "SELECT TOP(20) chunks, cosine_distance({{query_embedding[0]}}, chunks_embedding) AS distance FROM {{table}} ORDER BY distance ASC;",
+                    "sql": "SELECT TOP(20) texts, cosine_distance({{query_embedding[0]}}, texts_embedding) AS distance FROM {{table}} ORDER BY distance ASC;",
                     "table": "rag"
                 },
                 "name": "ant",
@@ -57,7 +57,7 @@
                 "created": "Sat, 02 Dec 2023 00:16:15 GMT",
                 "extras": {
                     "processor": "read_fb",
-                    "sql": "SELECT TOP(20) chunks, cosine_distance({{query_embedding[0]}}, chunks_embedding) AS distance FROM {{table}} ORDER BY distance ASC;",
+                    "sql": "SELECT TOP(20) texts, cosine_distance({{query_embedding[0]}}, texts_embedding) AS distance FROM {{table}} ORDER BY distance ASC;",
                     "table": null
                 },
                 "input_fields": [
@@ -75,7 +75,7 @@
                 ],
                 "processor": "read_fb",
                 "template_id": "1yEutS6OBhZGK",
-                "text": "{# Use this template to read from FeatureBase with SQL #}\n\n{# Input Fields #}\ninput_fields = [{\"name\": \"query_embedding\", \"type\": \"vectors\"}]\n\n{# Output Fields #}\noutput_fields = [{\"name\": \"chunks\", \"type\": \"strings\"}]\n\n{# Extras Fields #}\n{# SQL takes query_embedding and runs it against chunks_embeddings in the DB #}\nextras = {\"table\": None, \"processor\": \"read_fb\", \"sql\": \"SELECT TOP(20) chunks, cosine_distance({{query_embedding[0]}}, chunks_embedding) AS distance FROM {{table}} ORDER BY distance ASC;\"}",
+                "text": "{# Use this template to read from FeatureBase with SQL #}\n\n{# Input Fields #}\ninput_fields = [{\"name\": \"query_embedding\", \"type\": \"vectors\"}]\n\n{# Output Fields #}\noutput_fields = [{\"name\": \"texts\", \"type\": \"strings\"}]\n\n{# Extras Fields #}\n{# SQL takes query_embedding and runs it against texts in the DB #}\nextras = {\"table\": None, \"processor\": \"read_fb\", \"sql\": \"SELECT TOP(20) texts, cosine_distance({{query_embedding[0]}}, texts_embedding) AS distance FROM {{table}} ORDER BY distance ASC;\"}",
                 "uid": "r2lAJyPcFb8owj6Ks"
             }
         },
@@ -104,13 +104,13 @@
                 "name": "pompous",
                 "output_fields": [
                     {
-                        "name": "chunks",
+                        "name": "texts",
                         "type": "strings"
                     }
                 ],
                 "processor": "callback",
                 "template_id": "eiHWRSVe8b4BT",
-                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = [{\"name\": \"chunks\", \"type\": \"strings\"}]",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = [{\"name\": \"texts\", \"type\": \"strings\"}]",
                 "uid": "r2lAJyPcFb8owj6Ks"
             }
         }
