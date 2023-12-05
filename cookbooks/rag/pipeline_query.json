@@ -98,7 +98,6 @@
                 "extras": {
                     "callback_token": "[callback_token]",
                     "callback_uri": "[callback_uri]",
-                    "my_token": "[my_token]",
                     "processor": "callback"
                 },
                 "input_fields": null,
