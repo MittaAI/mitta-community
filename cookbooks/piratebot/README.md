@@ -1,19 +1,19 @@
 # PirateBot Install Guide
 
 ## Prerequisites
-- ensure you have Conda installed on your system
+- Ensure you have Conda installed on your system
 - You will need a Discord account to set up a bot
 
 ## Installation
 1. Set Up Conda Environment:
-	- Create and activate a new Conda environment using Python 3.11:
+	Create and activate a new Conda environment using Python 3.11:
 	```
 	conda create -n piratebot python=3.11
 	conda activate piratebot
 	```
 
 2. Install Dependencies
-	- Use pip to install required packages:
+	Use pip to install required packages:
 	```
 	pip install -r requirements.txt
 	```
@@ -27,7 +27,7 @@
 	- Edit `bot.conf` to include your tokens and pipeline IDs
 
 5. Run the Bot:
-	- Start the bot using the following command:
+	Start the bot using the following command:
 	```
 	python ./bot.py
 	```
