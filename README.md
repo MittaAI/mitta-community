@@ -37,13 +37,13 @@ To import a pipeline, follow these steps:
 1. Fill in any additional tokens or parameters as prompted.
 
 ## Contributing
-If you have a pipeline you'd like to contribute, please do a PR for it.
+If you have a pipeline you'd like to contribute, we welcome your contributions via a pull request (PR). To increase the likelihood of your PR being quickly added, please ensure the following:
 
-The PR will be more likely to be added quickly if the following is true:
-1. A new directory under `cookbooks` with a unique and short name.
-1. The pipeline export file should remain JSON formatted.
-1. Pipeline, node and template names should be unique and short.
-1. Prompts, variables, comments and other named objects should be reasonable.
-1. The pipeline runs successfully.
-1. A `README.md` file that clearly explains how to use the pipeline.
-1. Any supporting materials, organized by reasonable directory structure.
+1. Create a New Directory: Set up a new directory under the cookbooks section with a unique and concise name.
+1. JSON Format: Ensure that the pipeline export file remains in JSON format.
+1. Uniqueness and Simplicity: Make sure that the pipeline, node, and template names are unique and concise. Additionally, keep prompts, variables, comments, and other named objects reasonable and easy to understand.
+1. Successful Execution: Verify that the pipeline runs successfully without errors.
+1. README.md: Include a README.md file within the directory that provides clear instructions on how to use the pipeline. A well-documented pipeline enhances its usability.
+1. Supporting Materials: If your contribution includes any supporting materials (e.g., documentation, examples, or additional files), organize them in a logical directory structure for ease of access and understanding.
+
+By following these guidelines, you can contribute effectively and help maintain a high-quality collection of pipelines for the community. Your contributions are greatly appreciated!
