@@ -173,7 +173,7 @@
                 "created": "Fri, 01 Dec 2023 17:20:59 GMT",
                 "extras": {
                     "processor": "write_fb",
-                    "table": "steve"
+                    "table": "rag"
                 },
                 "name": "teal",
                 "node_id": "70qP97THqI1fH",
