@@ -3,19 +3,19 @@
     "nodes": [
         {
             "node": {
-                "created": "Sat, 02 Dec 2023 00:17:04 GMT",
+                "created": "Tue, 05 Dec 2023 21:41:53 GMT",
                 "extras": {
                     "model": "instructor_xl",
                     "vector_size": 768
                 },
                 "name": "mastiff",
-                "node_id": "fHK7mO3IbeNkn",
+                "node_id": "IPvrsUzk3yS1G",
                 "processor": "embedding",
-                "template_id": "xwBVNN20iSfZG",
-                "uid": "r2lAJyPcFb8owj6Ks"
+                "template_id": "yhCqaqQAaykpV",
+                "uid": "7VCZixV5tYTcEL2zl"
             },
             "template": {
-                "created": "Sat, 02 Dec 2023 00:16:58 GMT",
+                "created": "Tue, 05 Dec 2023 21:41:53 GMT",
                 "extras": {
                     "model": "instructor_xl",
                     "vector_size": 768
@@ -34,30 +34,30 @@
                     }
                 ],
                 "processor": "embedding",
-                "template_id": "xwBVNN20iSfZG",
+                "template_id": "yhCqaqQAaykpV",
                 "text": "{# Use this template to drive a Instructor XL embedding node processor! #}\n\n{# Input Fields #}\ninput_fields = [{'name': \"query\", 'type': \"strings\"}]\n\n{# Output Fields #}\noutput_fields = [{'name': \"query_embedding\", 'type': \"vectors\"}]\n\n{# Extras for embedding are vector_size: <size> and model: [instructor_large or instructor_xl] #}\nextras = {'vector_size': 768, 'model': \"instructor_xl\"}",
-                "uid": "r2lAJyPcFb8owj6Ks"
+                "uid": "7VCZixV5tYTcEL2zl"
             }
         },
         {
             "node": {
-                "created": "Sat, 02 Dec 2023 00:16:28 GMT",
+                "created": "Tue, 05 Dec 2023 21:41:53 GMT",
                 "extras": {
                     "processor": "read_fb",
-                    "sql": "SELECT TOP(20) texts, cosine_distance({{query_embedding[0]}}, texts_embedding) AS distance FROM {{table}} ORDER BY distance ASC;",
+                    "sql": "SELECT TOP(20) chunks, cosine_distance({{query_embedding[0]}}, chunks_embedding) AS distance FROM {{table}} ORDER BY distance ASC;",
                     "table": "rag"
                 },
                 "name": "ant",
-                "node_id": "YfRQIm1qv0zxk",
+                "node_id": "EN8ETEaNMbQi0",
                 "processor": "read_fb",
-                "template_id": "1yEutS6OBhZGK",
-                "uid": "r2lAJyPcFb8owj6Ks"
+                "template_id": "kl9UjeQaTWDRa",
+                "uid": "7VCZixV5tYTcEL2zl"
             },
             "template": {
-                "created": "Sat, 02 Dec 2023 00:16:15 GMT",
+                "created": "Tue, 05 Dec 2023 21:41:53 GMT",
                 "extras": {
                     "processor": "read_fb",
-                    "sql": "SELECT TOP(20) texts, cosine_distance({{query_embedding[0]}}, texts_embedding) AS distance FROM {{table}} ORDER BY distance ASC;",
+                    "sql": "SELECT TOP(20) chunks, cosine_distance({{query_embedding[0]}}, chunks_embedding) AS distance FROM {{table}} ORDER BY distance ASC;",
                     "table": null
                 },
                 "input_fields": [
@@ -74,27 +74,73 @@
                     }
                 ],
                 "processor": "read_fb",
-                "template_id": "1yEutS6OBhZGK",
-                "text": "{# Use this template to read from FeatureBase with SQL #}\n\n{# Input Fields #}\ninput_fields = [{\"name\": \"query_embedding\", \"type\": \"vectors\"}]\n\n{# Output Fields #}\noutput_fields = [{\"name\": \"texts\", \"type\": \"strings\"}]\n\n{# Extras Fields #}\n{# SQL takes query_embedding and runs it against texts in the DB #}\nextras = {\"table\": None, \"processor\": \"read_fb\", \"sql\": \"SELECT TOP(20) texts, cosine_distance({{query_embedding[0]}}, texts_embedding) AS distance FROM {{table}} ORDER BY distance ASC;\"}",
-                "uid": "r2lAJyPcFb8owj6Ks"
+                "template_id": "kl9UjeQaTWDRa",
+                "text": "{# Use this template to read from FeatureBase with SQL #}\n\n{# Input Fields #}\ninput_fields = [{\"name\": \"query_embedding\", \"type\": \"vectors\"}]\n\n{# Output Fields #}\noutput_fields = [{\"name\": \"chunks\", \"type\": \"strings\"}]\n\n{# Extras Fields #}\n{# SQL takes query_embedding and runs it against texts in the DB #}\nextras = {\"table\": None, \"processor\": \"read_fb\", \"sql\": \"SELECT TOP(20) chunks, cosine_distance({{query_embedding[0]}}, chunks_embedding) AS distance FROM {{table}} ORDER BY distance ASC;\"}",
+                "uid": "7VCZixV5tYTcEL2zl"
             }
         },
         {
             "node": {
-                "created": "Fri, 01 Dec 2023 17:20:36 GMT",
+                "created": "Tue, 05 Dec 2023 21:52:11 GMT",
+                "extras": {
+                    "model": "gpt-3.5-turbo",
+                    "openai_token": "[openai_token]",
+                    "processor": "aichat",
+                    "system_prompt": "You are a helpful assistant."
+                },
+                "name": "wrasse",
+                "node_id": "S4eEekXNfDFex",
+                "processor": "aichat",
+                "template_id": "FRAXWHFmhRb3j",
+                "uid": "7VCZixV5tYTcEL2zl"
+            },
+            "template": {
+                "created": "Tue, 05 Dec 2023 21:52:04 GMT",
+                "extras": {
+                    "model": "gpt-3.5-turbo",
+                    "openai_token": "[openai_token]",
+                    "processor": "aichat",
+                    "system_prompt": "You are a helpful assistant."
+                },
+                "input_fields": [
+                    {
+                        "name": "query",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "chunks",
+                        "type": "strings"
+                    }
+                ],
+                "name": "coral",
+                "output_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aichat",
+                "template_id": "FRAXWHFmhRb3j",
+                "text": "{# Use this template to drive a generative chat processor. #}\n\n{# Define the input_fields used in this template; user_history alternates user,assistant,user,assistant.. #}\n{# Remove user_history if you don't want to use a history #}\ninput_fields = [{'name': \"query\", 'type': \"strings\"},{'name': \"chunks\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are a helpful assistant.\", 'processor': \"aichat\", 'openai_token': None, 'model': \"gpt-3.5-turbo\"}\n\n1. The user's query has been augmented with the following document information, which is structured as a list:\n{{ chunks }}\n\n2. The user has entered:\n{{query}}\n\n3. Form a decent response based on the data in step 1.\n",
+                "uid": "7VCZixV5tYTcEL2zl"
+            }
+        },
+        {
+            "node": {
+                "created": "Tue, 05 Dec 2023 21:41:54 GMT",
                 "extras": {
                     "callback_token": "[callback_token]",
                     "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
                     "processor": "callback"
                 },
                 "name": "dormouse",
-                "node_id": "zduySYAoGrbk7",
+                "node_id": "IGKXD18beceIm",
                 "processor": "callback",
-                "template_id": "eiHWRSVe8b4BT",
-                "uid": "r2lAJyPcFb8owj6Ks"
+                "template_id": "dsS3GJjenMcxG",
+                "uid": "7VCZixV5tYTcEL2zl"
             },
             "template": {
-                "created": "Fri, 01 Dec 2023 17:20:36 GMT",
+                "created": "Tue, 05 Dec 2023 21:41:53 GMT",
                 "extras": {
                     "callback_token": "[callback_token]",
                     "callback_uri": "[callback_uri]",
@@ -104,16 +150,24 @@
                 "name": "pompous",
                 "output_fields": [
                     {
-                        "name": "texts",
+                        "name": "chunks",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "query",
                         "type": "strings"
                     }
                 ],
                 "processor": "callback",
-                "template_id": "eiHWRSVe8b4BT",
-                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = [{\"name\": \"texts\", \"type\": \"strings\"}]",
-                "uid": "r2lAJyPcFb8owj6Ks"
+                "template_id": "dsS3GJjenMcxG",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = [{\"name\": \"chunks\", \"type\": \"strings\"},{\"name\": \"assistant_content\", \"type\": \"strings\"},{\"name\": \"query\", \"type\": \"strings\"}]",
+                "uid": "7VCZixV5tYTcEL2zl"
             }
         }
     ],
-    "pipe_id": "HElmFq0Vsvr0F"
+    "pipe_id": "QdYubT6YLKBBS"
 }
