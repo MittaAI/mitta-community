@@ -9,12 +9,12 @@ There is a [Discord server](https://discord.gg/SxwcVGQ8j9) available for help wi
 If you have a pipeline you'd like to contribute, please do a PR for it.
 
 The PR will be more likely to be added quickly if the following is true:
-1. A new directory under `cookbooks` with a unique, short and polite name.
+1. A new directory under `cookbooks` with a unique and short name.
 2. The pipeline export file should remain JSON formatted.
-3. Pipeline, node and template names should be unique, short and polite.
+3. Pipeline, node and template names should be unique and short.
 4. Prompts, variables, comments and other named objects should be reasonable.
 5. The pipeline runs successfully.
-5. A `README.md` file that clearly and politely explains how to use the pipeline.
+5. A `README.md` file that clearly explains how to use the pipeline.
 6. Any supporting materials, organzied by reasonable directory structure.
 
 ## Getting Started Video
