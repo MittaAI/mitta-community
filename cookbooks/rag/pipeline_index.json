@@ -3,19 +3,19 @@
     "nodes": [
         {
             "node": {
-                "created": "Tue, 05 Dec 2023 21:08:01 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:22 GMT",
                 "extras": {
                     "processor": "info_file",
                     "upload": true
                 },
                 "name": "copperhead",
-                "node_id": "azzmikcy60yZX",
+                "node_id": "CeevDBwcrrSmz",
                 "processor": "info_file",
-                "template_id": "sCvQLhd9OLTwH",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "xmO1oXeskEp5b",
+                "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "Tue, 05 Dec 2023 21:08:00 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:21 GMT",
                 "extras": {
                     "processor": "info_file",
                     "upload": true
@@ -50,25 +50,25 @@
                     }
                 ],
                 "processor": "info_file",
-                "template_id": "sCvQLhd9OLTwH",
+                "template_id": "xmO1oXeskEp5b",
                 "text": "{# Use this template to drive a info processor that outputs file information. #}\n\n{# Define the input_fields used in this template #}\ninput_fields = [{'name': \"filename\", 'type': \"string\"},{'name': \"content_type\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template %}\noutput_fields = [{'name': \"content_type\", 'type': \"strings\"},{'name': \"file_size_bytes\", 'type': \"ints\"},{'name': \"ttl\", 'type': \"ints\"},{'name': \"pdf_num_pages\", 'type': \"ints\"}]]\n\n{# Define the info_file processor #}\nextras = {\"processor\": \"info_file\", \"upload\": True}",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "uid": "0kcas0aVtwkg6hNFh"
             }
         },
         {
             "node": {
-                "created": "Tue, 05 Dec 2023 21:08:01 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:22 GMT",
                 "extras": {
                     "processor": "jinja2"
                 },
                 "name": "myna",
-                "node_id": "lrxZ4u7EXsx40",
+                "node_id": "7qh5Wz1b7p9xT",
                 "processor": "jinja2",
-                "template_id": "6DaRx5HkzwhEU",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "XTgIYzvrmjXDA",
+                "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "Tue, 05 Dec 2023 21:08:01 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:22 GMT",
                 "extras": {
                     "processor": "jinja2"
                 },
@@ -102,28 +102,28 @@
                     }
                 ],
                 "processor": "jinja2",
-                "template_id": "6DaRx5HkzwhEU",
+                "template_id": "XTgIYzvrmjXDA",
                 "text": "{# Async RAG pipeline template #2 - builds a list of pages for the file. #}\n\n{# Be sure to always use double quotes for keys and strings! #}\n\n{# Input Fields #}\ninput_fields = [{\"name\": \"filename\", \"type\": \"strings\"}, {\"name\": \"content_type\", \"type\": \"strings\"}, {\"name\": \"pdf_num_pages\", \"type\": \"int\"}]\n\n{# Output Fields #}\noutput_fields = [{\"name\": \"filename\", \"type\": \"strings\"}, {\"name\": \"content_type\", \"type\": \"strings\"}, {\"name\": \"page_number\", \"type\": \"ints\"}]\n\n{# Extras #}\nextras = {\"processor\": \"jinja2\"}\n\n{# Build three lists of equal size to use for deserialization in the pipeline #}\n{% set result = {\"filename\": [], \"content_type\": [], \"page_number\": []} %}\n\n{% for page_number in range(1, pdf_num_pages[0] + 1) %}\n  {% set _ = result.filename.append(filename[0]) %}\n  {% set _ = result.content_type.append(content_type[0]) %}\n  {% set _ = result.page_number.append(page_number) %}\n{% endfor %}\n\n{# Enforce proper quoting by running it through the tojson filter #}\n{{ result|tojson }}\n",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "uid": "0kcas0aVtwkg6hNFh"
             }
         },
         {
             "node": {
-                "created": "Tue, 05 Dec 2023 21:08:01 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:23 GMT",
                 "extras": {
                     "batch_size": "5",
                     "processor": "split_task"
                 },
                 "name": "lobster",
-                "node_id": "rAeqQeig0flv9",
+                "node_id": "xohdvq1Uug6AX",
                 "processor": "split_task",
-                "template_id": "LzP5YYHmvw8Fg",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "J4sLvNbHqLcYB",
+                "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "Tue, 05 Dec 2023 21:08:01 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:23 GMT",
                 "extras": {
-                    "batch_size": 2,
+                    "batch_size": 4,
                     "processor": "split_task"
                 },
                 "input_fields": [
@@ -156,25 +156,25 @@
                     }
                 ],
                 "processor": "split_task",
-                "template_id": "LzP5YYHmvw8Fg",
-                "text": "{# Use this template with the split_task processor. #}\n\n{# The split_task processor spawns parallel tasks for a given set of keys with equal lengths. #}\n{# When used properly with an AI processor, it allows rapid inferencing of large amounts of data. #}\n\n{# The split_task processor requires input_fields and output_fields to be the same. #}\ninput_fields = [{'name': 'page_number', 'type': 'ints'}, {'name': 'filename', 'type': 'strings'}, {'name': 'content_type', 'type': 'strings'}]\n\noutput_fields = [{'name': 'page_number', 'type': 'ints'}, {'name': 'filename', 'type': 'strings'}, {'name': 'content_type', 'type': 'strings'}]\n\n{# The batch_size must be defined (or entered during node creation) and the recommended size is 20. }\nextras = {\"batch_size\": 2, \"processor\": \"split_task\"}",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "J4sLvNbHqLcYB",
+                "text": "{# Use this template with the split_task processor. #}\n\n{# The split_task processor spawns parallel tasks for a given set of keys with equal lengths. #}\n{# When used properly with an AI processor, it allows rapid inferencing of large amounts of data. #}\n\n{# The split_task processor requires input_fields and output_fields to be the same. #}\ninput_fields = [{'name': 'page_number', 'type': 'ints'}, {'name': 'filename', 'type': 'strings'}, {'name': 'content_type', 'type': 'strings'}]\n\noutput_fields = [{'name': 'page_number', 'type': 'ints'}, {'name': 'filename', 'type': 'strings'}, {'name': 'content_type', 'type': 'strings'}]\n\n{# The batch_size must be defined (or entered during node creation) and the recommended size is 20. }\nextras = {\"batch_size\": 4, \"processor\": \"split_task\"}",
+                "uid": "0kcas0aVtwkg6hNFh"
             }
         },
         {
             "node": {
-                "created": "Tue, 05 Dec 2023 21:08:02 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:23 GMT",
                 "extras": {
                     "processor": "read_file"
                 },
                 "name": "ostrich",
-                "node_id": "vQZDI6JYULjZk",
+                "node_id": "bEl9DPELUAcwX",
                 "processor": "read_file",
-                "template_id": "SI1el5soLi7Yj",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "Y2v6b5NUDxABl",
+                "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "Tue, 05 Dec 2023 21:08:01 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:23 GMT",
                 "extras": {
                     "processor": "read_file"
                 },
@@ -200,25 +200,25 @@
                     }
                 ],
                 "processor": "read_file",
-                "template_id": "SI1el5soLi7Yj",
+                "template_id": "Y2v6b5NUDxABl",
                 "text": "{# Use this template to quickly read a PDF file and convert it to text #}\r\n{# This example will deserialize PDF text extraction. It should not be used with .txt files #}\r\n\r\n{# Input Fields #}\r\n{# The page_number array is a list of page numbers (ints) to read from the PDF #}\r\n{# The filename and content_type arrays need to be the same length as the page_number array #}\r\ninput_fields = [{\"name\": \"filename\", \"type\": \"strings\"},{\"name\": \"content_type\", \"type\": \"strings\"},{\"name\": \"page_number\", \"type\": \"ints\"}]\r\n\r\n{# Output Fields #}\r\noutput_fields = [{\"name\": \"texts\", \"type\": \"strings\"}]\r\n\r\n{# Extras \"page_chunk_size\" is used for .txt files only, to set page size #}\r\nextras = {\"processor\": \"read_file\"}",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "uid": "0kcas0aVtwkg6hNFh"
             }
         },
         {
             "node": {
-                "created": "Tue, 05 Dec 2023 21:08:02 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:24 GMT",
                 "extras": {
                     "processor": "jinja2"
                 },
                 "name": "okapi",
-                "node_id": "pGRddTqmXi7Hs",
+                "node_id": "oXU7dMvMwpuip",
                 "processor": "jinja2",
-                "template_id": "ajdLlL56nhnhL",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "L41qUQI7rZ6SJ",
+                "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "Tue, 05 Dec 2023 21:08:02 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:24 GMT",
                 "extras": {
                     "processor": "jinja2"
                 },
@@ -256,14 +256,14 @@
                     }
                 ],
                 "processor": "jinja2",
-                "template_id": "ajdLlL56nhnhL",
-                "text": "{# This template creates chunks from page texts, which are passed in as a string per page. #}\n\n{# Extras #}\nextras = {\"processor\": \"jinja2\"}\n\n{# Input Fields #}\ninput_fields = [{'name': 'texts', 'type': 'strings'}, {'name': 'filename', 'type': 'strings'}, {'name': 'page_number', 'type': 'ints'}]\n\n{# Output Fields #}\noutput_fields = [{'name': 'chunks', 'type': 'strings'}, {'name': 'page_nums', 'type': 'ints'}, {'name': 'chunk_nums', 'type': 'ints'}, {'name': 'filenames', 'type': 'strings'}]\n\n{# call the chunker with current texts, filename list, and starting page number from page_number #}\n{% set data = chunk_with_page_filename(texts, filename[0], start_page=page_number[0], overlap=0) %}\n{\n    \"chunks\": {{ data.get('chunks')|tojson|safe }},\n    \"page_nums\": {{ data.get('page_nums')|tojson|safe }},\n    \"chunk_nums\": {{ data.get('chunk_nums')|tojson|safe }},\n    \"filenames\": {{ data.get('filenames')|tojson|safe }}\n}",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "L41qUQI7rZ6SJ",
+                "text": "{# This template creates chunks from page texts, which are passed in as a string per page. #}\n\n{# Extras #}\nextras = {\"processor\": \"jinja2\"}\n\n{# Input Fields #}\ninput_fields = [{'name': 'texts', 'type': 'strings'}, {'name': 'filename', 'type': 'strings'}, {'name': 'page_number', 'type': 'ints'}]\n\n{# Output Fields #}\noutput_fields = [{'name': 'chunks', 'type': 'strings'}, {'name': 'page_nums', 'type': 'ints'}, {'name': 'chunk_nums', 'type': 'ints'}, {'name': 'filenames', 'type': 'strings'}]\n\n{# call the chunker with current texts, filename list, and starting page number from page_number #}\n{% set data = chunk_with_page_filename(texts, filename[0], start_page=page_number[0], overlap=0, length=256) %}\n{\n    \"chunks\": {{ data.get('chunks')|tojson|safe }},\n    \"page_nums\": {{ data.get('page_nums')|tojson|safe }},\n    \"chunk_nums\": {{ data.get('chunk_nums')|tojson|safe }},\n    \"filenames\": {{ data.get('filenames')|tojson|safe }}\n}",
+                "uid": "0kcas0aVtwkg6hNFh"
             }
         },
         {
             "node": {
-                "created": "Tue, 05 Dec 2023 21:08:02 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:24 GMT",
                 "extras": {
                     "iterate_field": "texts",
                     "model": "gpt-3.5-turbo-1106",
@@ -272,15 +272,15 @@
                     "processor": "aidict"
                 },
                 "name": "peacock",
-                "node_id": "hMmTi15MTfOH1",
+                "node_id": "n1jf6Af5FZjXr",
                 "processor": "aidict",
-                "template_id": "3buzipLv4ZPR0",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "pbjhmh2795GtI",
+                "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "Tue, 05 Dec 2023 21:08:02 GMT",
+                "created": "Tue, 28 Nov 2023 21:23:41 GMT",
                 "extras": {
-                    "iterate_field": "chunks",
+                    "iterate_field": "texts",
                     "model": "gpt-3.5-turbo-1106",
                     "num_keyterms": 5,
                     "openai_token": "[openai_token]",
@@ -288,7 +288,7 @@
                 },
                 "input_fields": [
                     {
-                        "name": "chunks",
+                        "name": "texts",
                         "type": "strings"
                     }
                 ],
@@ -300,26 +300,88 @@
                     }
                 ],
                 "processor": "aidict",
-                "template_id": "3buzipLv4ZPR0",
-                "text": "{# Use this template to drive an OpenAI keyterm processor! #}\n\n{# Define the input_fields used in this template: #}\ninput_fields = [{'name': \"chunks\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template: #}\noutput_fields = [{'name': \"keyterms\", 'type': \"strings\"}]\n\n{# Extras #}\nextras = {'openai_token': None, 'model': 'gpt-3.5-turbo-1106', 'processor': 'aidict', 'num_keyterms': 5, 'iterate_field': \"chunks\"}\n\n{# Process the input string: #}\n# complete dict task by following step by step\n1. Inspect the following text:\n\"\"\"\n{{ chunks[outer_index] }}\n\"\"\"\n2. The required key for the dictionary is: 'keyterms'\n3. The required value for 'keyterms' is an array of ({num_keyterms}) strings.\n4. Create a concise list of ({{num_keyterms}}) keyterms from the text in step 1 and then follow step 2 and 3 to build the dictionary:\nai_dict = \n\n",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "pbjhmh2795GtI",
+                "text": "{# Use this template to drive an OpenAI keyterm processor! #}\n\n{# Define the input_fields used in this template: #}\ninput_fields = [{'name': \"texts\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template: #}\noutput_fields = [{'name': \"keyterms\", 'type': \"strings\"}]\n\n{# Extras #}\nextras = {'openai_token': None, 'model': 'gpt-3.5-turbo-1106', 'processor': 'aidict', 'num_keyterms': 5, 'iterate_field': \"texts\"}\n\n{# Process the input string: #}\n# complete dict task by following step by step\n1. Inspect the following text:\n\"\"\"\n{{ texts[outer_index][inner_index] }}\n\"\"\"\n2. The required key for the dictionary is: 'keyterms'\n3. The required value for 'keyterms' is an array of ({num_keyterms}) strings.\n4. Create a concise list of ({{num_keyterms}}) keyterms from the text in step 1 and then follow step 2 and 3 to build the dictionary:\nai_dict = \n\n",
+                "uid": "0kcas0aVtwkg6hNFh"
             }
         },
         {
             "node": {
-                "created": "Tue, 05 Dec 2023 21:08:03 GMT",
+                "created": "Tue, 05 Dec 2023 22:37:05 GMT",
+                "extras": {
+                    "batch_size": "4",
+                    "processor": "split_task"
+                },
+                "name": "mustang",
+                "node_id": "2qmSkSjV1cTdV",
+                "processor": "split_task",
+                "template_id": "ZrZsGyxzO0ylL",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "Tue, 05 Dec 2023 22:36:58 GMT",
+                "extras": {
+                    "batch_size": null,
+                    "processor": "split_task"
+                },
+                "input_fields": [
+                    {
+                        "name": "chunks",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "page_nums",
+                        "type": "ints"
+                    },
+                    {
+                        "name": "chunk_nums",
+                        "type": "ints"
+                    },
+                    {
+                        "name": "filenames",
+                        "type": "strings"
+                    }
+                ],
+                "name": "sexy",
+                "output_fields": [
+                    {
+                        "name": "chunks",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "page_nums",
+                        "type": "ints"
+                    },
+                    {
+                        "name": "chunk_nums",
+                        "type": "ints"
+                    },
+                    {
+                        "name": "filenames",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "split_task",
+                "template_id": "ZrZsGyxzO0ylL",
+                "text": "{# Use this template with the split_task processor. #}\n\n{# The split_task processor spawns parallel tasks for a given set of keys with equal lengths. #}\n{# When used properly with an AI processor, it allows rapid inferencing of large amounts of data. #}\n\n{# The split_task processor requires input_fields and output_fields to be the same. #}\ninput_fields = [{'name': 'chunks', 'type': 'strings'}, {'name': 'page_nums', 'type': 'ints'}, {'name': 'chunk_nums', 'type': 'ints'}, {'name': 'filenames', 'type': 'strings'}]\n\noutput_fields = [{'name': 'chunks', 'type': 'strings'}, {'name': 'page_nums', 'type': 'ints'}, {'name': 'chunk_nums', 'type': 'ints'}, {'name': 'filenames', 'type': 'strings'}]\n\n{# The batch_size must be defined (or entered during node creation) and the recommended size is 20. }\nextras = {\"batch_size\": None, \"processor\": \"split_task\"}",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "Tue, 05 Dec 2023 22:25:25 GMT",
                 "extras": {
                     "model": "instructor_xl",
                     "vector_size": 768
                 },
                 "name": "malkoha",
-                "node_id": "QYqf7NWUNWHEv",
+                "node_id": "6EP6TMy8ZfXSz",
                 "processor": "embedding",
-                "template_id": "ouo2LwNhvP3Hh",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "36MXi5erVvCK2",
+                "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "Tue, 05 Dec 2023 21:08:03 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:25 GMT",
                 "extras": {
                     "model": "instructor_xl",
                     "vector_size": 768
@@ -338,26 +400,26 @@
                     }
                 ],
                 "processor": "embedding",
-                "template_id": "ouo2LwNhvP3Hh",
+                "template_id": "36MXi5erVvCK2",
                 "text": "{# Use this template to drive a Instructor XL embedding node processor! #}\n\n{# Input Fields #}\ninput_fields = [{'name': \"chunks\", 'type': \"strings\"}]\n\n{# Output Fields #}\noutput_fields = [{'name': \"chunks_embedding\", 'type': \"vectors\"}]\n\n{# Extras for embedding are vector_size: <size> and model: [instructor_large or instructor_xl] #}\nextras = {'vector_size': 768, 'model': \"instructor_xl\"}",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "uid": "0kcas0aVtwkg6hNFh"
             }
         },
         {
             "node": {
-                "created": "Tue, 05 Dec 2023 21:08:03 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:25 GMT",
                 "extras": {
                     "processor": "write_fb",
                     "table": "rag"
                 },
                 "name": "owl",
-                "node_id": "Skmke8FbTtcKZ",
+                "node_id": "sbCqO2MKt7Rk7",
                 "processor": "write_fb",
-                "template_id": "V4BiNN0vfV7OS",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "template_id": "RbltFjSJSQ3O4",
+                "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "Tue, 05 Dec 2023 21:08:03 GMT",
+                "created": "Tue, 05 Dec 2023 22:25:25 GMT",
                 "extras": {
                     "processor": "write_fb",
                     "table": null
@@ -391,11 +453,11 @@
                 "name": "angelic",
                 "output_fields": null,
                 "processor": "write_fb",
-                "template_id": "V4BiNN0vfV7OS",
+                "template_id": "RbltFjSJSQ3O4",
                 "text": "{# Use this template to write a PDF's chunks, page numbers, and filename to FeatureBase #}\n\n{# Input Fields #}\n{# We're looking for keys to save to the database. #}\ninput_fields = [{\"name\": \"chunks_embedding\", \"type\": \"vectors\"},{\"name\": \"chunks\", \"type\": \"strings\"}, {\"name\": \"page_nums\", \n\"type\": \"ints\"}, {\"name\": \"chunk_nums\", \"type\": \"ints\"}, {\"name\": \"filenames\", \"type\": \"strings\"}, {\"name\": \"keyterms\", \"type\": \"stringset\"}]\n\n{# Extras Fields #}\n{# Leave table as None so that it will populate during node creation. #}\nextras = {\"table\": None, \"processor\": \"write_fb\"}",
-                "uid": "7VCZixV5tYTcEL2zl"
+                "uid": "0kcas0aVtwkg6hNFh"
             }
         }
     ],
-    "pipe_id": "g5VPPXuSQmWvE"
+    "pipe_id": "MGO0nlTeAWtXq"
 }
