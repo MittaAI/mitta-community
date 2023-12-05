@@ -1,0 +1,13 @@
+# bot config
+# values do not need to be quoted
+# rename this file to bot.conf
+
+[Credentials]
+discord_token = <discord_token>
+mittaai_token = <mittaai_token>
+
+[Settings]
+pipeline_id_bot = <bot_pipeline_id>
+pipeline_id_memory = <memory_pipeline_id>
+channel_id = <channel_id>
+bot_name = Sloth Bot
