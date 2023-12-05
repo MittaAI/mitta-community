@@ -32,6 +32,6 @@ For now, you will need a [FeatureBase Cloud](https://cloud.featurebase.com) acco
 
 SlothAI will eventually support other database storage layers.
 
-### RAG (Reference Augmented Generation)
-Check out this repo and navigate to the `cookbooks/rag` directory.
+### Importing a Pipeline
+To import a pipeline, navigate to the `pipelines` tab and click `import`. Choose the pipeline you would like to import and then fill in any extras when prompted.
 

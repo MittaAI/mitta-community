@@ -1,1 +1,244 @@
-{"name":"ragexample","nodes":[{"node":{"created":"Fri, 01 Dec 2023 17:20:58 GMT","extras":{"processor":"read_file"},"name":"caribou","node_id":"xp0IbKaewrUtG","processor":"read_file","template_id":"c2IdbVCFM4q2r","uid":"r2lAJyPcFb8owj6Ks"},"template":{"created":"Fri, 01 Dec 2023 17:20:57 GMT","extras":{"page_chunk_size":1536,"processor":"read_file"},"input_fields":[{"name":"filename","type":"string"},{"name":"content_type","type":"string"}],"name":"serious","output_fields":[{"name":"texts","type":"strings"}],"processor":"read_file","template_id":"c2IdbVCFM4q2r","text":"{# Use this template to read a PDF or .txt file and convert it to text #}\n{# This example will serialze PDF processing. Use the deserialized PDF template for faster extraction. #}\n\n{# Input Fields #}\n{# These should not be changed, as they are provided by the task ingestion endpoint for file uploads. #}\ninput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'content_type', 'type': 'string'}]\n\n{# Output Fields #}\noutput_fields = [{'name': 'texts', 'type': 'strings'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"processor\": \"read_file\", \"page_chunk_size\": 1536}","uid":"r2lAJyPcFb8owj6Ks"}},{"node":{"created":"Fri, 01 Dec 2023 17:20:58 GMT","extras":{"iterate_field":"chunks","model":"gpt-3.5-turbo-1106","num_keyterms":"5","openai_token":"[openai_token]","processor":"aidict"},"name":"turtle","node_id":"W3WR0nGZ4YlXE","processor":"aidict","template_id":"mufWPNffrfnv6","uid":"r2lAJyPcFb8owj6Ks"},"template":{"created":"Fri, 01 Dec 2023 17:20:58 GMT","extras":{"iterate_field":"chunks","model":"gpt-3.5-turbo-1106","num_keyterms":5,"openai_token":"[openai_token]","processor":"aidict"},"input_fields":[{"name":"chunks","type":"strings"}],"name":"beige","output_fields":[{"name":"keyterms","type":"strings"}],"processor":"aidict","template_id":"mufWPNffrfnv6","text":"{# Use this template to drive an OpenAI keyterm processor! #}\n\n{# Define the input_fields used in this template: #}\ninput_fields = [{'name': \"chunks\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template: #}\noutput_fields = [{'name': \"keyterms\", 'type': \"strings\"}]\n\n{# Extras #}\nextras = {'openai_token': None, 'model': 'gpt-3.5-turbo-1106', 'processor': 'aidict', 'num_keyterms': 5, 'iterate_field': \"chunks\"}\n\n{# Process the input string: #}\n# complete dict task by following step by step\n1. Inspect the following text:\n\"\"\"\n{{ chunks[outer_index] }}\n\"\"\"\n2. The required key for the dictionary is: 'keyterms'\n3. The required value for 'keyterms' is an array of ({num_keyterms}) strings.\n4. Create a concise list of ({{num_keyterms}}) keyterms from the text in step 1 and then follow step 2 and 3 to build the dictionary:\nai_dict = \n\n","uid":"r2lAJyPcFb8owj6Ks"}},{"node":{"created":"Fri, 01 Dec 2023 17:20:58 GMT","extras":{"processor":"jinja2"},"name":"squid","node_id":"vL4CcB0zszoKF","processor":"jinja2","template_id":"05x9zBLySka2W","uid":"r2lAJyPcFb8owj6Ks"},"template":{"created":"Fri, 01 Dec 2023 17:20:58 GMT","extras":{"processor":"jinja2"},"input_fields":[{"name":"texts","type":"strings"},{"name":"keyterms","type":"stringset"}],"name":"crystal","output_fields":[{"name":"texts","type":"strings"},{"name":"keyterms","type":"stringset"}],"processor":"jinja2","template_id":"05x9zBLySka2W","text":"{# Use this template to build lists of data to submit to the database. #}\n\n{# Be sure to always use double quotes for keys and strings! #}\n\n{# Input Fields #}\ninput_fields = [{\"name\": \"texts\", \"type\": \"strings\"}, {\"name\": \"keyterms\", \"type\": \"stringset\"}]\n\n{# Output Fields #}\noutput_fields = [{\"name\": \"texts\", \"type\": \"strings\"}, {\"name\": \"keyterms\", \"type\": \"stringset\"}]\n\n{# Extras #}\nextras = {\"processor\": \"jinja2\"}\n\n{# Build two lists of equal size to use for serialization in the pipeline #}\n{% set result = {\"texts\": [], \"keyterms\": []} %}\n\n{% for i in range(texts|length) %}\n  {% for j in range(texts[i]|length) %}\n    {% set _ = result.texts.append(texts[i][j]) %}\n    {% set _ = result.keyterms.append(keyterms[i][j]) %}\n  {% endfor %}\n{% endfor %}\n\n{# Enforce proper quoting by running it through the tojson filter #}\n{{ result|tojson }}\n","uid":"r2lAJyPcFb8owj6Ks"}},{"node":{"created":"Fri, 01 Dec 2023 17:20:59 GMT","extras":{"model":"instructor_xl","vector_size":768},"name":"crane","node_id":"Lb4r6ybK61FLI","processor":"embedding","template_id":"nXf43bA7Y2bUd","uid":"r2lAJyPcFb8owj6Ks"},"template":{"created":"Fri, 01 Dec 2023 17:20:59 GMT","extras":{"model":"instructor_xl","vector_size":768},"input_fields":[{"name":"texts","type":"strings"}],"name":"delicate","output_fields":[{"name":"texts_embedding","type":"vectors"}],"processor":"embedding","template_id":"nXf43bA7Y2bUd","text":"{# Use this template to drive a Instructor XL embedding node processor! #}\n\n{# Input Fields #}\ninput_fields = [{'name': \"texts\", 'type': \"strings\"}]\n\n{# Output Fields #}\noutput_fields = [{'name': \"texts_embedding\", 'type': \"vectors\"}]\n\n{# Extras for embedding are vector_size: <size> and model: [instructor_large or instructor_xl] #}\nextras = {'vector_size': 768, 'model': \"instructor_xl\"}","uid":"r2lAJyPcFb8owj6Ks"}},{"node":{"created":"Fri, 01 Dec 2023 17:20:59 GMT","extras":{"processor":"write_fb","table":"steve"},"name":"teal","node_id":"70qP97THqI1fH","processor":"write_fb","template_id":"kwosDIVGyPyet","uid":"r2lAJyPcFb8owj6Ks"},"template":{"created":"Fri, 01 Dec 2023 17:20:59 GMT","extras":{"processor":"write_fb","table":null},"input_fields":[{"name":"texts","type":"strings"},{"name":"keyterms","type":"stringset"},{"name":"texts_embedding","type":"vectors"}],"name":"festive","output_fields":null,"processor":"write_fb","template_id":"kwosDIVGyPyet","text":"{# Use this template to write to FeatureBase #}\n\n{# Input Fields #}\n{# We're looking for keys to save to the database. #}\ninput_fields = [{\"name\": \"texts\", \"type\": \"strings\"},{\"name\": \"keyterms\", \"type\": \"stringset\"},{\"name\": \"texts_embedding\", \"type\": \"vectors\"}]\n\n{# Extras Fields #}\n{# Leave table as None so that it will populate during node creation. #}\nextras = {\"table\": None, \"processor\": \"write_fb\"}","uid":"r2lAJyPcFb8owj6Ks"}},{"node":{"created":"Fri, 01 Dec 2023 17:21:00 GMT","extras":{"callback_token":"[callback_token]","callback_uri":"https://mitta.ai/hilarious-quetzal-of-excitement/callback?token={{callback_token}}","processor":"callback"},"name":"gaur","node_id":"QK7r7rlFk5EyZ","processor":"callback","template_id":"Tj0ooBk6fEBMf","uid":"r2lAJyPcFb8owj6Ks"},"template":{"created":"Fri, 01 Dec 2023 17:20:59 GMT","extras":{"callback_token":"[callback_token]","callback_uri":"[callback_uri]","processor":"callback"},"input_fields":null,"name":"spicy","output_fields":[],"processor":"callback","template_id":"Tj0ooBk6fEBMf","text":"{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [user_callback] or [user_token] will be auto populated. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []","uid":"r2lAJyPcFb8owj6Ks"}}],"pipe_id":"ZXtvVj3YS1CV1"}
+{
+    "name": "ragexample",
+    "nodes": [
+        {
+            "node": {
+                "created": "Fri, 01 Dec 2023 17:20:58 GMT",
+                "extras": {
+                    "processor": "read_file"
+                },
+                "name": "caribou",
+                "node_id": "xp0IbKaewrUtG",
+                "processor": "read_file",
+                "template_id": "c2IdbVCFM4q2r",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "Fri, 01 Dec 2023 17:20:57 GMT",
+                "extras": {
+                    "page_chunk_size": 1536,
+                    "processor": "read_file"
+                },
+                "input_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "string"
+                    }
+                ],
+                "name": "serious",
+                "output_fields": [
+                    {
+                        "name": "texts",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "read_file",
+                "template_id": "c2IdbVCFM4q2r",
+                "text": "{# Use this template to read a PDF or .txt file and convert it to text #}\n{# This example will serialze PDF processing. Use the deserialized PDF template for faster extraction. #}\n\n{# Input Fields #}\n{# These should not be changed, as they are provided by the task ingestion endpoint for file uploads. #}\ninput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'content_type', 'type': 'string'}]\n\n{# Output Fields #}\noutput_fields = [{'name': 'texts', 'type': 'strings'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"processor\": \"read_file\", \"page_chunk_size\": 1536}",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        },
+        {
+            "node": {
+                "created": "Fri, 01 Dec 2023 17:20:58 GMT",
+                "extras": {
+                    "iterate_field": "chunks",
+                    "model": "gpt-3.5-turbo-1106",
+                    "num_keyterms": "5",
+                    "openai_token": "[openai_token]",
+                    "processor": "aidict"
+                },
+                "name": "turtle",
+                "node_id": "W3WR0nGZ4YlXE",
+                "processor": "aidict",
+                "template_id": "mufWPNffrfnv6",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "Fri, 01 Dec 2023 17:20:58 GMT",
+                "extras": {
+                    "iterate_field": "chunks",
+                    "model": "gpt-3.5-turbo-1106",
+                    "num_keyterms": 5,
+                    "openai_token": "[openai_token]",
+                    "processor": "aidict"
+                },
+                "input_fields": [
+                    {
+                        "name": "chunks",
+                        "type": "strings"
+                    }
+                ],
+                "name": "beige",
+                "output_fields": [
+                    {
+                        "name": "keyterms",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aidict",
+                "template_id": "mufWPNffrfnv6",
+                "text": "{# Use this template to drive an OpenAI keyterm processor! #}\n\n{# Define the input_fields used in this template: #}\ninput_fields = [{'name': \"chunks\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template: #}\noutput_fields = [{'name': \"keyterms\", 'type': \"strings\"}]\n\n{# Extras #}\nextras = {'openai_token': None, 'model': 'gpt-3.5-turbo-1106', 'processor': 'aidict', 'num_keyterms': 5, 'iterate_field': \"chunks\"}\n\n{# Process the input string: #}\n# complete dict task by following step by step\n1. Inspect the following text:\n\"\"\"\n{{ chunks[outer_index] }}\n\"\"\"\n2. The required key for the dictionary is: 'keyterms'\n3. The required value for 'keyterms' is an array of ({num_keyterms}) strings.\n4. Create a concise list of ({{num_keyterms}}) keyterms from the text in step 1 and then follow step 2 and 3 to build the dictionary:\nai_dict = \n\n",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        },
+        {
+            "node": {
+                "created": "Fri, 01 Dec 2023 17:20:58 GMT",
+                "extras": {
+                    "processor": "jinja2"
+                },
+                "name": "squid",
+                "node_id": "vL4CcB0zszoKF",
+                "processor": "jinja2",
+                "template_id": "05x9zBLySka2W",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "Fri, 01 Dec 2023 17:20:58 GMT",
+                "extras": {
+                    "processor": "jinja2"
+                },
+                "input_fields": [
+                    {
+                        "name": "texts",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "keyterms",
+                        "type": "stringset"
+                    }
+                ],
+                "name": "crystal",
+                "output_fields": [
+                    {
+                        "name": "texts",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "keyterms",
+                        "type": "stringset"
+                    }
+                ],
+                "processor": "jinja2",
+                "template_id": "05x9zBLySka2W",
+                "text": "{# Use this template to build lists of data to submit to the database. #}\n\n{# Be sure to always use double quotes for keys and strings! #}\n\n{# Input Fields #}\ninput_fields = [{\"name\": \"texts\", \"type\": \"strings\"}, {\"name\": \"keyterms\", \"type\": \"stringset\"}]\n\n{# Output Fields #}\noutput_fields = [{\"name\": \"texts\", \"type\": \"strings\"}, {\"name\": \"keyterms\", \"type\": \"stringset\"}]\n\n{# Extras #}\nextras = {\"processor\": \"jinja2\"}\n\n{# Build two lists of equal size to use for serialization in the pipeline #}\n{% set result = {\"texts\": [], \"keyterms\": []} %}\n\n{% for i in range(texts|length) %}\n  {% for j in range(texts[i]|length) %}\n    {% set _ = result.texts.append(texts[i][j]) %}\n    {% set _ = result.keyterms.append(keyterms[i][j]) %}\n  {% endfor %}\n{% endfor %}\n\n{# Enforce proper quoting by running it through the tojson filter #}\n{{ result|tojson }}\n",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        },
+        {
+            "node": {
+                "created": "Fri, 01 Dec 2023 17:20:59 GMT",
+                "extras": {
+                    "model": "instructor_xl",
+                    "vector_size": 768
+                },
+                "name": "crane",
+                "node_id": "Lb4r6ybK61FLI",
+                "processor": "embedding",
+                "template_id": "nXf43bA7Y2bUd",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "Fri, 01 Dec 2023 17:20:59 GMT",
+                "extras": {
+                    "model": "instructor_xl",
+                    "vector_size": 768
+                },
+                "input_fields": [
+                    {
+                        "name": "texts",
+                        "type": "strings"
+                    }
+                ],
+                "name": "delicate",
+                "output_fields": [
+                    {
+                        "name": "texts_embedding",
+                        "type": "vectors"
+                    }
+                ],
+                "processor": "embedding",
+                "template_id": "nXf43bA7Y2bUd",
+                "text": "{# Use this template to drive a Instructor XL embedding node processor! #}\n\n{# Input Fields #}\ninput_fields = [{'name': \"texts\", 'type': \"strings\"}]\n\n{# Output Fields #}\noutput_fields = [{'name': \"texts_embedding\", 'type': \"vectors\"}]\n\n{# Extras for embedding are vector_size: <size> and model: [instructor_large or instructor_xl] #}\nextras = {'vector_size': 768, 'model': \"instructor_xl\"}",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        },
+        {
+            "node": {
+                "created": "Fri, 01 Dec 2023 17:20:59 GMT",
+                "extras": {
+                    "processor": "write_fb",
+                    "table": "steve"
+                },
+                "name": "teal",
+                "node_id": "70qP97THqI1fH",
+                "processor": "write_fb",
+                "template_id": "kwosDIVGyPyet",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "Fri, 01 Dec 2023 17:20:59 GMT",
+                "extras": {
+                    "processor": "write_fb",
+                    "table": null
+                },
+                "input_fields": [
+                    {
+                        "name": "texts",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "keyterms",
+                        "type": "stringset"
+                    },
+                    {
+                        "name": "texts_embedding",
+                        "type": "vectors"
+                    }
+                ],
+                "name": "festive",
+                "output_fields": null,
+                "processor": "write_fb",
+                "template_id": "kwosDIVGyPyet",
+                "text": "{# Use this template to write to FeatureBase #}\n\n{# Input Fields #}\n{# We're looking for keys to save to the database. #}\ninput_fields = [{\"name\": \"texts\", \"type\": \"strings\"},{\"name\": \"keyterms\", \"type\": \"stringset\"},{\"name\": \"texts_embedding\", \"type\": \"vectors\"}]\n\n{# Extras Fields #}\n{# Leave table as None so that it will populate during node creation. #}\nextras = {\"table\": None, \"processor\": \"write_fb\"}",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        },
+        {
+            "node": {
+                "created": "Fri, 01 Dec 2023 17:21:00 GMT",
+                "extras": {
+                    "callback_token": "[callback_token]",
+                    "callback_uri": "https://mitta.ai/hilarious-quetzal-of-excitement/callback?token={{callback_token}}",
+                    "processor": "callback"
+                },
+                "name": "gaur",
+                "node_id": "QK7r7rlFk5EyZ",
+                "processor": "callback",
+                "template_id": "Tj0ooBk6fEBMf",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "Fri, 01 Dec 2023 17:20:59 GMT",
+                "extras": {
+                    "callback_token": "[callback_token]",
+                    "callback_uri": "[callback_uri]",
+                    "processor": "callback"
+                },
+                "input_fields": null,
+                "name": "spicy",
+                "output_fields": [],
+                "processor": "callback",
+                "template_id": "Tj0ooBk6fEBMf",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [user_callback] or [user_token] will be auto populated. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        }
+    ],
+    "pipe_id": "ZXtvVj3YS1CV1"
+}
