@@ -9,7 +9,7 @@ The [cookbooks directory](./cookbooks) contains the example pipelines available 
 ## Getting Started Video
 Be sure to watch the getting started video guide. This guide will famialrize you with callbacks, storage and pipeline use.
 
-[![Getting Started](https://img.youtube.com/vi/ntLqz38hC60ntLqz38hC60/0.jpg)](https://www.youtube.com/watch?v=ntLqz38hC60)
+[![Getting Started](https://img.youtube.com/vi/ntLqz38hC60/0.jpg)](https://www.youtube.com/watch?v=ntLqz38hC60)
 
 ## Instructions for Use
 To use pipelines here, you will either need to create a [MittaAI account](https://mitta.ai), or install the [SlothAI framework](https://github.com/kordless/SlothAI) on Google Cloud.
