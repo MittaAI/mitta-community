@@ -84,8 +84,7 @@
                 "created": "Fri, 01 Dec 2023 17:20:36 GMT",
                 "extras": {
                     "callback_token": "[callback_token]",
-                    "callback_uri": "https://mitta.ai/annoying-shrew-of-expertise/callback?token={{callback_token}}",
-                    "my_token": "[my_token]",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
                     "processor": "callback"
                 },
                 "name": "dormouse",

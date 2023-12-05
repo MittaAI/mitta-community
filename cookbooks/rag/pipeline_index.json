@@ -214,7 +214,7 @@
                 "created": "Fri, 01 Dec 2023 17:21:00 GMT",
                 "extras": {
                     "callback_token": "[callback_token]",
-                    "callback_uri": "https://mitta.ai/hilarious-quetzal-of-excitement/callback?token={{callback_token}}",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
                     "processor": "callback"
                 },
                 "name": "gaur",
