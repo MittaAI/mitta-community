@@ -33,6 +33,7 @@ To import a pipeline, follow these steps:
 1. Navigate to the [pipelines](https://mitta.ai/pipelines) tab in MittaAI.
 1. Click on the import option.
 1. Choose the pipeline you would like to import from the cookbooks directory.
+1. Keep in mind that if there are multiple pipelines for a cookbook, you will need to import them separately.
 1. Fill in any additional tokens or parameters as prompted.
 
 ## Contributing
