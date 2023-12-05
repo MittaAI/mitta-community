@@ -1,5 +1,5 @@
 {
-    "name": "query",
+    "name": "rag-query",
     "nodes": [
         {
             "node": {
