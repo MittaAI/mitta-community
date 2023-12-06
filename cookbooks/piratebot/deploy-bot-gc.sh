@@ -80,12 +80,12 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --labels type=slothbot \
 --tags slothbot,token-$TOKEN \
 $PREEMPTIBLE \
---subnet=default $IP --network-tier=PREMIUM \
+--network-interface=address=$IP,network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
 --metadata startup-script="$SCRIPT"
 sleep 15
 
 # add data
-gcloud compute instances add-metadata $NAME-$NEW_UUID --zone $ZONE --metadata-from-file=shutdown-script=stopslothbot.sh
+gcloud compute instances add-metadata $NAME-$NEW_UUID --zone $ZONE --metadata-from-file=shutdown-script=stop-mittabot-gc.sh
 
 IP=$(gcloud compute instances describe $NAME-$NEW_UUID --zone $ZONE  | grep natIP | cut -d: -f2 | sed 's/^[ \t]*//;s/[ \t]*$//')
 

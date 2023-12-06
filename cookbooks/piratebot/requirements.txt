@@ -1,2 +1,3 @@
 discord==2.3.2
 Quart==0.19.4
+nest_asyncio==1.5.8
