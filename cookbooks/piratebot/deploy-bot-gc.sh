@@ -1,5 +1,5 @@
 #!/bin/bash
-TYPE=f1-micro
+TYPE=n1-standard-1
 NAME=slothbot
 NEW_UUID=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 4 ; echo)
 
@@ -7,7 +7,7 @@ ZONE=us-west1-a
 OPTION=$1
 PREEMPTIBLE="--preemptible"
 UBUNTU_VERSION="ubuntu-2204-jammy-v20231201"
-IP=""
+IP="104.199.116.124"
 
 echo "This instance is preemtible, unless it's started with --prod";
 case $OPTION in
@@ -58,9 +58,9 @@ else
 
   cd /opt/
   git clone https://github.com/MittaAI/mitta-community.git
-  mv mitta-community/cookbooks/piratebot ./slothbot
+  mv mitta-community/cookbooks/piratebot ./mittabot
   
-  cd /opt/slothbot
+  cd /opt/mittabot
   pip3 install -r requirements.txt
 
   date >> /opt/done.time
