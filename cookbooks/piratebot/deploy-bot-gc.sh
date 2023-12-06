@@ -7,14 +7,14 @@ ZONE=us-west1-a
 OPTION=$1
 PREEMPTIBLE="--preemptible"
 UBUNTU_VERSION="ubuntu-2204-jammy-v20231201"
-IP="104.199.116.124"
+IP=""
 
 echo "This instance is preemtible, unless it's started with --prod";
 case $OPTION in
     -p|--prod|--production)
        unset PREEMPTIBLE
        echo "Production mode enabled..."
-       IP=""
+       IP="104.199.116.124"
        echo;
 esac
 
