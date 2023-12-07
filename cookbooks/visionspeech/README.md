@@ -1,7 +1,9 @@
 # Vision to Speech Pipeline
 This pipeline implements a vision to speech agent. Use it to describe the scene with spoken words.
 
-Add the pipeline to [MittaAI](https://mitta.ai) from the `pipelines` page. To download or hear the audio file, use the output `uri` in the callback log. If you use the URL outside your browser, throw your [MittaAI token](https://mitta.ai/settings) on the end.
+Add the pipeline to [MittaAI](https://mitta.ai) from the `pipelines` page. Upload a file to the pipeline from the pipeline detail page. 
+
+To listen to the audio file, use the output `uri` in the [callback log](https://mitta.ai/logs). If you want to use the URL outside your browser, throw your [MittaAI token](https://mitta.ai/settings) on the end.
 
 ## Example
 ![Faraday](https://github.com/MittaAI/mitta-community/blob/main/cookbooks/visionspeech/experiment.png?raw=true)
