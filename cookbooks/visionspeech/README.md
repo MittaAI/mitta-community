@@ -1,5 +1,5 @@
 # Vision to Speech Pipeline
-This pipeline implements a vision to speech pipeline. Use it to describe the scene with spoken words.
+This pipeline implements a vision to speech agent. Use it to describe the scene with spoken words.
 
 Add the pipeline to [MittaAI](https://mitta.ai) from the `pipelines` page. To download or hear the audio file, use the output `uri` in the callback log. If you use the URL outside your browser, throw your [MittaAI token](https://mitta.ai/settings) on the end.
 
