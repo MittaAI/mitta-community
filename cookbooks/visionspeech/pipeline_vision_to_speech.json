@@ -1,0 +1,166 @@
+{
+    "pipe_id": "F3EsWCjFI3Iom",
+    "name": "vision_to_audio",
+    "nodes": [
+        {
+            "node": {
+                "created": "2023-12-07T14:40:50.694196",
+                "extras": {
+                    "model": "gpt-4-vision-preview",
+                    "openai_token": "[openai_token]",
+                    "processor": "aivision",
+                    "system_prompt": "Simply explain what you are seeing, keeping in mind your words will be converted to spoken speech."
+                },
+                "name": "hawk",
+                "node_id": "Cm9o6ryXrfiMb",
+                "processor": "aivision",
+                "template_id": "idFByV68osH5X",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "2023-12-07T14:40:45.485268",
+                "extras": {
+                    "model": "gpt-4-vision-preview",
+                    "openai_token": "[openai_token]",
+                    "processor": "aivision",
+                    "system_prompt": "Simply explain what you are seeing, keeping in mind your words will be converted to spoken speech."
+                },
+                "input_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "string"
+                    }
+                ],
+                "name": "polar",
+                "output_fields": [
+                    {
+                        "name": "scene",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aivision",
+                "template_id": "idFByV68osH5X",
+                "text": "{# Use this template to drive an OpenAI GPT vision processor that outputs a scene description. #}\n\n{# Define the input_fields used in this template #}\ninput_fields = [{'name': \"filename\", 'type': \"string\"},{'name': \"content_type\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template %}\noutput_fields = [{'name': \"scene\", 'type': \"strings\"}]\n\n{# Define the gpt-scene model to extract the scene description #}\n{# To emulate the gv-objects model, pass the scene into a keyterms extractor #}\nextras = {\"model\": \"gpt-4-vision-preview\", \"openai_token\": None, \"processor\": \"aivision\", \"system_prompt\": \"Simply explain what you are seeing, keeping in mind your words will be converted to spoken speech.\"}",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-06T17:54:34.327784",
+                "extras": {
+                    "system_prompt": "You are a helpful assistant and your texts are being used to transcribe to audio, so format your replies for spoken conversation.",
+                    "processor": "aichat",
+                    "openai_token": "[openai_token]",
+                    "model": "gpt-3.5-turbo"
+                },
+                "name": "dinosaur",
+                "node_id": "79kYw4whgT8J0",
+                "processor": "aichat",
+                "template_id": "6jl7EHKzSqj7W",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "2023-12-06T17:53:20.940611",
+                "extras": {
+                    "system_prompt": "You are a helpful assistant and your texts are being used to transcribe to audio, so format your replies for spoken conversation.",
+                    "processor": "aichat",
+                    "openai_token": "[openai_token]",
+                    "model": "gpt-3.5-turbo"
+                },
+                "input_fields": [
+                    {
+                        "name": "scene",
+                        "type": "strings"
+                    }
+                ],
+                "name": "rational",
+                "output_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aichat",
+                "template_id": "6jl7EHKzSqj7W",
+                "text": "{# Use this template to drive a generative chat processor. #}\n\n{# Define the input_fields used in this template; user_history alternates user,assistant,user,assistant.. #}\n{# Remove user_history if you don't want to use a history #}\ninput_fields = [{'name': \"scene\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are a helpful assistant and your texts are being used to transcribe to audio, so format your replies for spoken conversation.\", 'processor': \"aichat\", 'openai_token': None, 'model': \"gpt-3.5-turbo\"}\n\nThe assistant's ears just saw (as a python array):\n{{ scene }}\n\nForm a reply that is suitable for spoken audio which describes the scene:\n",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-06T18:00:33.334451",
+                "extras": {
+                    "openai_token": "[openai_token]",
+                    "model": "tts-1",
+                    "processor": "aispeech",
+                    "voice": "shimmer"
+                },
+                "name": "weasel",
+                "node_id": "n4GzyUw8DcuDw",
+                "processor": "aispeech",
+                "template_id": "1t8OCTNmUkyPq",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "2023-12-06T18:00:08.145453",
+                "extras": {
+                    "openai_token": "[openai_token]",
+                    "model": "tts-1",
+                    "processor": "aispeech",
+                    "voice": "shimmer"
+                },
+                "input_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "name": "tested",
+                "output_fields": [
+                    {
+                        "name": "uri",
+                        "type": "urls"
+                    }
+                ],
+                "processor": "aispeech",
+                "template_id": "1t8OCTNmUkyPq",
+                "text": "{# Use this template to convert text to speech/spoken audio #}\n\n{# Input Fields #}\n{# Specify a filename if you want it saved with a particular name. #}\ninput_fields = [{'name': 'assistant_content', 'type': 'strings'}]\n\n{# Output Fields #}\n{# Output the URL for the download. Access will require MittaAI token. #}\noutput_fields = [{'name': 'uri', 'type': 'urls'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"openai_token\": None, \"model\": \"tts-1\", \"processor\": \"aispeech\", \"voice\": \"shimmer\"}",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-01T17:21:00.152391",
+                "extras": {
+                    "callback_token": "[callback_token]",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
+                    "processor": "callback"
+                },
+                "name": "gaur",
+                "node_id": "QK7r7rlFk5EyZ",
+                "processor": "callback",
+                "template_id": "Tj0ooBk6fEBMf",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            },
+            "template": {
+                "created": "2023-12-01T17:20:59.899471",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "[callback_uri]",
+                    "callback_token": "[callback_token]"
+                },
+                "input_fields": null,
+                "name": "spicy",
+                "output_fields": [],
+                "processor": "callback",
+                "template_id": "Tj0ooBk6fEBMf",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [user_callback] or [user_token] will be auto populated. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "r2lAJyPcFb8owj6Ks"
+            }
+        }
+    ]
+}
