@@ -21,7 +21,7 @@ To use these pipelines, you'll need to create a [MittaAI account](https://mitta.
 If you prefer to use the pipelines locally on Google Cloud, you can install the [SlothAI framework](https://github.com/kordless/SlothAI). This framework allows you to run AI pipelines in your own environment.
 
 ### Storage Requirements
-Please note that some pipelines may require storage. For this purpose, you will need a [FeatureBase Cloud](https://cloud.featurebase.com) account. FeatureBase Cloud provides a cloud-based storage solution for AI pipeline data.
+Please note that some advanced pipelines may require dedicated database storage. For this purpose, you will need a [FeatureBase Cloud](https://cloud.featurebase.com) account. FeatureBase Cloud provides a cloud-based storage solution for AI pipeline data.
 
 SlothAI will eventually support other database storage layers, providing more flexibility.
 
