@@ -121,4 +121,4 @@ async def callback():
 async def serve_index():
     return await render_template('index.html')
 
-app.run()
+app.run(host=0.0.0.0, port=5000)

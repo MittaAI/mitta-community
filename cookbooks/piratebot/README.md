@@ -1,33 +1,109 @@
-# PirateBot Install Guide
+# Bot Install Guide
+This guide will walk through setting up a Discord bot that uses a MittaAI pipeline to store conversations.
 
 ## Prerequisites
-- Ensure you have Conda installed on your system
-- You will need a Discord account to set up a bot
+- You will need a [MittaAI](https://mitta.ai) account
+- You will need a Discord account and server to set up a bot
+- You need to know a little bit of Python, but not much
+- It's useful to have [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) installed on your system
+- You may need to deploy this code somewhere to run. It works best on a server.
 
 ## Installation
-1. Set Up Conda Environment:
-	Create and activate a new Conda environment using Python 3.11:
-	```
-	conda create -n piratebot python=3.11
-	conda activate piratebot
-	```
+### Set Up a Conda Environment
+Open a terminal on your computer.
 
-2. Install Dependencies
-	Use pip to install required packages:
-	```
-	pip install -r requirements.txt
-	```
+Create and activate a new Conda environment using Python 3.11:
+```
+conda create -n piratebot python=3.11
+conda activate piratebot
+```
 
-3. Configure Discord Bot:
-	- Set up a bot on your Discord account and retrieve the token.
-	- Detailed instructions will be provided in a forthcoming video.
+### Install Dependencies
+Use pip to install required packages:
+```
+pip install -r requirements.txt
+```
 
-4. Set Up Configuration File:
-	- Copy `bot.conf.sample` to `bot.conf`.
-	- Edit `bot.conf` to include your tokens and pipeline IDs
+### Check the Repo Out
+You need to have `git` installed to check the repo out:
 
-5. Run the Bot:
-	Start the bot using the following command:
-	```
-	python ./bot.py
-	```
+```
+https://github.com/MittaAI/mitta-community.git
+```
+
+Navigate to `mitta-community/cookbooks/piratebot` in your shell to continue.
+
+### Configure a Discord Bot
+Login to your Discord account in a browser and navigate to your server on the left.
+
+1. Navigate to the [Discord Developer Portal](https://discord.com/developers/applications)
+1. Click New Application
+1. Type in a name for the bot. Click to agree to the terms and then create the app
+1. Click on 'bot' to the left, then click on 'reset token'
+1. One the token is reset, it will show up. Copy it.
+1. Back in your terminal, copy the `bot.conf.sample` file to `bot.conf`
+1. Edit the file and update the token for Discord
+
+Now we need to invite the bot to your Discord server.
+
+1. Back in the Discord Developer Portal, click on `OAuth2`, then `URL Generator`
+1. Check the `bot` box under `scopes`
+1. Ensure at least `Send Messges`, `Read Message History`, and `Attach Files` is checked under `Bot Permissions`
+1. Copy the generated URL at the bottom.
+1. Paste the URL into a new tab in your browser.
+1. Select your server from the pulldown and then click `continue`.
+1. Click `Authorize`
+1. Ensure your bot has been added to the server. The bot will be inactive until you start it.
+
+Finally, copy the channel you want the bot in and responding to messages.
+
+1. In Discord, right click on the channel you want the bot to monitor. Click `copy channel ID` at the bottom.
+1. Edit the `bot.conf` file and then update the channel_id value with the channel ID you copied.
+
+### Configure the Pipeline
+To add the bot pipelines to MittaAI, navigate to your [pipelines page](https://mitta.ai/pipelines).
+
+1. Click `Import` and navigate to the bot directory in the file chooser
+1. Select the `pipeline_memories.json` file and then click `open`
+1. The pipeline may prompt you for information related to secure tokens. Enter the tokens or values as needed.
+1. Click `Import` again and then do the same thing for `pipeline_bot.json`
+1. Click on the `crayfish` node and then click on `edit node`
+1. Change the callback URL to whatever you need to to receive the callback. See below.
+
+If you don't have a way to expose a port on your local machine, or you don't know how to deploy a server somewhere that runs this code, you can do this locally using Ngrok:
+
+1. Navigate to [Ngrok](https://ngrok.io) and then signup for an account.
+1. Navigate to Ngrok's [setup and installation](https://dashboard.ngrok.com/get-started/setup) page.
+1. To run Ngrok on the local instance of the bot, do the following:
+
+```
+cd /path_to_ngrok/
+./ngrok http 5000
+```
+
+1. Copy the forwarding address
+1. On the MittaAI `crayfish` node detail page, update the callback_url with the new forwarding address
+1. Click save.
+
+### Finish the Configuration
+Assuming you've determined where to send the callback from MittaAI, continue the configuration by doing the following:
+
+1. Navigate to both the `pirate-bot` and `pirate-memories` pipelines and then copy the ID of each pipeline.
+1. Put each of the IDs for the pipelines in the `bot.conf` file. The pipeline config names are labeled to match.
+1. 
+
+### Launch the Bot
+As covered above, the bot will need an external callback handler mapped to your local machine to function correctly. If the bot is deployed onto a dedicated server on the Internet, you will need to provide a URL to the callback handler that either has the IP address or named address of the server, plus the port number you are running it on.
+
+You may need to deal with firewalls as well. If you don't know anything about running servers, try checking out [Google Cloud](https://cloud.google.com/). There are scripts in the `scripts` directory that will let you start a bot on a Google cloud server that will cost you about $20 a month.
+
+To launch the bot locally, run the following:
+
+```
+python bot.py
+```
+
+Navigate to your Discord channel and you should see the bot has posted an emoji. Each time you save the `bot.py` file, the bot will emit an emoji to the channel.
+
+### Future Work
+Future work on this repo will include adding image posting, PDF posting, image generation and more. Stay tuned!
