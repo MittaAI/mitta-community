@@ -1,6 +1,8 @@
 # Bot Install Guide
 This guide will walk through setting up a Discord bot that uses a MittaAI pipeline to store conversations.
 
+[!pirate](https://mitta.ai/static/images/pirate.png)
+
 ## Prerequisites
 - You will need a [MittaAI](https://mitta.ai) account
 - You will need a Discord account and server to set up a bot
