@@ -20,12 +20,6 @@ conda create -n piratebot python=3.11
 conda activate piratebot
 ```
 
-### Install Dependencies
-Use pip to install required packages:
-```
-pip install -r requirements.txt
-```
-
 ### Check the Repo Out
 You need to have `git` installed to check the repo out:
 
@@ -34,6 +28,12 @@ git clone https://github.com/MittaAI/mitta-community.git
 ```
 
 Change to the `mitta-community/cookbooks/piratebot` directory in your shell to continue.
+
+### Install Dependencies
+Use pip to install required packages:
+```
+pip install -r requirements.txt
+```
 
 ### Configure a Discord Bot
 Login to your Discord account in a browser and navigate to your server on the left.
