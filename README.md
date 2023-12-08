@@ -1,7 +1,7 @@
 # Welcome to MittaAI
 This is the community repository for MittaAI and SlothAI users. All code or examples here are covered by the [MIT software license](https://github.com/MittaAI/mitta-community/blob/main/LICENSE).
 
-The SlothAI framework, which runs MittaAI, is located [here](https://github.com/kordless/SlothAI).
+The SlothAI framework, which runs MittaAI, is located [here](https://github.com/MittaAI/SlothAI).
 
 There is a [Discord server](https://discord.gg/SxwcVGQ8j9) available for help with building or running pipelines.
 
@@ -18,7 +18,7 @@ In the [cookbooks directory](./cookbooks), you'll find a collection of example p
 To use these pipelines, you'll need to create a [MittaAI account](https://mitta.ai) if you don't already have one. MittaAI provides a user-friendly platform for running and managing AI pipelines.
 
 ### Installing the SlothAI Framework (Optional)
-If you prefer to use the pipelines locally on Google Cloud, you can install the [SlothAI framework](https://github.com/kordless/SlothAI). This framework allows you to run AI pipelines in your own environment.
+If you prefer to use the pipelines locally on Google Cloud, you can install the [SlothAI framework](https://github.com/MittaAI/SlothAI). This framework allows you to run AI pipelines in your own environment.
 
 ### Storage Requirements
 Please note that some advanced pipelines may require dedicated database storage. For this purpose, you will need a [FeatureBase Cloud](https://cloud.featurebase.com) account. FeatureBase Cloud provides a cloud-based storage solution for AI pipeline data.
