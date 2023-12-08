@@ -5,7 +5,7 @@ This guide will walk through setting up a Discord bot that uses a MittaAI pipeli
 
 ## Prerequisites
 - You will need a [MittaAI](https://mitta.ai) account
-- You will need a Discord account and server to set up a bot
+- You will need a [Discord](https://discord.com) account and server to set up a bot
 - You need to know a little bit of Python, but not much
 - It's useful to have [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) installed on your system
 - You may need to deploy this code somewhere to run. It works best on a server.
@@ -30,10 +30,10 @@ pip install -r requirements.txt
 You need to have `git` installed to check the repo out:
 
 ```
-https://github.com/MittaAI/mitta-community.git
+git clone https://github.com/MittaAI/mitta-community.git
 ```
 
-Navigate to `mitta-community/cookbooks/piratebot` in your shell to continue.
+Change to the `mitta-community/cookbooks/piratebot` directory in your shell to continue.
 
 ### Configure a Discord Bot
 Login to your Discord account in a browser and navigate to your server on the left.
@@ -92,12 +92,14 @@ Assuming you've determined where to send the callback from MittaAI, continue the
 
 1. Navigate to both the `pirate-bot` and `pirate-memories` pipelines and then copy the ID of each pipeline.
 1. Put each of the IDs for the pipelines in the `bot.conf` file. The pipeline config names are labeled to match.
-1. 
+1. Finally, navigate to your [settings](https://mitta.ai/settings) on MittaAI and copy your token.
+1. Edit the config file and put your MittaAI token in the correct location.
+1. Save the config file.
 
 ### Launch the Bot
 As covered above, the bot will need an external callback handler mapped to your local machine to function correctly. If the bot is deployed onto a dedicated server on the Internet, you will need to provide a URL to the callback handler that either has the IP address or named address of the server, plus the port number you are running it on.
 
-You may need to deal with firewalls as well. If you don't know anything about running servers, try checking out [Google Cloud](https://cloud.google.com/). There are scripts in the `scripts` directory that will let you start a bot on a Google cloud server that will cost you about $20 a month.
+You may need to deal with firewalls as well. If you don't know anything about running servers, try checking out [Google Cloud](https://cloud.google.com/). There are scripts in the `scripts` directory that will let you start a bot on a Google cloud server that will cost you about $20 a month. Some editing require. Pop into [SlothAI's Discord](https://discord.gg/SxwcVGQ8j9) for help.
 
 To launch the bot locally, run the following:
 
@@ -105,7 +107,7 @@ To launch the bot locally, run the following:
 python bot.py
 ```
 
-Navigate to your Discord channel and you should see the bot has posted an emoji. Each time you save the `bot.py` file, the bot will emit an emoji to the channel.
+Navigate to your Discord channel and you should see the bot has posted an emoji. Each time you save the `bot.py` file, the bot should post an emoji to the channel.
 
 ### Future Work
 Future work on this repo will include adding image posting, PDF posting, image generation and more. Stay tuned!
