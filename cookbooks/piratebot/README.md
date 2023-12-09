@@ -3,6 +3,11 @@ This guide will walk through setting up a Discord bot that uses a MittaAI pipeli
 
 ![pirate](https://mitta.ai/static/images/pirate.png)
 
+## Video Guide
+Watch the video guide before beginning installation.
+
+[![Pirate Bot](https://img.youtube.com/vi/VNqnvoCx9Wg/0.jpg)](https://www.youtube.com/watch?v=VNqnvoCx9Wg)
+
 ## Prerequisites
 - You will need a [MittaAI](https://mitta.ai) account
 - You will need a [Discord](https://discord.com) account and server to set up a bot
