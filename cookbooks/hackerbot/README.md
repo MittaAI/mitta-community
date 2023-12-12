@@ -1,9 +1,9 @@
 # HackerNews Bot
-This pipeline is designed to fetch and process news stories from Hacker News API, convert documents to text, transform JSON data, and generate chat responses using AI. It enables users to automate the extraction and transformation of data from various sources and engage with their audience through generated chat content. 
+This pipeline is designed to fetch and process news stories from Algolia's Hacker News API, convert documents to text, transform JSON data, and generate chat responses using AI. It enables users to automate the extraction and transformation of data from various sources and engage with their audience through generated chat content. 
 
 It can be used with the [piratebot](https://github.com/MittaAI/mitta-community/blob/main/cookbooks/piratebot) cookbook to implement an agent that posts on Discord.
 
-![pirate](https://mitta.ai/images/hn.png)
+![cans](https://mitta.ai/images/hn.png)
 
 Add the pipeline in this directory to [MittaAI](https://mitta.ai) from the `pipelines` page. The pipeline retreives (50) stories from Algolia's HN search endpoint. 
 
