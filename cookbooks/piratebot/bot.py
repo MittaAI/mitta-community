@@ -117,8 +117,4 @@ async def callback():
         print(e)
         return {"error": str(e)}, 500
 
-@app.route('/')
-async def serve_index():
-    return await render_template('index.html')
-
 app.run(host=0.0.0.0, port=5000)

@@ -1,7 +1,7 @@
 # Bot Install Guide
 This guide will walk through setting up a Discord bot that uses a MittaAI pipeline to store conversations.
 
-![pirate](https://mitta.ai/static/images/pirate.png)
+![pirate](https://mitta.ai/images/pirate.png)
 
 ## Video Guide
 Watch the video guide before beginning installation.
