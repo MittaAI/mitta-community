@@ -28,3 +28,5 @@ curl -X POST "https://mitta.ai/pipeline/VPMRR1OsoNkyG/task?token=<token>" \
 	"assistant_content": "Here's an interesting story from the list:  Title: 'New AI startup from the co-authors of the Original Transformers Paper' Link: [Essential AI](https://essential.ai/)  Description: Essential AI is a new startup founded by the co-authors of the original Transformers paper. Transformers are a type of deep learning model that has been widely successful in natural language processing tasks. With Essential AI, the team aims to build cutting-edge AI technologies and provide state-of-the-art solutions for various industry applications. The startup's website provides an overview of their vision and expertise, and it will be interesting to see the advancements they bring to the field of AI.  (Note: This post has received 8 points and has comments in the Hacker News thread.)"
 }
 ```
+
+If you have issues configuring the pipeline, pop into [Discord](https://discord.com/invite/SxwcVGQ8j9).
