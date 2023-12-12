@@ -21,7 +21,7 @@
                 "extras": {
                     "processor": "read_uri",
                     "method": "GET",
-                    "uri": "https://hn.algolia.com/api/v1/search_by_date?tags=story&page=1"
+                    "uri": "https://hn.algolia.com/api/v1/search_by_date?tags=story&hitsPerPage=50"
                 },
                 "input_fields": [],
                 "name": "lovely",
@@ -37,7 +37,7 @@
                 ],
                 "processor": "read_uri",
                 "template_id": "laYRXlJ77TNuj",
-                "text": "{# Use this template to read a file from a URI #}\n\n{# Input Fields #}\n{# If the URI isn't working, try using filename and content_type + the uri #}\ninput_fields = []\n\n{# Output Fields must contain filename and content_type #}\noutput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'content_type', 'type': 'string'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"processor\": \"read_uri\", \"method\": \"GET\", \"uri\": \"https://hn.algolia.com/api/v1/search_by_date?tags=story&page=1\"}",
+                "text": "{# Use this template to read a file from a URI #}\n\n{# Input Fields #}\n{# If the URI isn't working, try using filename and content_type + the uri #}\ninput_fields = []\n\n{# Output Fields must contain filename and content_type #}\noutput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'content_type', 'type': 'string'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"processor\": \"read_uri\", \"method\": \"GET\", \"uri\": \"https://hn.algolia.com/api/v1/search_by_date?tags=story&hitsPerPage=50\"}",
                 "uid": "0kcas0aVtwkg6hNFh"
             }
         },
