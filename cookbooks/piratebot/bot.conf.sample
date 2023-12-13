@@ -9,5 +9,7 @@ mittaai_token = <mittaai_token>
 [Settings]
 pipeline_id_bot = <bot_pipeline_id>
 pipeline_id_memory = <memory_pipeline_id>
+pipeline_id_hn = <hn_pipeline_id>
 channel_id = <channel_id>
-bot_name = Sloth Bot
+news_channel_id = <news_channel_id>
+bot_name = SlothBot

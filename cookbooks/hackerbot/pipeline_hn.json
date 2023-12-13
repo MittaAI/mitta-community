@@ -1,23 +1,23 @@
 {
-    "pipe_id": "VPMRR1OsoNkyG",
+    "pipe_id": "NJUbjAyyP6zOl",
     "name": "hn",
     "nodes": [
         {
             "node": {
-                "created": "2023-12-12T20:56:05.741806",
+                "created": "2023-12-12T22:33:58.343451",
                 "extras": {
                     "processor": "read_uri",
                     "method": "GET",
                     "uri": "https://hn.algolia.com/api/v1/search_by_date?tags=story&hitsPerPage=50"
                 },
                 "name": "asp",
-                "node_id": "DkupMxRQQIOrv",
+                "node_id": "BmcUyiUKhKVB5",
                 "processor": "read_uri",
-                "template_id": "laYRXlJ77TNuj",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "template_id": "5qGeUPlt7pxJH",
+                "uid": "UTfkZlwIMtC0qQ41Z"
             },
             "template": {
-                "created": "2023-12-12T15:07:47.623816",
+                "created": "2023-12-12T22:33:58.197396",
                 "extras": {
                     "processor": "read_uri",
                     "method": "GET",
@@ -36,25 +36,25 @@
                     }
                 ],
                 "processor": "read_uri",
-                "template_id": "laYRXlJ77TNuj",
+                "template_id": "5qGeUPlt7pxJH",
                 "text": "{# Use this template to read a file from a URI #}\n\n{# Input Fields #}\n{# If the URI isn't working, try using filename and content_type + the uri #}\ninput_fields = []\n\n{# Output Fields must contain filename and content_type #}\noutput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'content_type', 'type': 'string'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"processor\": \"read_uri\", \"method\": \"GET\", \"uri\": \"https://hn.algolia.com/api/v1/search_by_date?tags=story&hitsPerPage=50\"}",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "uid": "UTfkZlwIMtC0qQ41Z"
             }
         },
         {
             "node": {
-                "created": "2023-12-12T16:02:33.360579",
+                "created": "2023-12-12T22:33:58.676328",
                 "extras": {
                     "processor": "read_file"
                 },
                 "name": "chital",
-                "node_id": "jDSXuDKSLpTgT",
+                "node_id": "xb09pjIbHC7t1",
                 "processor": "read_file",
-                "template_id": "xRpCP6pSOH1o5",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "template_id": "xvb0rDHaXPMBT",
+                "uid": "UTfkZlwIMtC0qQ41Z"
             },
             "template": {
-                "created": "2023-12-12T16:02:27.877724",
+                "created": "2023-12-12T22:33:58.543228",
                 "extras": {
                     "processor": "read_file"
                 },
@@ -76,25 +76,25 @@
                     }
                 ],
                 "processor": "read_file",
-                "template_id": "xRpCP6pSOH1o5",
+                "template_id": "xvb0rDHaXPMBT",
                 "text": "{# Use this template to read a PDF or .txt file and convert it to text #}\n{# This example will serialze PDF processing. Use the deserialized PDF template for faster extraction. #}\n\n{# Input Fields #}\n{# These should not be changed, as they are provided by the task ingestion endpoint for file uploads. #}\ninput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'content_type', 'type': 'string'}]\n\n{# Output Fields #}\noutput_fields = [{'name': 'texts', 'type': 'strings'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"processor\": \"read_file\"}",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "uid": "UTfkZlwIMtC0qQ41Z"
             }
         },
         {
             "node": {
-                "created": "2023-12-12T16:29:05.098529",
+                "created": "2023-12-12T22:33:59.083088",
                 "extras": {
                     "processor": "jinja2"
                 },
                 "name": "wombat",
-                "node_id": "cEHJy9M5yRpJQ",
+                "node_id": "uXT5PvBl5cV56",
                 "processor": "jinja2",
-                "template_id": "mRUZZ9bg4nIpS",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "template_id": "4MNHkrmWbRc7Y",
+                "uid": "UTfkZlwIMtC0qQ41Z"
             },
             "template": {
-                "created": "2023-12-12T16:29:01.682750",
+                "created": "2023-12-12T22:33:58.946292",
                 "extras": {
                     "processor": "jinja2"
                 },
@@ -132,14 +132,14 @@
                     }
                 ],
                 "processor": "jinja2",
-                "template_id": "mRUZZ9bg4nIpS",
+                "template_id": "4MNHkrmWbRc7Y",
                 "text": "{# This is a reference jinja2 processor template #}\n\n{# Input Fields #}\ninput_fields = [{\"name\": \"json_data\", \"type\": \"dict\"}]\n\n{# Output Fields #}\noutput_fields = [{\"name\": \"authors\", \"type\": \"strings\"},{\"name\": \"points\", \"type\": \"ints\"},{\"name\": \"urls\", \"type\": \"strings\"},{\"name\": \"titles\", \"type\": \"strings\"},{\"name\": \"num_comments\", \"type\": \"ints\"},{\"name\": \"object_id\", \"type\": \"ints\"}]\n\n{# Extras are required. #}\nextras = {\"processor\": \"jinja2\"}\n\n{% set authors = [] %}\n{% set points = [] %}\n{% set num_comments = [] %}\n{% set urls = [] %}\n{% set titles = [] %}\n{% set object_ids = [] %}\n\n{# json_data is always an array of whatevers #}\n{% for data in json_data %}\n    {% for item in data['hits'] %}\n        {% set _ = authors.append(item['author']) %}\n        {% set _ = points.append(item['points']) %}\n        {% set _ = urls.append(item['url']) %}\n        {% set _ = titles.append(item['title']) %}\n        {% set _ = num_comments.append(item['num_comments']) %}\n        {% set _ = num_comments.append(item['object_ids']) %}\n    {% endfor %}\n{% endfor %}\n\n{% set result_dict = {\n    'authors': authors,\n    'points': points,\n    'num_comments': num_comments,\n    'urls': urls,\n    'titles': titles,\n    'object_ids': object_ids\n} %}\n\n{{ result_dict|safe_tojson }}\n",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "uid": "UTfkZlwIMtC0qQ41Z"
             }
         },
         {
             "node": {
-                "created": "2023-12-12T21:36:27.008031",
+                "created": "2023-12-12T22:33:59.489833",
                 "extras": {
                     "system_prompt": "You are a bot that posts interesting news stories about AI and other technology.",
                     "processor": "aichat",
@@ -147,13 +147,13 @@
                     "model": "gpt-3.5-turbo"
                 },
                 "name": "trogon",
-                "node_id": "GtEYoo9hGsqrx",
+                "node_id": "WEWgmCl7k812V",
                 "processor": "aichat",
-                "template_id": "lgLAk9nIzNqKE",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "template_id": "j1ZrTJH8ldibd",
+                "uid": "UTfkZlwIMtC0qQ41Z"
             },
             "template": {
-                "created": "2023-12-12T21:36:21.916089",
+                "created": "2023-12-12T22:33:59.232957",
                 "extras": {
                     "system_prompt": "You are an assistant that posts interesting news stories about AI and other technology from HackerNews. You act as a user would.",
                     "processor": "aichat",
@@ -190,39 +190,76 @@
                     }
                 ],
                 "processor": "aichat",
-                "template_id": "lgLAk9nIzNqKE",
+                "template_id": "j1ZrTJH8ldibd",
                 "text": "{# Use this template to drive a generative chat processor. #}\n\n{# Define the input_fields used in this template; user_history alternates user,assistant,user,assistant.. #}\n{# Remove user_history if you don't want to use a history #}\ninput_fields = [{'name': \"authors\", 'type': \"strings\"},{'name': \"points\", 'type': \"ints\"},{'name': \"num_comments\", 'type': \"ints\"},{'name': \"urls\", 'type': \"strings\"},{'name': \"titles\", 'type': \"ints\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are an assistant that posts interesting news stories about AI and other technology from HackerNews. You act as a user would.\", 'processor': \"aichat\", 'openai_token': None, 'model': \"gpt-3.5-turbo\"}\n\nThe following stories were pulled from Hacker News:\n'''\n{% for i in range(points|length) %}\n    {% set point = points[i] %}\n    {% set num_comment = num_comments[i] %}\n    {% set title = titles[i] %}\n    {% set url = urls[i] %}\n    {% set author = authors[i] %}\n    {% set object_id = object_ids[i] %}\n    {{i}}. {{ title }} ({{ url }}) \n    {{ point }} point(s) by {{ author }} a while ago | {{ num_comment }} comment(s)\n    https://news.ycombinator.com/item?id={{object_id}} \n{% endfor %}\n'''\n\nPick a story from the list and write a post for it to Discord. Don't use headers, markup or any other labels for the data. Just write about it and post the link. You may mention it has a lot of comments, if it does. These are recent posts, so any with high points would be interesting.",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "uid": "UTfkZlwIMtC0qQ41Z"
             }
         },
         {
             "node": {
-                "created": "2023-12-11T19:40:09.996292",
+                "created": "2023-12-08T19:38:23.323314",
                 "extras": {
-                    "processor": "callback",
-                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
-                    "callback_token": "[callback_token]"
+                    "callback_token": "[callback_token]",
+                    "callback_uri": "https://mitta.ai/hilarious-quetzal-of-excitement/callback?token={{callback_token}}",
+                    "processor": "callback"
                 },
-                "name": "ferret",
-                "node_id": "nd2Rgp8Hv60oR",
+                "name": "gaur",
+                "node_id": "HvvjW2dlhLFHF",
                 "processor": "callback",
-                "template_id": "lFOJqIFkrFT28",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "template_id": "Tx8isaVUqnl1R",
+                "uid": "UTfkZlwIMtC0qQ41Z"
             },
             "template": {
-                "created": "2023-12-11T19:40:04.834098",
+                "created": "2023-12-08T19:38:23.137235",
                 "extras": {
                     "processor": "callback",
                     "callback_uri": "[callback_uri]",
                     "callback_token": "[callback_token]"
                 },
                 "input_fields": null,
-                "name": "fancy",
+                "name": "spicy",
                 "output_fields": [],
                 "processor": "callback",
-                "template_id": "lFOJqIFkrFT28",
-                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
-                "uid": "0kcas0aVtwkg6hNFh"
+                "template_id": "Tx8isaVUqnl1R",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [user_callback] or [user_token] will be auto populated. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-08T19:38:30.110513",
+                "extras": {
+                    "callback_uri": "http://bot.mitta.ai:5000/callback",
+                    "processor": "callback"
+                },
+                "name": "crayfish",
+                "node_id": "2R7lSX48CD9gv",
+                "processor": "callback",
+                "template_id": "66pNiJOMNxRxD",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            },
+            "template": {
+                "created": "2023-12-08T19:38:29.978336",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "https://kordless.ngrok.io/callback"
+                },
+                "input_fields": null,
+                "name": "esoteric",
+                "output_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "channel_id",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "callback",
+                "template_id": "66pNiJOMNxRxD",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras #}\nextras = {'processor': \"callback\", 'callback_uri': \"https://kordless.ngrok.io/callback\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = [{\"name\": \"assistant_content\", \"type\": \"strings\"},{\"name\": \"channel_id\", \"type\": \"strings\"}]",
+                "uid": "UTfkZlwIMtC0qQ41Z"
             }
         }
     ]

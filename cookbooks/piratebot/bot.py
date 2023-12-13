@@ -18,7 +18,9 @@ DISCORD_TOKEN = config.get('Credentials', 'discord_token')
 MITTAAI_TOKEN = config.get('Credentials', 'mittaai_token')
 PIPELINE_ID_BOT = config.get('Settings', 'pipeline_id_bot')
 PIPELINE_ID_MEMORY = config.get('Settings', 'pipeline_id_memory')
+PIPELINE_ID_HN = config.get('Settings', 'pipeline_id_hn')
 CHANNEL_ID = config.get('Settings', 'channel_id')
+NEWS_CHANNEL_ID = config.get('Settings', 'news_channel_id')
 BOT_NAME = config.get('Settings', 'bot_name')
 
 # Create a Discord bot instance
@@ -61,12 +63,27 @@ async def before_serving():
 @bot.event
 async def on_message(message):
     # check if we are allowed to interact with the current channel
-    if int(message.channel.id) != int(CHANNEL_ID):
-        return
+    if str(message.channel.id) != str(CHANNEL_ID): 
+        if str(message.channel.id) != str(NEWS_CHANNEL_ID):
+            return
 
     # if author is the bot, we ignore it from here   
     if message.author == bot.user:
         return
+    
+    if int(message.channel.id) == int(NEWS_CHANNEL_ID):
+        print("in the news channel")
+        print(message.content.lower())
+        if "news" in message.content.lower():
+            await typing(message.channel)
+            async with aiohttp.ClientSession() as session:
+                url = f"https://mitta.ai/pipeline/{PIPELINE_ID_HN}/task?token={MITTAAI_TOKEN}"
+                document = {"author": message.author.name, "channel_id": message.channel.id}
+                async with session.post(url, json=document) as resp:
+                    assert resp.status == 200
+                    response = await resp.json()
+        return
+
 
     try:
         await typing(message.channel)
@@ -98,6 +115,13 @@ async def callback():
         message = data.get("assistant_content")
         channel_id = int(data.get("channel_id")[0])
 
+        # news posts
+        if channel_id == int(NEWS_CHANNEL_ID):
+            print(channel_id)
+            channel = bot.get_channel(int(NEWS_CHANNEL_ID))
+            await say(message, channel)
+            return {"message": "Thank you."}
+            
         if message is None:
             return {"error": "Missing 'message' in JSON payload"}, 400
 
@@ -117,4 +141,8 @@ async def callback():
         print(e)
         return {"error": str(e)}, 500
 
-app.run(host=0.0.0.0, port=5000)
+@app.route('/')
+async def serve_index():
+    return await render_template('index.html')
+
+app.run(host='0.0.0.0')
