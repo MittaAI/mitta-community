@@ -96,7 +96,7 @@ cd /path_to_ngrok/
 Assuming you've determined where to send the callback from MittaAI, continue the configuration by doing the following:
 
 1. Navigate to both the `pirate-bot` and `pirate-memories` pipelines and then copy the ID of each pipeline.
-1. If you like, you can add the [hackerbot](https://github.com/MittaAI/mitta-community/blob/main/cookbooks/hackerbot) pipeline. If you don't want to use it, just put a fake pipeline ID and channel_id in for those values.
+1. If you like, you can add the [hackerbot](https://github.com/MittaAI/mitta-community/blob/main/cookbooks/hackerbot) pipeline. If you don't want to use it, just put a fake news_channel_id and pipeline_id_hn in for those values.
 1. Put each of the IDs for the pipelines in the `bot.conf` file. The pipeline config names are labeled to match.
 1. Finally, navigate to your [settings](https://mitta.ai/settings) on MittaAI and copy your token.
 1. Edit the config file and put your MittaAI token in the correct location.
