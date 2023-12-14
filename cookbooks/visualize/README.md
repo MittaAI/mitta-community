@@ -11,9 +11,7 @@ Video guide coming soon!
 ## Install
 You will need both an [OpenAI token](https://platform.openai.com/api-keys) as well as a [Gemini token](https://makersuite.google.com/app/apikey).
 
-Add the pipeline in this directory to [MittaAI](https://mitta.ai) from the `pipelines` page. The pipeline retreives (50) stories from Algolia's HN search endpoint. 
-
-The URL is defined in `extras`, but could be moved to the POST to the pipeline's endpoint.
+Add the pipeline in this directory to [MittaAI](https://mitta.ai) from the `pipelines` page.
 
 ## Use
 ### Upload an image.
