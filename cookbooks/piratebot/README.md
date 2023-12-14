@@ -1,5 +1,5 @@
 # Bot Install Guide
-This guide will walk through setting up a Discord bot that uses a MittaAI pipeline to store conversations.
+This guide will walk through setting up a Discord bot that uses a MittaAI pipeline to store conversations. It can also be configured to post new stories from Hacker News when asked about "news".
 
 ![pirate](https://mitta.ai/images/pirate.png)
 

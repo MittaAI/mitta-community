@@ -1,0 +1,168 @@
+{
+    "pipe_id": "DlEQxtO2pqnsF",
+    "name": "visualize",
+    "nodes": [
+        {
+            "node": {
+                "created": "2023-12-14T13:26:53.197276",
+                "extras": {
+                    "model": "gemini-pro-vision",
+                    "gemini_token": "[gemini_token]",
+                    "processor": "aivision",
+                    "system_prompt": "What is in the image?",
+                    "upload": "True"
+                },
+                "name": "pug",
+                "node_id": "Tb7HRkVDD5Zna",
+                "processor": "aivision",
+                "template_id": "kJaRt83Kf7Adg",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            },
+            "template": {
+                "created": "2023-12-14T13:26:33.406248",
+                "extras": {
+                    "model": "gemini-pro-vision",
+                    "gemini_token": "[gemini_token]",
+                    "processor": "aivision",
+                    "system_prompt": "What is in the image?",
+                    "upload": "True"
+                },
+                "input_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "string"
+                    }
+                ],
+                "name": "maroon",
+                "output_fields": [
+                    {
+                        "name": "scene",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aivision",
+                "template_id": "kJaRt83Kf7Adg",
+                "text": "{# Use this template to drive an OpenAI GPT vision processor that outputs a scene description. #}\r\n\r\n{# Define the input_fields used in this template #}\r\ninput_fields = [{\"name\": \"filename\", \"type\": \"string\"},{\"name\": \"content_type\", \"type\": \"string\"}]\r\n\r\n{# The output_fields expected from the node processor using this template %}\r\noutput_fields = [{\"name\": \"scene\", \"type\": \"strings\"}]\r\n\r\n{# Define the gpt-scene model to extract the scene description #}\r\n{# To emulate the gv-objects model, pass the scene into a keyterms extractor #}\r\nextras = {\"model\": \"gemini-pro-vision\", \"gemini_token\": None, \"processor\": \"aivision\", \"system_prompt\": \"What is in the image?\", \"upload\": \"True\"}",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-14T16:06:17.663075",
+                "extras": {
+                    "system_prompt": "You are a pirate's vision consciousness. You analyze text of a description of an image, then transform it into pirate thoughts.",
+                    "processor": "aichat",
+                    "gemini_token": "[gemini_token]",
+                    "model": "gemini-pro"
+                },
+                "name": "sparrow",
+                "node_id": "BS4u00fFachTI",
+                "processor": "aichat",
+                "template_id": "n7gWZcfWDeQrG",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            },
+            "template": {
+                "created": "2023-12-14T16:06:10.977949",
+                "extras": {
+                    "system_prompt": "You are a pirate's vision consciousness. You analyze text of a description of an image, then transform it into pirate thoughts.",
+                    "processor": "aichat",
+                    "gemini_token": "[gemini_token]",
+                    "model": "gemini-pro"
+                },
+                "input_fields": [
+                    {
+                        "name": "scene",
+                        "type": "strings"
+                    }
+                ],
+                "name": "olive",
+                "output_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aichat",
+                "template_id": "n7gWZcfWDeQrG",
+                "text": "{# Use this template to drive a generative chat processor with Gemini. #}\n\n{# inputs are words - either a string or a list of strings #}\ninput_fields = [{'name': \"scene\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are a pirate's vision consciousness. You analyze text of a description of an image, then transform it into pirate thoughts.\", 'processor': \"aichat\", 'gemini_token': None, 'model': \"gemini-pro\"}\n\nScene: The following things are visible here: a beach, coconut trees and sand. Lots of sand. There is a chest here. It is locked.\n\nThe pirates mind is currently pondering: Gold, plunder, wind patterns, sand in boot.\n\nThe pirates eyes suddenly realize they are looking at \"{{scene}}\". The pirate thinks of a new an image prompt for themselves, such they may visualize it in mind:\n    \n\n\n",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-14T16:03:19.998490",
+                "extras": {
+                    "processor": "aiimage",
+                    "num_images": "1",
+                    "openai_token": "[openai_token]",
+                    "model": "dall-e-3"
+                },
+                "name": "pheasant",
+                "node_id": "8VO0UROSnTiEV",
+                "processor": "aiimage",
+                "template_id": "4aaoRgH2wJLZL",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            },
+            "template": {
+                "created": "2023-12-14T16:03:03.895259",
+                "extras": {
+                    "processor": "aiimage",
+                    "num_images": null,
+                    "openai_token": "[openai_token]",
+                    "model": "dall-e-3"
+                },
+                "input_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "name": "daft",
+                "output_fields": [
+                    {
+                        "name": "uri",
+                        "type": "urls"
+                    }
+                ],
+                "processor": "aiimage",
+                "template_id": "4aaoRgH2wJLZL",
+                "text": "{# Use this template to drive a generative image processor. #}\n\n{# Define the input_fields used in this template: #}\ninput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"uri\", 'type': \"urls\"}]\n\n{# Define the 'extras' for the number of keyterms desired #}\nextras = {'processor': \"aiimage\", 'num_images': None, 'openai_token': None, 'model': \"dall-e-3\"}\n",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-12T22:33:59.845843",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
+                    "callback_token": "[callback_token]"
+                },
+                "name": "ferret",
+                "node_id": "S58JvhCQZeJLF",
+                "processor": "callback",
+                "template_id": "2pYVHobuC6Guf",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            },
+            "template": {
+                "created": "2023-12-12T22:33:59.652338",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "[callback_uri]",
+                    "callback_token": "[callback_token]"
+                },
+                "input_fields": null,
+                "name": "fancy",
+                "output_fields": [],
+                "processor": "callback",
+                "template_id": "2pYVHobuC6Guf",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "UTfkZlwIMtC0qQ41Z"
+            }
+        }
+    ]
+}
