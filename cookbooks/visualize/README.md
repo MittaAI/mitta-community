@@ -17,6 +17,8 @@ Add the pipeline in this directory to [MittaAI](https://mitta.ai) from the `pipe
 ### Upload an image.
 Navigate to the pipeline in your Mitta account. Click 'upload' to upload an image. The image will be sent to Gemini for scene exraction, then an `aichat` processor will build a scene description. The final node calls OpenAI dalle-3 to generate a new image.
 
+The default callback will return the URL to the `logs` tab.
+
 ### Sample Output
 ```
 {"scene": [
