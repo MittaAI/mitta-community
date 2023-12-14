@@ -4,7 +4,7 @@ This pipeline is designed to process and transform image and text data using AI 
 It can be used with the [piratebot](https://github.com/MittaAI/mitta-community/blob/main/cookbooks/piratebot) cookbook to implement an agent that posts on Discord.
 
 ## Sample Image
-![beaver](https://raw.githubusercontent.com/MittaAI/mitta-community/main/cookbooks/visualize/chest.png)
+<img src="https://raw.githubusercontent.com/MittaAI/mitta-community/main/cookbooks/visualize/chest.png" width="313">
 
 Video guide coming soon!
 
