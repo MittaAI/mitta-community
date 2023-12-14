@@ -6,7 +6,7 @@ It can be used with the [piratebot](https://github.com/MittaAI/mitta-community/b
 ## Sample Image
 <img src="https://raw.githubusercontent.com/MittaAI/mitta-community/main/cookbooks/visualize/chest.png" width="313">
 
-Video guide coming soon!
+We have no idea where the motor for the chainsaw went. Maybe it's in the chest.
 
 ## Install
 You will need both an [OpenAI token](https://platform.openai.com/api-keys) as well as a [Gemini token](https://makersuite.google.com/app/apikey).
