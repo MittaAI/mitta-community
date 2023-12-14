@@ -3,8 +3,10 @@ This pipeline is designed to process and transform image and text data using AI 
 
 It can be used with the [piratebot](https://github.com/MittaAI/mitta-community/blob/main/cookbooks/piratebot) cookbook to implement an agent that posts on Discord.
 
-## Video Guide
-Video coming soon!
+## Sample Image
+![beaver](https://raw.githubusercontent.com/MittaAI/mitta-community/main/cookbooks/visualize/chest.png)
+
+Video guide coming soon!
 
 ## Install
 You will need both an [OpenAI token](https://platform.openai.com/api-keys) as well as a [Gemini token](https://makersuite.google.com/app/apikey).
