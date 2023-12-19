@@ -1,0 +1,285 @@
+{
+    "pipe_id": "3pbhs29UvkiKp",
+    "name": "sceneeleven",
+    "nodes": [
+        {
+            "node": {
+                "created": "2023-12-14T22:36:20.508075",
+                "extras": {
+                    "model": "gemini-pro-vision",
+                    "gemini_token": "[gemini_token]",
+                    "processor": "aivision",
+                    "system_prompt": "What is in the image?",
+                    "upload": "True"
+                },
+                "name": "pug",
+                "node_id": "RVwdalASkwMl6",
+                "processor": "aivision",
+                "template_id": "ukc5jVFBzvQ8r",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-14T22:36:20.308293",
+                "extras": {
+                    "model": "gemini-pro-vision",
+                    "gemini_token": "[gemini_token]",
+                    "processor": "aivision",
+                    "system_prompt": "What is in the image?",
+                    "upload": "True"
+                },
+                "input_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "string"
+                    }
+                ],
+                "name": "maroon",
+                "output_fields": [
+                    {
+                        "name": "scene",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aivision",
+                "template_id": "ukc5jVFBzvQ8r",
+                "text": "{# Use this template to drive an OpenAI GPT vision processor that outputs a scene description. #}\r\n\r\n{# Define the input_fields used in this template #}\r\ninput_fields = [{\"name\": \"filename\", \"type\": \"string\"},{\"name\": \"content_type\", \"type\": \"string\"}]\r\n\r\n{# The output_fields expected from the node processor using this template %}\r\noutput_fields = [{\"name\": \"scene\", \"type\": \"strings\"}]\r\n\r\n{# Define the gpt-scene model to extract the scene description #}\r\n{# To emulate the gv-objects model, pass the scene into a keyterms extractor #}\r\nextras = {\"model\": \"gemini-pro-vision\", \"gemini_token\": None, \"processor\": \"aivision\", \"system_prompt\": \"What is in the image?\", \"upload\": \"True\"}",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-18T17:25:35.109411",
+                "extras": {
+                    "processor": "read_uri",
+                    "uri": "https://api.elevenlabs.io/v1/voices",
+                    "method": "GET"
+                },
+                "name": "goldfish",
+                "node_id": "RCq1olK3NohDt",
+                "processor": "read_uri",
+                "template_id": "17Hn4IXhhJa9c",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-18T17:25:30.257349",
+                "extras": {
+                    "processor": "read_uri",
+                    "uri": "https://api.elevenlabs.io/v1/voices",
+                    "method": "GET"
+                },
+                "input_fields": [],
+                "name": "glaring",
+                "output_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "string"
+                    }
+                ],
+                "processor": "read_uri",
+                "template_id": "17Hn4IXhhJa9c",
+                "text": "{# Use this template to read a file from a URI #}\n\n{# Input Fields #}\n{# If the URI isn't working, try using filename and content_type + the uri #}\ninput_fields = []\n\n{# Output Fields must contain filename and content_type #}\noutput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'content_type', 'type': 'string'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"processor\": \"read_uri\", \"uri\": \"https://api.elevenlabs.io/v1/voices\", \"method\": \"GET\"}",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-18T17:30:49.451220",
+                "extras": {
+                    "processor": "read_file"
+                },
+                "name": "dolphin",
+                "node_id": "E67lHLRmr8yg4",
+                "processor": "read_file",
+                "template_id": "QIciyCeqJGi7W",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-18T17:30:45.091833",
+                "extras": {
+                    "processor": "read_file"
+                },
+                "input_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "string"
+                    }
+                ],
+                "name": "rustling",
+                "output_fields": [],
+                "processor": "read_file",
+                "template_id": "QIciyCeqJGi7W",
+                "text": "{# Use this template to read a JSON file #}\r\n\r\n{# Input Fields #}\r\n{# These should not be changed, as they are provided by the task ingestion endpoint for file uploads. #}\r\ninput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'content_type', 'type': 'string'}]\r\n\r\n{# Output Fields #}\r\n{# output of JSON reader is a json_data object #}\r\noutput_fields = []\r\n\r\n{# Extras #}\r\nextras = {\"processor\": \"read_file\"}",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-18T17:38:39.071519",
+                "extras": {
+                    "processor": "jinja2"
+                },
+                "name": "chinchilla",
+                "node_id": "I2nZGIQq9sIqN",
+                "processor": "jinja2",
+                "template_id": "pmgkyyHwl40PU",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-18T17:34:35.485487",
+                "extras": {
+                    "processor": "jinja2"
+                },
+                "input_fields": [
+                    {
+                        "name": "json_data",
+                        "type": "dicts"
+                    }
+                ],
+                "name": "enormous",
+                "output_fields": [
+                    {
+                        "name": "voice",
+                        "type": "string"
+                    }
+                ],
+                "processor": "jinja2",
+                "template_id": "pmgkyyHwl40PU",
+                "text": "{# This is a reference jinja2 processor template #}\n\n{# Input Fields #}\ninput_fields = [{\"name\": \"json_data\", \"type\": \"dicts\"}]\n\n{# Output Fields #}\noutput_fields = [{\"name\": \"voice\", \"type\": \"string\"}]\n\n{# Extras are required. #}\nextras = {\"processor\": \"jinja2\"}\n\n{% set voices = [] %}\n{% for item in json_data %}\n    {% if item.get('voices') %}\n        {% for voice in item.get('voices') %}\n            {% if voice.get('name') %}\n                {% set _ = voices.append(voice.get('name')) %}\n            {% endif %}\n        {% endfor %}\n    {% endif %}\n{% endfor %}\n\n{\n    \"voice\": {{ random_entry(voices) | tojson }}\n}\n",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-19T00:47:11.587959",
+                "extras": {
+                    "system_prompt": "You are a {{voice}}'s vision consciousness. You analyze text of a description of an image, then transform it into {{voice}} thoughts.",
+                    "processor": "aichat",
+                    "gemini_token": "[gemini_token]",
+                    "model": "gemini-pro"
+                },
+                "name": "impala",
+                "node_id": "0ejmSNpFtOF3s",
+                "processor": "aichat",
+                "template_id": "SJmdkyGmxibfX",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-14T22:36:20.687142",
+                "extras": {
+                    "system_prompt": "You are a pirate's vision consciousness. You analyze text of a description of an image, then transform it into pirate thoughts.",
+                    "processor": "aichat",
+                    "gemini_token": "[gemini_token]",
+                    "model": "gemini-pro"
+                },
+                "input_fields": [
+                    {
+                        "name": "scene",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "voice",
+                        "type": "string"
+                    }
+                ],
+                "name": "olive",
+                "output_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aichat",
+                "template_id": "SJmdkyGmxibfX",
+                "text": "{# Use this template to drive a generative chat processor with Gemini. #}\n\n{# inputs are words - either a string or a list of strings #}\ninput_fields = [{'name': \"scene\", 'type': \"strings\"},{'name': \"voice\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are a pirate's vision consciousness. You analyze text of a description of an image, then transform it into pirate thoughts.\", 'processor': \"aichat\", 'gemini_token': None, 'model': \"gemini-pro\"}\n\n{{voice[0]}}'s eyes suddenly realize they are looking at \"{{scene}}\". {{voice[0]}} thinks of a new an audio speech prompt for themselves, such they may hear it in mind (but not speak it outloud):\n    \n    \n\n\n",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-18T19:38:47.223626",
+                "extras": {
+                    "elevenlabs_token": "[elevenlabs_token]",
+                    "model": "eleven_multilingual_v2",
+                    "processor": "aispeech"
+                },
+                "name": "labrador",
+                "node_id": "4Sqf5NCiaDpUq",
+                "processor": "aispeech",
+                "template_id": "YHpTkfPWLQDek",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-18T19:29:51.781944",
+                "extras": {
+                    "elevenlabs_token": "[elevenlabs_token]",
+                    "model": "eleven_multilingual_v2",
+                    "processor": "aispeech",
+                    "voice": "Nicole"
+                },
+                "input_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "name": "busy",
+                "output_fields": [
+                    {
+                        "name": "uri",
+                        "type": "urls"
+                    }
+                ],
+                "processor": "aispeech",
+                "template_id": "YHpTkfPWLQDek",
+                "text": "{# Use this template to convert text to speech/spoken audio #}\n\n{# Input Fields #}\n{# Specify a filename if you want it saved with a particular name. #}\ninput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'assistant_content', 'type': 'strings'}]\n\n{# Output Fields #}\n{# Output the URL for the download. Access will require MittaAI token. #}\noutput_fields = [{'name': 'uri', 'type': 'urls'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"elevenlabs_token\": None, \"model\": \"eleven_multilingual_v2\", \"processor\": \"aispeech\", \"voice\": \"Nicole\"}",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-11T19:40:09.996292",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
+                    "callback_token": "[callback_token]"
+                },
+                "name": "ferret",
+                "node_id": "nd2Rgp8Hv60oR",
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-11T19:40:04.834098",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "[callback_uri]",
+                    "callback_token": "[callback_token]"
+                },
+                "input_fields": null,
+                "name": "fancy",
+                "output_fields": [],
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        }
+    ]
+}
