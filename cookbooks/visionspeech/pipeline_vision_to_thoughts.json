@@ -178,7 +178,7 @@
             "template": {
                 "created": "2023-12-14T22:36:20.687142",
                 "extras": {
-                    "system_prompt": "You are a pirate's vision consciousness. You analyze text of a description of an image, then transform it into pirate thoughts.",
+                    "system_prompt": "You are a {{voice}}'s vision consciousness. You analyze text of a description of an image, then transform it into {{voice}} thoughts.",
                     "processor": "aichat",
                     "gemini_token": "[gemini_token]",
                     "model": "gemini-pro"
@@ -202,7 +202,7 @@
                 ],
                 "processor": "aichat",
                 "template_id": "SJmdkyGmxibfX",
-                "text": "{# Use this template to drive a generative chat processor with Gemini. #}\n\n{# inputs are words - either a string or a list of strings #}\ninput_fields = [{'name': \"scene\", 'type': \"strings\"},{'name': \"voice\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are a pirate's vision consciousness. You analyze text of a description of an image, then transform it into pirate thoughts.\", 'processor': \"aichat\", 'gemini_token': None, 'model': \"gemini-pro\"}\n\n{{voice[0]}}'s eyes suddenly realize they are looking at \"{{scene}}\". {{voice[0]}} thinks of a new an audio speech prompt for themselves, such they may hear it in mind (but not speak it outloud):\n    \n    \n\n\n",
+                "text": "{# Use this template to drive a generative chat processor with Gemini. #}\n\n{# inputs are words - either a string or a list of strings #}\ninput_fields = [{'name': \"scene\", 'type': \"strings\"},{'name': \"voice\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are a {{voice}}'s vision consciousness. You analyze text of a description of an image, then transform it into {{voice}} thoughts.\", 'processor': \"aichat\", 'gemini_token': None, 'model': \"gemini-pro\"}\n\n{{voice[0]}}'s eyes suddenly realize they are looking at \"{{scene}}\". {{voice[0]}} thinks of a new an audio speech prompt for themselves, such they may hear it in mind (but not speak it outloud):\n    \n    \n\n\n",
                 "uid": "0kcas0aVtwkg6hNFh"
             }
         },
