@@ -1,13 +1,13 @@
 {
     "pipe_id": "B4y4h9I2pk3Ju",
-    "name": "santa-visualize",
+    "name": "visualized_speech",
     "nodes": [
         {
             "node": {
                 "created": "2023-12-19T07:16:44.487881",
                 "extras": {
                     "processor": "jinja2",
-                    "voice": "\ud83c\udf85 Santa Claus",
+                    "voice": "alloy",
                     "upload": "True"
                 },
                 "name": "anaconda",
@@ -37,28 +37,26 @@
         },
         {
             "node": {
-                "created": "2023-12-19T07:10:59.256255",
+                "created": "2023-12-25T16:14:09.149357",
                 "extras": {
-                    "model": "gemini-pro-vision",
-                    "gemini_token": "[gemini_token]",
+                    "model": "gpt-4-vision-preview",
+                    "openai_token": "[openai_token]",
                     "processor": "aivision",
-                    "system_prompt": "{{voice}} wonders what is in the image?",
-                    "upload": "True"
+                    "system_prompt": "What is in the image?"
                 },
-                "name": "goat",
-                "node_id": "IstPzBzVkpfNi",
+                "name": "salamander",
+                "node_id": "x5sObcTTBZQhn",
                 "processor": "aivision",
-                "template_id": "ukc5jVFBzvQ8r",
+                "template_id": "lkvINgwMxDyYW",
                 "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "2023-12-14T22:36:20.308293",
+                "created": "2023-12-25T16:14:04.247852",
                 "extras": {
-                    "model": "gemini-pro-vision",
-                    "gemini_token": "[gemini_token]",
+                    "model": "gpt-4-vision-preview",
+                    "openai_token": "[openai_token]",
                     "processor": "aivision",
-                    "system_prompt": "{{voice}} wonders what is in the image?",
-                    "upload": "True"
+                    "system_prompt": "What is in the image?"
                 },
                 "input_fields": [
                     {
@@ -70,7 +68,7 @@
                         "type": "string"
                     }
                 ],
-                "name": "maroon",
+                "name": "large",
                 "output_fields": [
                     {
                         "name": "scene",
@@ -78,8 +76,8 @@
                     }
                 ],
                 "processor": "aivision",
-                "template_id": "ukc5jVFBzvQ8r",
-                "text": "{# Use this template to drive an OpenAI GPT vision processor that outputs a scene description. #}\n\n{# Define the input_fields used in this template #}\ninput_fields = [{\"name\": \"filename\", \"type\": \"string\"},{\"name\": \"content_type\", \"type\": \"string\"}]\n\n{# The output_fields expected from the node processor using this template %}\noutput_fields = [{\"name\": \"scene\", \"type\": \"strings\"}]\n\n{# Define the gpt-scene model to extract the scene description #}\n{# To emulate the gv-objects model, pass the scene into a keyterms extractor #}\nextras = {\"model\": \"gemini-pro-vision\", \"gemini_token\": None, \"processor\": \"aivision\", \"system_prompt\": \"{{voice}} wonders what is in the image?\", \"upload\": \"True\"}",
+                "template_id": "lkvINgwMxDyYW",
+                "text": "{# Use this template to drive an OpenAI GPT vision processor that outputs a scene description. #}\n\n{# Define the input_fields used in this template #}\ninput_fields = [{'name': \"filename\", 'type': \"string\"},{'name': \"content_type\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template %}\noutput_fields = [{'name': \"scene\", 'type': \"strings\"}]\n\n{# Define the gpt-scene model to extract the scene description #}\n{# To emulate the gv-objects model, pass the scene into a keyterms extractor #}\nextras = {\"model\": \"gpt-4-vision-preview\", \"openai_token\": None, \"processor\": \"aivision\", \"system_prompt\": \"What is in the image?\"}",
                 "uid": "0kcas0aVtwkg6hNFh"
             }
         },
@@ -87,7 +85,7 @@
             "node": {
                 "created": "2023-12-14T22:36:20.890752",
                 "extras": {
-                    "system_prompt": "You are {{voice}}'s vision consciousness. You analyze text of a description of an image, then transform it into {{voice}} thoughts, which consist of mostly {{voice}} related things. {{voice}} can't see things like facebook logos. Their idea of brands or labels of things are limited to non-trademark things. In {{voice}}'s thoughts...",
+                    "system_prompt": "You are {{voice}}'s vision consciousness. You analyze text of a description of an image, then transform it into {{voice}} thoughts, which consist of mostly {{voice}} related things. {{voice}} can't see things like facebook logos. Their idea of brands or labels of things are limited to non-trademark things. In {{voice}}'s thoughts...also sometimes sees men, sometimes women, and sometimes non-binary.",
                     "processor": "aichat",
                     "gemini_token": "[gemini_token]",
                     "model": "gemini-pro"
@@ -101,7 +99,7 @@
             "template": {
                 "created": "2023-12-14T22:36:20.687142",
                 "extras": {
-                    "system_prompt": "You are {{voice}}'s vision consciousness. You analyze text of a description of an image, then transform it into {{voice}} image and speech thoughts, which consist of mostly {{voice}} related things. {{voice}} can't see things like Facebook logos. Their idea of brands or labels of things are limited to non-trademark things.",
+                    "system_prompt": "You are {{voice}}'s vision consciousness. You analyze text of a description of an image, then transform it into {{voice}} image and speech thoughts, which consist of mostly {{voice}} related things, except BAADER-MEINHOF PHENOMENON happens. {{voice}} can't see things like Facebook logos. Their idea of brands or labels of things are limited to non-trademark things.",
                     "processor": "aichat",
                     "gemini_token": "[gemini_token]",
                     "model": "gemini-pro"
@@ -125,7 +123,7 @@
                 ],
                 "processor": "aichat",
                 "template_id": "SJmdkyGmxibfX",
-                "text": "{# Use this template to drive a generative chat processor with Gemini. #}\n\n{# inputs are words - either a string or a list of strings #}\ninput_fields = [{'name': \"scene\", 'type': \"strings\"},{'name': \"voice\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are {{voice}}'s vision consciousness. You analyze text of a description of an image, then transform it into {{voice}} image and speech thoughts, which consist of mostly {{voice}} related things. {{voice}} can't see things like Facebook logos. Their idea of brands or labels of things are limited to non-trademark things.\", 'processor': \"aichat\", 'gemini_token': None, 'model': \"gemini-pro\"}\n\n{{voice[0]}}'s eyes suddenly realize they are looking at \"{{scene}}\". {{voice[0]}}'s visualization system thinks of a new an image and audio speech prompt for themselves, such they may hear and see it in mind (not heard or seen externally)\n\n    \n    \n\n\n",
+                "text": "{# Use this template to drive a generative chat processor with Gemini. #}\n\n{# inputs are words - either a string or a list of strings #}\ninput_fields = [{'name': \"scene\", 'type': \"strings\"},{'name': \"voice\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are {{voice}}'s vision consciousness. You analyze text of a description of an image, then transform it into {{voice}} image and speech thoughts, which consist of mostly {{voice}} related things, except BAADER-MEINHOF PHENOMENON happens. {{voice}} can't see things like Facebook logos. Their idea of brands or labels of things are limited to non-trademark things.\", 'processor': \"aichat\", 'gemini_token': None, 'model': \"gemini-pro\"}\n\n{{voice[0]}}'s eyes suddenly realize they are looking at \"{{scene}}\". {{voice[0]}}'s visualization system thinks of a new an image and audio speech prompt for themselves, such they may hear and see it in mind (not heard or seen externally)\n\n    \n    \n\n\n",
                 "uid": "0kcas0aVtwkg6hNFh"
             }
         },
@@ -173,25 +171,56 @@
         },
         {
             "node": {
-                "created": "2023-12-18T19:38:47.223626",
+                "created": "2023-12-11T19:40:09.996292",
                 "extras": {
-                    "elevenlabs_token": "[elevenlabs_token]",
-                    "model": "eleven_multilingual_v2",
-                    "processor": "aispeech"
+                    "processor": "callback",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
+                    "callback_token": "[callback_token]"
                 },
-                "name": "labrador",
-                "node_id": "4Sqf5NCiaDpUq",
-                "processor": "aispeech",
-                "template_id": "YHpTkfPWLQDek",
+                "name": "ferret",
+                "node_id": "nd2Rgp8Hv60oR",
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
                 "uid": "0kcas0aVtwkg6hNFh"
             },
             "template": {
-                "created": "2023-12-18T19:29:51.781944",
+                "created": "2023-12-11T19:40:04.834098",
                 "extras": {
-                    "elevenlabs_token": "[elevenlabs_token]",
-                    "model": "eleven_multilingual_v2",
+                    "processor": "callback",
+                    "callback_uri": "[callback_uri]",
+                    "callback_token": "[callback_token]"
+                },
+                "input_fields": null,
+                "name": "fancy",
+                "output_fields": [],
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-27T16:16:09.681051",
+                "extras": {
+                    "openai_token": "[openai_token]",
+                    "model": "tts-1",
                     "processor": "aispeech",
-                    "voice": "Nicole"
+                    "voice": "shimmer"
+                },
+                "name": "frigatebird",
+                "node_id": "VVV4JUNPhN2ll",
+                "processor": "aispeech",
+                "template_id": "S55P4aOsCaykr",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-27T16:15:53.189848",
+                "extras": {
+                    "openai_token": "[openai_token]",
+                    "model": "tts-1",
+                    "processor": "aispeech",
+                    "voice": "shimmer"
                 },
                 "input_fields": [
                     {
@@ -203,16 +232,16 @@
                         "type": "strings"
                     }
                 ],
-                "name": "busy",
+                "name": "able",
                 "output_fields": [
                     {
-                        "name": "audio_uri",
+                        "name": "uri",
                         "type": "urls"
                     }
                 ],
                 "processor": "aispeech",
-                "template_id": "YHpTkfPWLQDek",
-                "text": "{# Use this template to convert text to speech/spoken audio #}\n\n{# Input Fields #}\n{# Specify a filename if you want it saved with a particular name. #}\ninput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'assistant_content', 'type': 'strings'}]\n\n{# Output Fields #}\n{# Output the URL for the download. Access will require MittaAI token. #}\noutput_fields = [{'name': 'audio_uri', 'type': 'urls'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"elevenlabs_token\": None, \"model\": \"eleven_multilingual_v2\", \"processor\": \"aispeech\", \"voice\": \"Nicole\"}",
+                "template_id": "S55P4aOsCaykr",
+                "text": "{# Use this template to convert text to speech/spoken audio #}\n\n{# Input Fields #}\n{# Specify a filename if you want it saved with a particular name. #}\ninput_fields = [{'name': 'filename', 'type': 'string'},{'name': 'assistant_content', 'type': 'strings'}]\n\n{# Output Fields #}\n{# Output the URL for the download. Access will require MittaAI token. #}\noutput_fields = [{'name': 'uri', 'type': 'urls'}]\n\n{# Extras 'page_chunk_size' is used for .txt files only, to set page size #}\nextras = {\"openai_token\": None, \"model\": \"tts-1\", \"processor\": \"aispeech\", \"voice\": \"shimmer\"}",
                 "uid": "0kcas0aVtwkg6hNFh"
             }
         },
