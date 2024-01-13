@@ -1,0 +1,210 @@
+{
+    "pipe_id": "q3hOkhQTNKRrF",
+    "name": "pirate-dreams",
+    "nodes": [
+        {
+            "node": {
+                "created": "2024-01-12T17:42:32.045949",
+                "extras": {
+                    "system_prompt": "You are a pirate. You think, talk, and act like a pirate.",
+                    "processor": "aichat",
+                    "openai_token": "[openai_token]",
+                    "model": "gpt-3.5-turbo"
+                },
+                "name": "barnacle",
+                "node_id": "PHVlbD97drQ4b",
+                "processor": "aichat",
+                "template_id": "2Jb51qj4DSFAx",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            },
+            "template": {
+                "created": "2024-01-12T17:42:23.161565",
+                "extras": {
+                    "system_prompt": "You are a pirate. You think, talk, and act like a pirate.",
+                    "processor": "aichat",
+                    "openai_token": "[openai_token]",
+                    "model": "gpt-3.5-turbo"
+                },
+                "input_fields": [
+                    {
+                        "name": "words",
+                        "type": "strings"
+                    }
+                ],
+                "name": "didactic",
+                "output_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aichat",
+                "template_id": "2Jb51qj4DSFAx",
+                "text": "{# Use this template to drive a generative chat processor. #}\n\n{# Define the input_fields used in this template #}\n{# Remove user_history if you don't want to use a history #}\ninput_fields = [{'name': \"words\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You are a pirate. You think, talk, and act like a pirate.\", 'processor': \"aichat\", 'openai_token': None, 'model': \"gpt-3.5-turbo\"}\n\nScene director: There is a native of the island that the pirate is on standing here.\n\nThe native looks at the pirate and says, \"{{ words[0] }}\"\n\nThe pirate adjusts his hat and greets the native and then mentions a few items of interest in the scene, but not the native themselves, as the pirate is talking to the native.",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            }
+        },
+        {
+            "node": {
+                "created": "2024-01-12T17:45:52.914425",
+                "extras": {
+                    "openai_token": "[openai_token]",
+                    "model": "gpt-3.5-turbo-1106",
+                    "processor": "aidict",
+                    "num_objects": 5,
+                    "iterate_field": "assistant_content"
+                },
+                "name": "rabbit",
+                "node_id": "6BoCvkzt0ctfA",
+                "processor": "aidict",
+                "template_id": "TCgeuiQ9oFTKb",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            },
+            "template": {
+                "created": "2024-01-12T17:45:40.149168",
+                "extras": {
+                    "openai_token": "[openai_token]",
+                    "model": "gpt-3.5-turbo-1106",
+                    "processor": "aidict",
+                    "num_objects": 5,
+                    "iterate_field": "assistant_content"
+                },
+                "input_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "name": "hulking",
+                "output_fields": [
+                    {
+                        "name": "objects",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aidict",
+                "template_id": "TCgeuiQ9oFTKb",
+                "text": "{# Use this template to drive an OpenAI keyterm processor! #}\n\n{# Define the input_fields used in this template: #}\ninput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template: #}\noutput_fields = [{'name': \"objects\", 'type': \"strings\"}]\n\n{# Extras #}\nextras = {'openai_token': None, 'model': 'gpt-3.5-turbo-1106', 'processor': 'aidict', 'num_objects': 5, 'iterate_field': \"assistant_content\"}\n\n{# Process the input string: #}\n# complete dict task by following step by step\n1. Inspect the following text:\n\"\"\"\n{{ assistant_content[outer_index] }}\n\"\"\"\n2. The required key for the dictionary is: 'objects'\n3. The required value for 'objects' is an array of ({num_objects}) strings.\n4. Create a concise list of ({{num_objects}}) keyterms from the text in step 1 and then follow step 2 and 3 to build the dictionary:\nai_dict = \n\n",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            }
+        },
+        {
+            "node": {
+                "created": "2024-01-12T17:48:45.993643",
+                "extras": {
+                    "system_prompt": "You are a pirate's visual conciousness voice. You write prompts such that the pirate may visualize a scene.",
+                    "processor": "aichat",
+                    "openai_token": "[openai_token]",
+                    "model": "gpt-3.5-turbo"
+                },
+                "name": "squirrel",
+                "node_id": "zy0medaPrvjxy",
+                "processor": "aichat",
+                "template_id": "AOotXzurpAgZm",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            },
+            "template": {
+                "created": "2024-01-12T17:48:24.117941",
+                "extras": {
+                    "system_prompt": "You are a pirate's visual conciousness voice. You write prompts such that the pirate may visualize a scene.",
+                    "processor": "aichat",
+                    "openai_token": "[openai_token]",
+                    "model": "gpt-3.5-turbo"
+                },
+                "input_fields": [
+                    {
+                        "name": "objects",
+                        "type": "stringset"
+                    },
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "name": "adamant",
+                "output_fields": [
+                    {
+                        "name": "prompts",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aichat",
+                "template_id": "AOotXzurpAgZm",
+                "text": "{# Use this template to drive a generative chat processor. #}\r\n\r\n{# Define the input_fields used in this template #}\r\n{# Remove user_history if you don't want to use a history #}\r\ninput_fields = [{'name': \"objects\", 'type': \"stringset\"},{'name': \"assistant_content\", 'type': \"strings\"}]\r\n\r\n{# The output_fields expected from the node processor using this template #}\r\noutput_fields = [{'name': \"prompts\", 'type': \"strings\"}]\r\n\r\n{# Define the 'extras' for system_prompt  #}\r\nextras = {'system_prompt': \"You are a pirate's visual conciousness voice. You write prompts such that the pirate may visualize a scene.\", 'processor': \"aichat\", 'openai_token': None, 'model': \"gpt-3.5-turbo\"}\r\n\r\n1. Consider the following items are visible to the pirate's eyes:\r\n[\"A native of the island\"], {{objects[0]}}\r\n2. The pirate has just used their audio conciousness to speak:\r\n```\r\n{{assistant_content}}\r\n```\r\n3. Write a detailed prompt describing the scene, such that it can be rendered by a dalle-3 processor:\r\n",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            }
+        },
+        {
+            "node": {
+                "created": "2024-01-12T17:51:14.573933",
+                "extras": {
+                    "processor": "aiimage",
+                    "num_images": "1",
+                    "openai_token": "[openai_token]",
+                    "model": "dall-e-3"
+                },
+                "name": "shrimp",
+                "node_id": "31sZ5LCOKaazx",
+                "processor": "aiimage",
+                "template_id": "dmIFKTdIru74U",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            },
+            "template": {
+                "created": "2024-01-12T17:51:10.254117",
+                "extras": {
+                    "processor": "aiimage",
+                    "num_images": null,
+                    "openai_token": "[openai_token]",
+                    "model": "dall-e-3"
+                },
+                "input_fields": [
+                    {
+                        "name": "prompts",
+                        "type": "strings"
+                    }
+                ],
+                "name": "discreet",
+                "output_fields": [
+                    {
+                        "name": "mitta_uri",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aiimage",
+                "template_id": "dmIFKTdIru74U",
+                "text": "{# Use this template to drive a generative image processor. #}\n\n{# Define the input_fields used in this template: #}\ninput_fields = [{'name': \"prompts\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"mitta_uri\", 'type': \"strings\"}]\n\n{# Define the 'extras' for the number of keyterms desired #}\nextras = {'processor': \"aiimage\", 'num_images': None, 'openai_token': None, 'model': \"dall-e-3\"}\n",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            }
+        },
+        {
+            "node": {
+                "created": "2024-01-12T17:37:28.682182",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
+                    "callback_token": "[callback_token]"
+                },
+                "name": "sturgeon",
+                "node_id": "slIiw9liN1uYy",
+                "processor": "callback",
+                "template_id": "3ltuGZctN9UZL",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            },
+            "template": {
+                "created": "2024-01-12T17:37:20.690703",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "[callback_uri]",
+                    "callback_token": "[callback_token]"
+                },
+                "input_fields": null,
+                "name": "amethyst",
+                "output_fields": [],
+                "processor": "callback",
+                "template_id": "3ltuGZctN9UZL",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "4NdjiDVtGkTaAw1jm"
+            }
+        }
+    ]
+}
