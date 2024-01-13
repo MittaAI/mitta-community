@@ -8,7 +8,7 @@ There is a [Discord server](https://discord.gg/SxwcVGQ8j9) available for help wi
 ## Getting Started Video
 Before you begin, we recommend watching the Getting Started video guide. This guide will help you become familiar with important concepts such as callbacks, storage, and how to use pipelines effectively.
 
-[![Getting Started](https://img.youtube.com/vi/ntLqz38hC60/0.jpg)](https://www.youtube.com/watch?v=ntLqz38hC60)
+ [![Getting Started...with Pirates](https://img.youtube.com/vi/CuALke2rQbQ/0.jpg)](https://www.youtube.com/watch?v=CuALke2rQbQ)
 
 ## Pipeline Cookbooks
 In the [cookbooks directory](./cookbooks), you'll find a collection of example pipelines that are available for use on MittaAI's website. These pipelines can help you get started quickly. 
