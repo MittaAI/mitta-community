@@ -3,7 +3,8 @@ The Pirate Dreams cookbook provides a pipeline which synthesizes a story using a
 
  ## Installation
  1. *MittaAI Account*: Ensure you have an active account on [MittaAI](https://mitta.ai).
- 2. *Adding the Pipeline*: On the MittaAI platform, navigate to the `pipelines` section and add the Pirate Dreams pipeline using the provided `pipeline_dreams.json` file. You can download the file from [this link](https://github.com/MittaAI/mitta-community/blob/main/cookbooks/piratedreams/pipeline_dreams.json?raw=true).
+ 2. *Adding the Pipeline*: On the MittaAI platform, navigate to the `pipelines` section and add the Pirate Dreams pipeline using the provided `pipeline_dreams.json` file. You can [download pipeline_dreams.json](https://raw.githubusercontent.com/MittaAI/mitta-community/main/cookbooks/piratedreams/pipeline_dreams.json)
+.
 
  ## Video Guide
  For a comprehensive guide on how to set up and use the Pirate Dreams pipeline, watch our detailed video that covers building and using the pipeline.
