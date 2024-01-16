@@ -1,0 +1,162 @@
+{
+    "pipe_id": "7nR6jMtvnTqhs",
+    "name": "translate",
+    "nodes": [
+        {
+            "node": {
+                "created": "2023-12-05T22:51:11.521147",
+                "extras": {
+                    "processor": "info_file",
+                    "upload": true
+                },
+                "name": "copperhead",
+                "node_id": "vw8AjUnTkvGum",
+                "processor": "info_file",
+                "template_id": "569HUvqgRkWTg",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-05T22:51:11.380998",
+                "extras": {
+                    "processor": "info_file",
+                    "upload": true
+                },
+                "input_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "string"
+                    }
+                ],
+                "name": "celadon",
+                "output_fields": [
+                    {
+                        "name": "mitta_uri",
+                        "type": "urls"
+                    }
+                ],
+                "processor": "info_file",
+                "template_id": "569HUvqgRkWTg",
+                "text": "{# Use this template to drive a info processor that outputs file information. #}\n\n{# Define the input_fields used in this template #}\ninput_fields = [{'name': \"filename\", 'type': \"string\"},{'name': \"content_type\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template %}\noutput_fields = [{'name': \"mitta_uri\", 'type': \"urls\"}]\n\n{# Define the info_file processor #}\nextras = {\"processor\": \"info_file\", \"upload\": True, \"language\": None}",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2024-01-10T03:10:35.947916",
+                "extras": {
+                    "model": "gv-ocr"
+                },
+                "name": "sponge",
+                "node_id": "sb96LOXl8uypw",
+                "processor": "aivision",
+                "template_id": "i15hk7EbKIGOx",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2024-01-10T03:10:26.797831",
+                "extras": {
+                    "model": "gv-ocr"
+                },
+                "input_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "string"
+                    }
+                ],
+                "name": "jasmine",
+                "output_fields": [
+                    {
+                        "name": "texts",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aivision",
+                "template_id": "i15hk7EbKIGOx",
+                "text": "{# Use this template to drive a vision processor. #}\r\n\r\n{# Define the input_fields used in this template; user_history alternates user,assistant,user,assistant.. #}\r\ninput_fields = [{'name': \"filename\", 'type': \"string\"},{'name': \"content_type\", 'type': \"string\"}]\r\n\r\n{# The output_fields expected from the node processor using this template %}\r\noutput_fields = [{'name': \"texts\", 'type': \"strings\"}]\r\n\r\nextras = {\"model\": \"gv-ocr\"}",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2024-01-15T18:49:14.471134",
+                "extras": {
+                    "system_prompt": "You read web pages.",
+                    "processor": "aichat",
+                    "gemini_token": "[gemini_token]",
+                    "model": "gemini-pro",
+                    "language": null
+                },
+                "name": "coucal",
+                "node_id": "IzCcwHgWXwFjc",
+                "processor": "aichat",
+                "template_id": "GxIXZOsLOj5UP",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2024-01-15T18:47:59.502665",
+                "extras": {
+                    "system_prompt": "You read web pages.",
+                    "processor": "aichat",
+                    "gemini_token": "[gemini_token]",
+                    "model": "gemini-pro",
+                    "language": null
+                },
+                "input_fields": [
+                    {
+                        "name": "texts",
+                        "type": "strings"
+                    }
+                ],
+                "name": "precious",
+                "output_fields": [
+                    {
+                        "name": "assistant_content",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aichat",
+                "template_id": "GxIXZOsLOj5UP",
+                "text": "{# Use this template to drive a generative chat processor with Gemini. #}\n\n{# inputs are words - either a string or a list of strings #}\ninput_fields = [{'name': \"texts\", 'type': \"strings\"}]\n\n{# The output_fields expected from the node processor using this template #}\noutput_fields = [{'name': \"assistant_content\", 'type': \"strings\"}]\n\n{# Define the 'extras' for system_prompt  #}\nextras = {'system_prompt': \"You read web pages.\", 'processor': \"aichat\", 'gemini_token': None, 'model': \"gemini-pro\", 'language': None}\n\n1. Look at this text from a website:\n\"\"\"\n{{ texts }}\n\"\"\"\n2. Translate the text into {{language}}.\n3. Provide a summary in {{language}}.\n\n\n",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-11T19:40:09.996292",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
+                    "callback_token": "[callback_token]"
+                },
+                "name": "ferret",
+                "node_id": "nd2Rgp8Hv60oR",
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-11T19:40:04.834098",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "[callback_uri]",
+                    "callback_token": "[callback_token]"
+                },
+                "input_fields": null,
+                "name": "fancy",
+                "output_fields": [],
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        }
+    ]
+}
