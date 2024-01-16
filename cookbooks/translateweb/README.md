@@ -1,5 +1,5 @@
 # Translate Webpage Bot
-This pair of pipelines crawls a website visually and then translates the page contents into the language of your choice. It uses the Google `gemini-pro` model, but can be changed to use any model supported on the system, which itself supports tranlation to the desired language.
+This pair of pipelines crawls a website visually and then translates the page contents into the language of your choice. It uses the Google `gemini-pro` model, but can be changed to use any model supported on the system, and which also supports translation to the desired language.
 
 ## Install
 Add the two pipelines in this directory to [MittaAI](https://mitta.ai) from the `pipelines` page. One pipeline crawls the page, the other pipeline uses the image from that crawl to extract the text and translate it. 
