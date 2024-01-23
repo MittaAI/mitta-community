@@ -4,14 +4,14 @@
   "cookbook_cards": [
     {
       "image": {
-        "src": "/cookbooks/conversion/images/convert.png",
+        "src": "images/convert.png",
         "alt": "Convert"
       },
       "title": "Media Conversion",
       "description": "Converts media files using conversational language. Uploads are limited in size to 32MB.",
       "links": {
         "install": {
-          "href": "/cookbooks/conversion/pipeline_convert.json",
+          "href": "pipeline_convert.json",
           "text": "Install"
         },
         "github": {
@@ -21,14 +21,14 @@
     },
     {
       "image": {
-        "src": "/cookbooks/conversion/images/callback.png",
+        "src": "images/callback.png",
         "alt": "Callback"
       },
       "title": "Media Callback",
       "description": "Handles the callback from the `aiffmpeg` processor and displays it in the log tab.",
       "links": {
         "install": {
-          "href": "/cookbooks/conversion/pipeline_callback.json",
+          "href": "pipeline_callback.json",
           "text": "Install"
         },
         "github": {
