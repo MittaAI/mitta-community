@@ -1,15 +1,15 @@
 {
   "header": "AI Powered FFmpeg",
-  "description": "Media files may be converted on Mitta by using an `aiffmpeg` processor. An AI is used to write the conversion code, then those are passed along with the file to a backend for processing.",
+  "description": "Convert various media file types using an `aiffmpeg` processor powered pipeline. You can use the processor in other pipelines to transform generated files.",
   "youtube_url": "https://www.youtube.com/embed/zAdhqL1yr5Y?si=HDn0lds--Sm-rhg",
   "cookbook_cards": [
-    {
+    { 
       "image": {
         "src": "images/convert.png",
         "alt": "Convert"
       },
       "title": "FFMpeg Conversion",
-      "description": "Use this pipeline to convert media files with conversational language using ffmpeg. Uploads are limited in size to 32MB.",
+      "description": "Use this pipeline to convert media files with conversational language using FFmpeg. Uploads are limited in size to 32MB.",
       "links": {
         "install": {
           "href": "pipeline_convert.json",
