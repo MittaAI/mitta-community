@@ -23,6 +23,6 @@ curl -X POST "http://localhost:8080/pipeline/zeXeO6d0IiQdF/task?token=<token>" \
 ```
 
 ### Sample Output
-<img src="https://raw.githubusercontent.com/MittaAI/mitta-community/main/cookbooks/conversion/7GjzjSoj8V7OB.png">
+<img src="https://raw.githubusercontent.com/MittaAI/mitta-community/main/cookbooks/conversion/images/7GjzjSoj8V7OB.png">
 
 If you have issues configuring the pipeline, pop into [Slack](https://join.slack.com/t/mittaai/shared_invite/zt-2azbcv29i-CL74lmOksgvN54jhvmVWeA).
