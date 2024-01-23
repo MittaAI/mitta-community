@@ -1,0 +1,40 @@
+{
+  "header": "AI Powered Media Conversion",
+  "description": "Media files may be converted by using an `aiffmpeg` processor. An AI is used to write the conversion code, then passed along with the file to a backend processor.",
+  "cookbook_cards": [
+    {
+      "image": {
+        "src": "/cookbooks/conversion/images/convert.png",
+        "alt": "Convert"
+      },
+      "title": "Media Conversion",
+      "description": "Converts media files using conversational language. Uploads are limited in size to 32MB.",
+      "links": {
+        "install": {
+          "href": "/cookbooks/conversion/pipeline_convert.json",
+          "text": "Install"
+        },
+        "github": {
+          "href": "https://github.com/MittaAI/mitta-community/tree/main/cookbooks/conversion"
+        }
+      }
+    },
+    {
+      "image": {
+        "src": "/cookbooks/conversion/images/callback.png",
+        "alt": "Callback"
+      },
+      "title": "Media Callback",
+      "description": "Handles the callback from the `aiffmpeg` processor and displays it in the log tab.",
+      "links": {
+        "install": {
+          "href": "/cookbooks/conversion/pipeline_callback.json",
+          "text": "Install"
+        },
+        "github": {
+          "href": "https://github.com/MittaAI/mitta-community/tree/main/cookbooks/conversion"
+        }
+      }
+    }
+  ]
+}
