@@ -1,14 +1,15 @@
 {
-  "header": "AI Powered Media Conversion",
-  "description": "Media files may be converted by using an `aiffmpeg` processor. An AI is used to write the conversion code, then passed along with the file to a backend processor.",
+  "header": "AI Powered FFmpeg",
+  "description": "Media files may be converted on Mitta by using an `aiffmpeg` processor. An AI is used to write the conversion code, then those are passed along with the file to a backend for processing.",
+  "youtube_url": "",
   "cookbook_cards": [
     {
       "image": {
         "src": "images/convert.png",
         "alt": "Convert"
       },
-      "title": "Media Conversion",
-      "description": "Converts media files using conversational language. Uploads are limited in size to 32MB.",
+      "title": "FFMpeg Conversion",
+      "description": "Use this pipeline to convert media files with conversational language using <strong>ffmpeg</strong>. Uploads are limited in size to 32MB.",
       "links": {
         "install": {
           "href": "pipeline_convert.json",
@@ -22,10 +23,10 @@
     {
       "image": {
         "src": "images/callback.png",
-        "alt": "Callback"
+        "alt": "FFMpeg Callback"
       },
-      "title": "Media Callback",
-      "description": "Handles the callback from the `aiffmpeg` processor and displays it in the log tab.",
+      "title": "FFMpeg Callback",
+      "description": "Use this pipeline to catch the callback from the `aiffmpeg` processor. Displays the output from the first pipeline in the logs tab.",
       "links": {
         "install": {
           "href": "pipeline_callback.json",
