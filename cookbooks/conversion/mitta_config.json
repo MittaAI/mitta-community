@@ -1,7 +1,7 @@
 {
   "header": "AI Powered FFmpeg",
   "description": "Media files may be converted on Mitta by using an `aiffmpeg` processor. An AI is used to write the conversion code, then those are passed along with the file to a backend for processing.",
-  "youtube_url": "https://www.youtube.com/watch?v=zAdhqL1yr5Y",
+  "youtube_url": "https://www.youtube.com/embed/zAdhqL1yr5Y?si=HDn0lds--Sm-rhg",
   "cookbook_cards": [
     {
       "image": {

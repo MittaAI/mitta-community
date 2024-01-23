@@ -6,13 +6,23 @@ It can be used with file generation pipelines to resize/reformat images or audio
 ## Video Guide
 Watch the video guide before beginning installation.
 
-[![Pirate Bot](https://img.youtube.com/vi/zAdhqL1yr5Y/0.jpg)](https://www.youtube.com/watch?v=zAdhqL1yr5Y)
+[![conversion](https://img.youtube.com/vi/zAdhqL1yr5Y/0.jpg)](https://www.youtube.com/watch?v=zAdhqL1yr5Y)
 
 ## Install
 Add the pipelines in this directory to [MittaAI](https://mitta.ai) from the `pipelines` page. The first pipeline defaults to resizing PNGs and calling another pipeline back to log the output. The first pipeline expect the second pipeline to be called `ffmpegupload`, but could be changed to do a callback to a custom endpoint.
 
 ## Use
 You can test the pipeline using the `upload` button on the pipeline detail page, or you can do a request with `curl`:
+
+Resize an image:
+```
+convert to a 256 x 256 png
+```
+
+Resize an audio file and convert it:
+```
+convert to an mp3 and make it start at 1 minute and last for 30 seconds
+```
 
 ### Example
 The POST requires an image file.
