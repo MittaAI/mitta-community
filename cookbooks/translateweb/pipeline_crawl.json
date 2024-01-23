@@ -1,0 +1,72 @@
+{
+    "pipe_id": "pLudpSaxxFEvT",
+    "name": "crawl",
+    "nodes": [
+        {
+            "node": {
+                "created": "2024-01-10T17:53:05.385587",
+                "extras": {
+                    "pipeline": "translate"
+                },
+                "name": "terrier",
+                "node_id": "9NQCQCiZ7jovU",
+                "processor": "aigrub",
+                "template_id": "Y9EdpeRFagUPA",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2024-01-10T17:49:33.168217",
+                "extras": {
+                    "pipeline": null
+                },
+                "input_fields": [
+                    {
+                        "name": "uri",
+                        "type": "strings"
+                    }
+                ],
+                "name": "merciful",
+                "output_fields": [
+                    {
+                        "name": "mitta_uri",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aigrub",
+                "template_id": "Y9EdpeRFagUPA",
+                "text": "{# Use this template to screenshot a set of URLs #}\n\n{# Input Fields #}\ninput_fields = [{'name': \"uri\", 'type': \"strings\"}]\n\n{# Output Fields #}\noutput_fields = [{'name': \"mitta_uri\", 'type': \"strings\"}]\n\n{# Define the pipeline to call with the screenshot #}\nextras = {'pipeline': None}",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-11T19:40:09.996292",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
+                    "callback_token": "[callback_token]"
+                },
+                "name": "ferret",
+                "node_id": "nd2Rgp8Hv60oR",
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-11T19:40:04.834098",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "[callback_uri]",
+                    "callback_token": "[callback_token]"
+                },
+                "input_fields": null,
+                "name": "fancy",
+                "output_fields": [],
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        }
+    ]
+}
