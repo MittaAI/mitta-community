@@ -15,15 +15,14 @@ app = Flask(__name__)
 
 @app.route('/embed', methods=['POST'])
 def embed():
-
-  ffmpeg_token = os.getenv('INSTRUCTOR_TOKEN')
+  instructor_token = os.getenv('INSTRUCTOR_TOKEN')
   data = await request.get_json()
   
   # token check
   if not data.get('instructor_token'):
     return jsonify({'result': 'failed: must include token'})
   else:
-    if data.get('instructor_token') != ffmpeg_token:
+    if data.get('instructor_token') != instructor_token:
       return jsonify({'result': 'failed: bad token'})
 
   if request.method == 'POST':
@@ -48,7 +47,7 @@ def embed():
     return jsonify(response_data)
   else:
     return jsonify({'result': "not supported"})
-    
+
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0', port=5000)

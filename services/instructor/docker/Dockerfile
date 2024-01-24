@@ -1,8 +1,16 @@
 # Use an official Python runtime as a parent image
-FROM python:3.8-slim
+FROM python:3.9-slim
 
 # Set the working directory in the container
 WORKDIR /app
+
+# Update app-get
+RUN apt-get update && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Update pip
+RUN pip install --upgrade pip
 
 # Copy the current directory contents into the container at /app
 COPY . /app
