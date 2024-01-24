@@ -7,9 +7,14 @@ import subprocess
 
 from urllib.parse import urlparse
 from werkzeug.utils import secure_filename
-from quart import Quart, request, jsonify
+from quart import Quart, request, redirect, jsonify
 
 app = Quart(__name__)
+
+@app.route('/')
+async def home_redirect():
+    return redirect('https://mitta.ai', code=302)
+
 
 @app.route('/convert', methods=['POST'])
 async def convert():
@@ -49,6 +54,7 @@ async def convert():
   except:
     return jsonify({'result': 'failed: task did not run'})
 
+
 async def download_file(url, directory):
   local_filename = secure_filename(os.path.basename(urlparse(url).path))
   file_path = os.path.join(directory, local_filename)
@@ -63,6 +69,7 @@ async def download_file(url, directory):
         f.write(chunk)
   
   return file_path
+
 
 def is_safe_filename(filename):
   # Check for dangerous characters or patterns
@@ -127,6 +134,7 @@ async def upload_file():
     if response.status_code != 200:
       data = {'ffmpeg_status': "FFmpeg failed to upload a file."}
       response = await client.post(callback_url, data=data)
+
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0', port=6969)
