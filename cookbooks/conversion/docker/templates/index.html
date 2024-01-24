@@ -55,7 +55,7 @@
 
 <script type="text/javascript">
 document.addEventListener("DOMContentLoaded", function() {
-  var ws = new WebSocket("ws://" + window.location.host + "/ws");
+  var ws = new WebSocket("wss://" + window.location.host + "/ws");
   ws.onopen = function() {
     console.log("WebSocket connection established");
   };
