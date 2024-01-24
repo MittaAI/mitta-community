@@ -9,11 +9,11 @@ connected_websockets = set()
 
 @app.route('/')
 async def home():
-    mitta_token = os.getenv('MITTA_TOKEN')
-    return await render_template('index.html', mitta_token=mitta_token)
+    return await render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
 async def upload():
+    mitta_token = os.getenv('MITTA_TOKEN')
     if 'file' in await request.files:
         file = (await request.files)['file']
         instructions = (await request.form).get('instructions', '')
