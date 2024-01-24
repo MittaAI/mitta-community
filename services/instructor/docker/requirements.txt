@@ -1,0 +1,7 @@
+InstructorEmbedding==1.0.1
+torch==2.1.2
+numpy==1.26.3
+transformers==4.37.1
+sentence_transformers==2.2.2
+flask==3.0.1
+gunicorn==21.2.0
