@@ -18,8 +18,11 @@ COPY . /app
 # Install Python dependencies from requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Output the contents of the /app directory to confirm files are copied
+RUN ls -la /app/*
+
 # Put the model in the container
-RUN python /app/fetch_instructor.py
+RUN echo "Running fetch_instructor.py..." && python /app/fetch_instructor.py
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
