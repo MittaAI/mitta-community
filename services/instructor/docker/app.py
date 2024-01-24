@@ -16,7 +16,7 @@ app = Flask(__name__)
 @app.route('/embed', methods=['POST'])
 def embed():
   instructor_token = os.getenv('INSTRUCTOR_TOKEN')
-  data = await request.get_json()
+  data = request.get_json()
   
   # token check
   if not data.get('instructor_token'):
