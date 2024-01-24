@@ -1,0 +1,94 @@
+@font-face {
+  font-family: 'Orbitron Regular';
+  src: url('/static/Orbitron-Regular.ttf') format('truetype');
+  font-weight: 400; /* Regular */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Silka Regular';
+  src: url('/static/silka-regular-webfont.ttf') format('truetype');
+}
+
+/* General Page Styles */
+body {
+  font-family: 'Silka Regular';
+  background-color: #101010; /* Example background color */
+  color: #ffffff; /* Example text color */
+}
+
+/* Form Styles */
+div.auth {
+  /* Style for the authentication container */
+}
+
+div.input-group {
+  /* Style for the input group */
+}
+
+form {
+  /* General form styles */
+}
+
+form label {
+  /* Styles for labels in the form */
+}
+
+form input[type=email], form input[type=password] {
+  /* Styles for email and password input fields */
+}
+
+/* Button Styles */
+button, a.btn {
+  /* General button styles */
+  -webkit-appearance: none; /* To remove default browser styles */
+}
+
+/* Specific button styles, e.g., submit and cancel buttons */
+button[type=submit], a.btn-outline-light, a.btn-outline-dark {
+  /* Add specific styling here */
+}
+
+/* Link Styles */
+a {
+  /* General link styles */
+  color: #96c9ff; /* Example link color */
+  text-decoration: none;
+}
+
+a:hover {
+  /* Styles for hovering over links */
+}
+
+.input-group {
+	width: 800px;
+}
+
+/* Custom gradient background and centering for .convert */
+.convert {
+  background: radial-gradient(circle at center center, rgba(128, 128, 128, 0.3) 0%, rgba(128, 128, 128, 0) 800px);
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f4f4f4;
+}
+
+h1 {
+  font-family: 'Orbitron Regular';
+  text-transform: uppercase; 
+}
+
+.input-group-text {
+  cursor: pointer;
+}
+
+.greater-than {
+  color: #0adf1c;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  /* Styles for smaller screens (e.g., tablets, mobile devices) */
+}
