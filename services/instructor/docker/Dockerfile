@@ -19,7 +19,6 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Put the model in the container
-COPY fetch_instructor.py /app/
 RUN python /app/fetch_instructor.py
 
 # Make port 5000 available to the world outside this container
