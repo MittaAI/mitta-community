@@ -32,7 +32,7 @@ async def upload():
         data = {'json': json_data}  
 
         # Define the endpoint and token
-        url = "https://mitta.ai/pipeline/zeXeO6d0IiQdF/task?token=mitta_token"
+        url = f"https://mitta.ai/pipeline/zeXeO6d0IiQdF/task?token={mitta_token}"
 
         # Send the file using httpx
         async with httpx.AsyncClient(timeout=30) as client:  # Timeout of 30 seconds
