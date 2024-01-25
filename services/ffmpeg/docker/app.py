@@ -155,15 +155,16 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
       # Handle FFmpeg failure
       await notify_failure(callback_url, f"FFmpeg command failed: {e.stderr}")
 
-  finally:
-        os.chdir(original_directory)
+  except Exception as e:
+      # Catch-all for any other exceptions during the process
+      await notify_failure(callback_url, f"An unexpected error occurred: {e}")
 
 
 async def notify_failure(callback_url, message):
     async with httpx.AsyncClient() as client:
         data = {'ffmpeg_result': message}
-        await client.post(callback_url, data=data)
-
+        response = await client.post(callback_url, data=data)
+        logging.info(response)
 
 async def upload_file(callback_url, output_file):
     async with httpx.AsyncClient() as client:
