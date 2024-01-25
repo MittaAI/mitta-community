@@ -121,9 +121,12 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
   if args[0] == 'ffmpeg':
     args = args[1:]
 
-  # Change to the user directory
-  original_directory = os.getcwd()
-  os.chdir(user_directory)
+  # Find and update the input file path following the '-i' argument
+  if '-i' in args:
+      i_index = args.index('-i') + 1  # Get the index of the input file path
+      if i_index < len(args):
+          # Update the input file path with either a relative path or an absolute path
+          args[i_index] = os.path.join(user_directory, args[i_index])
 
   # Add 'ffmpeg' at the beginning of the command
   ffmpeg_command = ['ffmpeg'] + args
