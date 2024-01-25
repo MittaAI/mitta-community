@@ -99,20 +99,27 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
   # Execute the FFmpeg command
   process = subprocess.run(ffmpeg_command, capture_output=True, text=True)
 
-  # Check for FFmpeg command success
-  if process.returncode == 0:
-      # Assuming your FFmpeg command includes the output filename as the last argument
-      output_file = os.path.join(user_directory, args[-1])
+  try:
+      # Execute the FFmpeg command without changing the global working directory
+      process = subprocess.run(args, cwd=user_directory, capture_output=True, text=True)
 
-      if os.path.exists(output_file):
-          # File exists, FFmpeg succeeded
-          await upload_file(callback_url, output_file)
+      # Handle FFmpeg execution result
+      if process.returncode != 0:
+          # FFmpeg command failed, manually raise an exception
+          raise subprocess.CalledProcessError(process.returncode, process.args, output=process.stdout, stderr=process.stderr)
+
+      # Success path: Check for the output file and proceed with upload
+      output_file_path = os.path.join(user_directory, output_file)
+      if os.path.exists(output_file_path):
+          await upload_file(callback_url, output_file_path)
       else:
-          # File doesn't exist, FFmpeg failed to generate output
+          # Output file missing
           await notify_failure(callback_url, "FFmpeg succeeded but output file is missing.")
-  else:
-      # FFmpeg command failed
-      await notify_failure(callback_url, f"FFmpeg command failed: {process.stderr}")
+
+  except subprocess.CalledProcessError as e:
+      # Handle FFmpeg failure
+      await notify_failure(callback_url, f"FFmpeg command failed: {e.stderr}")
+
 
 
 async def notify_failure(callback_url, message):
