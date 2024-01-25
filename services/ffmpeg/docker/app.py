@@ -121,12 +121,6 @@ async def notify_failure(callback_url, message):
         await client.post(callback_url, data=data)
 
 
-async def notify_failure(callback_url, message):
-    async with httpx.AsyncClient() as client:
-        data = {'ffmpeg_result': message}
-        await client.post(callback_url, data=data)
-
-
 async def upload_file(callback_url, output_file):
     async with httpx.AsyncClient() as client:
         with open(output_file, 'rb') as f:
