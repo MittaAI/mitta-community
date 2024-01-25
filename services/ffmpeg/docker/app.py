@@ -44,7 +44,7 @@ async def home_redirect():
 async def convert():
   logging.info(f"Current working directory: {os.getcwd()}")
   logging.info(f"Base directory: {BASE_DIR}")
-  logging.info(f"Uploads directory: {UPLOADS_DIR}")
+  logging.info(f"Uploads directory: {UPLOAD_DIR}")
 
   ffmpeg_token = os.getenv('FFMPEG_TOKEN')
   data = await request.get_json()
