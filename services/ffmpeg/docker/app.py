@@ -18,6 +18,23 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
+
+def create_and_check_directory(directory_path):
+    try:
+        # Attempt to create the directory (and any necessary parent directories)
+        os.makedirs(directory_path, exist_ok=True)
+        logging.info(f"Directory '{directory_path}' ensured to exist.")
+        
+        # Check if the directory exists to verify it was created
+        if os.path.isdir(directory_path):
+            logging.info(f"Confirmed: The directory '{directory_path}' exists.")
+        else:
+            logging.error(f"Error: The directory '{directory_path}' was not found after creation attempt.")
+    except Exception as e:
+        # If an error occurred during the creation, log the error
+        logging.error(f"An error occurred while creating the directory: {e}")
+
+
 @app.route('/')
 async def home_redirect():
     return redirect('https://mitta.ai', code=302)
@@ -26,7 +43,8 @@ async def home_redirect():
 @app.route('/convert', methods=['POST'])
 async def convert():
   logging.info(f"Current working directory: {os.getcwd()}")
-  logging.info(f"Uploads directory: {BASE_DIR}")
+  logging.info(f"Base directory: {BASE_DIR}")
+  logging.info(f"Uploads directory: {UPLOADS_DIR}")
 
   ffmpeg_token = os.getenv('FFMPEG_TOKEN')
   data = await request.get_json()
@@ -44,10 +62,16 @@ async def convert():
   callback_url = data.get('callback_url')
   ffmpeg_command = data.get('ffmpeg_command')
   output_file = data.get('output_file')
+  # we should get the filename here
+
+  # lightly check command for problems
+  if ".." in ffmpeg_command:
+    return jsonify({'result': 'Failed command stopped at security checkpoint.'})
 
   # Creating user-specific directory\
   user_dir = os.path.join(UPLOAD_DIR, uid)
-  os.makedirs(user_dir, exist_ok=True)
+  logging.info(f"User's directory: {user_dir}")
+  create_and_check_directory(user_dir)
 
   # Saving received data to data.json in the user's directory
   data_file_path = os.path.join(user_dir, 'data.json')
@@ -84,15 +108,10 @@ async def download_file(url, directory):
   return file_path
 
 
-def is_safe_filename(filename):
-  # Check for dangerous characters or patterns
-  return ".." not in filename and not filename.startswith('/')
-
-
 async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
   logging.info(f"Current working directory: {os.getcwd()}")
   logging.info(f"Uploads directory: {BASE_DIR}")
-  
+
   # Split the command string into arguments
   args = shlex.split(ffmpeg_command)
 
