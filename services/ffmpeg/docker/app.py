@@ -133,17 +133,19 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
       output_index = args.index(output_file)  # Find the index of the output file
       args[output_index] = os.path.join(user_directory, output_file)  # Replace with full path
 
-  # Add 'ffmpeg' at the beginning of the command
-  ffmpeg_command = ['ffmpeg'] + args
+  # Add 'ffmpeg' back at the beginning of the command
+  args = ['ffmpeg'] + args
 
   logging.info(f"Final command list: {args}")
   logging.info(f"ffmpeg_command is: {ffmpeg_command}")
-  
+
   # change to logging
   logging.info(f"Executing FFmpeg command in {user_directory}: {' '.join(ffmpeg_command)}")
 
   try:
       # Execute the FFmpeg command without changing the global working directory
+      # process = subprocess.run(' '.join(ffmpeg_command), cwd=user_directory, shell=True, capture_output=True, text=True)
+
       process = subprocess.run(args, cwd=user_directory, capture_output=True, text=True)
 
       # Handle FFmpeg execution result
