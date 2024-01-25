@@ -1,0 +1,126 @@
+{
+    "pipe_id": "zeXeO6d0IiQdF",
+    "name": "ffmpeg",
+    "nodes": [
+        {
+            "node": {
+                "created": "2024-01-24T04:48:19.765962",
+                "extras": {
+                    "processor": "info_file",
+                    "upload": true
+                },
+                "name": "collie",
+                "node_id": "xUIkw0Lej5hqA",
+                "processor": "info_file",
+                "template_id": "UTWvxe7hgfBjl",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2024-01-24T04:47:46.672161",
+                "extras": {
+                    "processor": "info_file",
+                    "upload": true
+                },
+                "input_fields": [
+                    {
+                        "name": "filename",
+                        "type": "string"
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "string"
+                    }
+                ],
+                "name": "cyclone",
+                "output_fields": [
+                    {
+                        "name": "mitta_uri",
+                        "type": "urls"
+                    }
+                ],
+                "processor": "info_file",
+                "template_id": "UTWvxe7hgfBjl",
+                "text": "{# Use this template to drive a info processor that outputs file information. #}\n\n{# Define the input_fields used in this template #}\ninput_fields = [{'name': \"filename\", 'type': \"string\"},{'name': \"content_type\", 'type': \"string\"}]\n\n{# The output_fields expected from the node processor using this template %}\noutput_fields = [{'name': \"mitta_uri\", 'type': \"urls\"}]\n\n{# Define the info_file processor #}\nextras = {\"processor\": \"info_file\", \"upload\": True}",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2024-01-24T05:01:05.216277",
+                "extras": {
+                    "pipeline": "ffupload",
+                    "processor": "aiffmpeg",
+                    "model": "gpt-3.5-turbo-1106",
+                    "openai_token": "[openai_token]",
+                    "ffmpeg_request": "convert to a 640 wide black and white gif"
+                },
+                "name": "yak",
+                "node_id": "xvYTl7VufwVIv",
+                "processor": "aiffmpeg",
+                "template_id": "nPfa9vBS7K6bz",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2024-01-24T05:00:38.240958",
+                "extras": {
+                    "pipeline": null,
+                    "processor": "aiffmpeg",
+                    "model": "gpt-3.5-turbo-1106",
+                    "openai_token": "[openai_token]",
+                    "ffmpeg_request": "convert to a 640 wide black and white gif"
+                },
+                "input_fields": [
+                    {
+                        "name": "ffmpeg_request",
+                        "type": "string"
+                    }
+                ],
+                "name": "sklone",
+                "output_fields": [
+                    {
+                        "name": "ffmpeg_output_file",
+                        "type": "strings"
+                    },
+                    {
+                        "name": "ffmpeg_command",
+                        "type": "strings"
+                    }
+                ],
+                "processor": "aiffmpeg",
+                "template_id": "nPfa9vBS7K6bz",
+                "text": "{# Use this template to convert audio, video and images to other formats #}\n\n{# Input Fields #}\n{# 'mitta_uri', 'ffmpeg_string' and 'pipeline' are required. #}\ninput_fields = [{'name': \"ffmpeg_request\", 'type': \"string\"}]\n\n{# Output Fields #}\n{# 'ffmpeg_result' will contain the status of the task, which is normally 'started' #}\noutput_fields = [{'name': \"ffmpeg_output_file\", 'type': \"strings\"},{'name': \"ffmpeg_command\", 'type': \"strings\"}]\n\n{# Define the pipeline to call with the result file #}\nextras = {'pipeline': None, 'processor': \"aiffmpeg\", 'model': \"gpt-3.5-turbo-1106\", 'openai_token': None}\n\n{# Instructions for file conversion #}\n1. The file the user is wanting to convert is:\n\"\"\"\n{{filename[0]}}\n\"\"\"\n2. The user has requested the following type of ffmpeg conversion:\n\"\"\"\n{{ffmpeg_request}}\n\"\"\"\n3. In the JSON dictionary, you will output a `output_file` key with a value that carries the proper file extension for the request. You may append this file extension to the following name, but if it has an extension already, replace it with the correct one:\n\"\"\"\n{{output_file}}\n\"\"\"\n4. In the JSON dictionary, you will output a `ffmpeg_command` that carries the full ffmpeg command for doing the conversion, including the input and output filenames as mentioned in step 1 and step 3 (output_file):\nai_dict=",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        },
+        {
+            "node": {
+                "created": "2023-12-11T19:40:09.996292",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "https://mitta.ai/{{username}}/callback?token={{callback_token}}",
+                    "callback_token": "[callback_token]"
+                },
+                "name": "ferret",
+                "node_id": "nd2Rgp8Hv60oR",
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
+                "uid": "0kcas0aVtwkg6hNFh"
+            },
+            "template": {
+                "created": "2023-12-11T19:40:04.834098",
+                "extras": {
+                    "processor": "callback",
+                    "callback_uri": "[callback_uri]",
+                    "callback_token": "[callback_token]"
+                },
+                "input_fields": null,
+                "name": "fancy",
+                "output_fields": [],
+                "processor": "callback",
+                "template_id": "lFOJqIFkrFT28",
+                "text": "{# Welcome to the SlothAI Templating System. #}\n\n{# This template will be used to create a callback node. #}\n\n{# Next Tasks #}\n{# 1. Review this callback template then click on the 'Save' button. #}\n{# 2. Create a new template, then click the `Choose Template` pulldown and select `Generate random words'. #}\n\n{# Extras that have [callback_uri] or [callback_token] will be auto populated with local callback info. #}\nextras = {'processor': \"callback\", 'callback_uri': \"[callback_uri]\", 'callback_token': \"[callback_token]\"}\n\n{# Any output fields we define will be passed to the callback endpoint. #}\n{# If output fields is empty, all data will be sent to the callback endpoint. #}\noutput_fields = []",
+                "uid": "0kcas0aVtwkg6hNFh"
+            }
+        }
+    ]
+}
