@@ -110,7 +110,9 @@ async def download_file(url, directory):
 
 async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
   logging.info(f"Current working directory: {os.getcwd()}")
-  logging.info(f"Uploads directory: {BASE_DIR}")
+  logging.info(f"Uploads directory: {UPLOAD_DIR}")
+  logging.info(f"User directory: {user_directory}")
+  logging.info(f"Callback: {callback_url}")
 
   # Split the command string into arguments
   args = shlex.split(ffmpeg_command)
@@ -120,8 +122,8 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
     args = args[1:]
 
   # Change to the user directory
-  # original_directory = os.getcwd()
-  # os.chdir(user_directory)
+  original_directory = os.getcwd()
+  os.chdir(user_directory)
 
   # Add 'ffmpeg' at the beginning of the command
   ffmpeg_command = ['ffmpeg'] + args
@@ -149,6 +151,9 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
   except subprocess.CalledProcessError as e:
       # Handle FFmpeg failure
       await notify_failure(callback_url, f"FFmpeg command failed: {e.stderr}")
+
+  finally:
+        os.chdir(original_directory)
 
 
 async def notify_failure(callback_url, message):
