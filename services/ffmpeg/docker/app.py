@@ -75,7 +75,7 @@ async def convert():
 
   # Download the file
   local_file_path = await download_file(file_url, user_dir)
-  logging_info(f"local file path: {local_file_path}")
+  logging.info(f"local file path: {local_file_path}")
 
   # log the request
   logging.info(f"User request resulted in the command: {ffmpeg_command}")
