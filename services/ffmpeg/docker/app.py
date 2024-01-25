@@ -46,6 +46,8 @@ async def convert():
 
   # Download the file
   local_file_path = await download_file(file_url, user_dir)
+  
+  print(ffmpeg_command)
 
   try:
     # Processing with FFmpeg
@@ -91,50 +93,55 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
   # Add 'ffmpeg' at the beginning of the command
   ffmpeg_command = ['ffmpeg'] + args
 
-  print(f"Executing FFmpeg command in {user_directory}: {' '.join(ffmpeg_command)}")
+  # change to logging
+  # print(f"Executing FFmpeg command in {user_directory}: {' '.join(ffmpeg_command)}")
 
-  try:
-    subprocess.run(ffmpeg_command, check=True)
-    await upload_file()
-  except subprocess.CalledProcessError as e:
-    with open('data.json', 'r') as file:
-      data = json.load(file)
-    callback_url = data.get('callback_url')
-    
-    # Remove data.json after reading
-    os.remove('data.json')
+  # Execute the FFmpeg command
+  process = subprocess.run(ffmpeg_command, cwd=user_directory, capture_output=True, text=True)
 
+  # Check for FFmpeg command success
+  if process.returncode == 0:
+      # Assuming your FFmpeg command includes the output filename as the last argument
+      output_file = os.path.join(user_directory, args[-1])
+
+      if os.path.exists(output_file):
+          # File exists, FFmpeg succeeded
+          await upload_file(callback_url, output_file)
+      else:
+          # File doesn't exist, FFmpeg failed to generate output
+          await notify_failure(callback_url, "FFmpeg succeeded but output file is missing.")
+  else:
+      # FFmpeg command failed
+      await notify_failure(callback_url, f"FFmpeg command failed: {process.stderr}")
+
+
+async def notify_failure(callback_url, message):
     async with httpx.AsyncClient() as client:
-      data = {'ffmpeg_result': "The request to convert the file failed."}
-      response = await client.post(callback_url, data=data)
-
-  finally:
-    os.chdir(original_directory)
+        data = {'ffmpeg_result': message}
+        await client.post(callback_url, data=data)
 
 
-async def upload_file():
-  # Read callback_url from data.json
-  with open('data.json', 'r') as file:
-    data = json.load(file)
-  callback_url = data.get('callback_url')
-  output_file = data.get('output_file')
+async def notify_failure(callback_url, message):
+    async with httpx.AsyncClient() as client:
+        data = {'ffmpeg_result': message}
+        await client.post(callback_url, data=data)
 
-  # Remove data.json after reading
-  os.remove('data.json')
 
-  async with httpx.AsyncClient() as client:
-    with open(output_file, 'rb') as f:
-      files = {'file': (os.path.basename(output_file), f)}
-      data = {'filename': output_file}
-      response = await client.post(callback_url, files=files, data=data)
+async def upload_file(callback_url, output_file):
+    async with httpx.AsyncClient() as client:
+        with open(output_file, 'rb') as f:
+            files = {'file': (os.path.basename(output_file), f)}
+            data = {'filename': os.path.basename(output_file)}
+            response = await client.post(callback_url, files=files, data=data)
+
+        if response.status_code != 200:
+            await notify_failure(callback_url, "Failed to upload the file after FFmpeg processing.")
+        else:
+            # Handle successful upload if needed
+            pass
 
     # Cleanup
     os.remove(output_file)
-
-    if response.status_code != 200:
-      data = {'ffmpeg_status': "FFmpeg failed to upload a file."}
-      response = await client.post(callback_url, data=data)
-
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0', port=5000)
