@@ -97,7 +97,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
   # print(f"Executing FFmpeg command in {user_directory}: {' '.join(ffmpeg_command)}")
 
   # Execute the FFmpeg command
-  process = subprocess.run(ffmpeg_command, cwd=user_directory, capture_output=True, text=True)
+  process = subprocess.run(ffmpeg_command, capture_output=True, text=True)
 
   # Check for FFmpeg command success
   if process.returncode == 0:
