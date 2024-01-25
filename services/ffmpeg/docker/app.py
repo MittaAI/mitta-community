@@ -86,7 +86,7 @@ async def convert():
   
   try:
     # Processing with FFmpeg
-    asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, uid))
+    asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, input_file, output_file, uid))
     return jsonify({'result': 'success'})
   except:
     return jsonify({'result': 'failed: task did not run'})
@@ -108,7 +108,7 @@ async def download_file(url, directory):
   return file_path
 
 
-async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
+async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, uid):
   logging.info(f"Current working directory: {os.getcwd()}")
   logging.info(f"Uploads directory: {UPLOAD_DIR}")
   logging.info(f"User directory: {user_directory}")
@@ -118,15 +118,24 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
   args = shlex.split(ffmpeg_command)
 
   # Check if the first argument is 'ffmpeg' and remove it if present
+  # first step of security handling
   if args[0] == 'ffmpeg':
     args = args[1:]
 
-  # Find and update the input file path following the '-i' argument
-  if '-i' in args:
-      i_index = args.index('-i') + 1  # Get the index of the input file path
-      if i_index < len(args):
-          # Update the input file path with either a relative path or an absolute path
-          args[i_index] = os.path.join(user_directory, args[i_index])
+
+  # check both the input file and output file for ..
+  # second step of security handling
+  if any(s in output_file for s in ["/", ".."]) or any(s in input_file for s in ["/", ".."]):
+      return jsonify({'result': 'failed: command stopped at security checkpoint. No callback will occur'})
+
+  # Update paths for the input and output files within the command arguments
+  if input_file in args:
+      input_index = args.index(input_file)  # Find the index of the input file
+      args[input_index] = os.path.join(user_directory, input_file)  # Replace with full path
+
+  if output_file in args:
+      output_index = args.index(output_file)  # Find the index of the output file
+      args[output_index] = os.path.join(user_directory, output_file)  # Replace with full path
 
   # Add 'ffmpeg' at the beginning of the command
   ffmpeg_command = ['ffmpeg'] + args
@@ -163,7 +172,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
 async def notify_failure(callback_url, message):
     logging.info(f"Notifying failure: {message}")
     async with httpx.AsyncClient() as client:
-        json_data = {'ffmpeg_result': message}
+        json_data = {'ffmpeg_result': message, 'filename': "None"}
         # Use the `json=` parameter to ensure the `Content-Type` is set to `application/json`
         response = await client.post(callback_url, json=json_data)
         logging.info(f"Notification response: {response.text}")
