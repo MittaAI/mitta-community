@@ -73,14 +73,10 @@ async def convert():
   logging.info(f"User's directory: {user_dir}")
   create_and_check_directory(user_dir)
 
-  # Saving received data to data.json in the user's directory
-  data_file_path = os.path.join(user_dir, 'data.json')
-  with open(data_file_path, 'w') as file:
-    json.dump(data, file)
-
   # Download the file
   local_file_path = await download_file(file_url, user_dir)
-  
+  logging_info(f"local file path: {local_file_path}")
+
   # log the request
   logging.info(f"User request resulted in the command: {ffmpeg_command}")
   
