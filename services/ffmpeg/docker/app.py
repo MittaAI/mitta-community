@@ -51,7 +51,7 @@ async def convert():
 
   try:
     # Processing with FFmpeg
-    asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, user_dir, uid))
+    asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, uid))
     return jsonify({'result': 'success'})
   except:
     return jsonify({'result': 'failed: task did not run'})
