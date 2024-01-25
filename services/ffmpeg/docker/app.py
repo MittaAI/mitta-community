@@ -136,6 +136,9 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
   # Add 'ffmpeg' at the beginning of the command
   ffmpeg_command = ['ffmpeg'] + args
 
+  logging.info(f"Final command list: {args}")
+  logging.info(f"ffmpeg_command is: {ffmpeg_command}")
+  
   # change to logging
   logging.info(f"Executing FFmpeg command in {user_directory}: {' '.join(ffmpeg_command)}")
 
