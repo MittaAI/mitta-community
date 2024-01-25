@@ -167,10 +167,11 @@ async def notify_failure(callback_url, message):
         logging.info(response)
 
 async def upload_file(callback_url, output_file):
+    logging.info(f"output_file: {output_file}")
     async with httpx.AsyncClient() as client:
         with open(output_file, 'rb') as f:
-            files = {'file': (os.path.basename(output_file), f)}
-            data = {'filename': os.path.basename(output_file)}
+            files = {'file': (output_file, f)}
+            data = {'filename': output_file}
             response = await client.post(callback_url, files=files, data=data)
 
         if response.status_code != 200:
