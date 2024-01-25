@@ -4,12 +4,19 @@ import asyncio
 import httpx
 import shlex
 import subprocess
+import logging
 
 from urllib.parse import urlparse
 from werkzeug.utils import secure_filename
 from quart import Quart, request, redirect, jsonify
 
 app = Quart(__name__)
+
+# Configure basic logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
 @app.route('/')
 async def home_redirect():
@@ -18,6 +25,9 @@ async def home_redirect():
 
 @app.route('/convert', methods=['POST'])
 async def convert():
+  logging.info(f"Current working directory: {os.getcwd()}")
+  logging.info(f"Uploads directory: {BASE_DIR}")
+
   ffmpeg_token = os.getenv('FFMPEG_TOKEN')
   data = await request.get_json()
   
@@ -35,8 +45,8 @@ async def convert():
   ffmpeg_command = data.get('ffmpeg_command')
   output_file = data.get('output_file')
 
-  # Creating user-specific directory
-  user_dir = os.path.join("upload", uid)
+  # Creating user-specific directory\
+  user_dir = os.path.join(UPLOAD_DIR, uid)
   os.makedirs(user_dir, exist_ok=True)
 
   # Saving received data to data.json in the user's directory
@@ -47,8 +57,9 @@ async def convert():
   # Download the file
   local_file_path = await download_file(file_url, user_dir)
   
-  print(ffmpeg_command)
-
+  logging.info("User request was:")
+  logging.info(ffmpeg_command)
+  
   try:
     # Processing with FFmpeg
     asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, uid))
@@ -79,6 +90,9 @@ def is_safe_filename(filename):
 
 
 async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
+  logging.info(f"Current working directory: {os.getcwd()}")
+  logging.info(f"Uploads directory: {BASE_DIR}")
+  
   # Split the command string into arguments
   args = shlex.split(ffmpeg_command)
 
@@ -94,19 +108,16 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
   ffmpeg_command = ['ffmpeg'] + args
 
   # change to logging
-  # print(f"Executing FFmpeg command in {user_directory}: {' '.join(ffmpeg_command)}")
-
-  # Execute the FFmpeg command
-  process = subprocess.run(ffmpeg_command, capture_output=True, text=True)
+  logging.info(f"Executing FFmpeg command in {user_directory}: {' '.join(ffmpeg_command)}")
 
   try:
       # Execute the FFmpeg command without changing the global working directory
-      process = subprocess.run(args, capture_output=True, text=True)
+      process = subprocess.run(args, cwd=user_directory, capture_output=True, text=True)
 
       # Handle FFmpeg execution result
       if process.returncode != 0:
           # FFmpeg command failed, manually raise an exception
-          raise subprocess.CalledProcessError(process.returncode, cwd=user_directory, process.args, output=process.stdout, stderr=process.stderr)
+          raise subprocess.CalledProcessError(process.returncode, process.args, output=process.stdout, stderr=process.stderr)
 
       # Success path: Check for the output file and proceed with upload
       output_file_path = os.path.join(user_directory, output_file)
