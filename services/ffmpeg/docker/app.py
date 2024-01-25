@@ -161,10 +161,11 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
 
 
 async def notify_failure(callback_url, message):
+    logging.info(message)
     async with httpx.AsyncClient() as client:
         data = {'ffmpeg_result': message}
         response = await client.post(callback_url, data=data)
-        logging.info(response)
+        logging.info(response.text)
 
 async def upload_file(callback_url, output_file):
     logging.info(f"output_file: {output_file}")
