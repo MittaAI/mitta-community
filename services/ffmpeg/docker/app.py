@@ -61,12 +61,12 @@ async def convert():
   file_url = data.get('mitta_uri')
   callback_url = data.get('callback_url')
   ffmpeg_command = data.get('ffmpeg_command')
+  input_file = data.get('input_file')
   output_file = data.get('output_file')
-  # we should get the filename here
 
   # lightly check command for problems
-  if ".." in ffmpeg_command:
-    return jsonify({'result': 'Failed command stopped at security checkpoint.'})
+  if ".." in ffmpeg_command or ".." in input_file:
+    return jsonify({'result': 'failed: command stopped at security checkpoint. No callback will occur.'})
 
   # Creating user-specific directory\
   user_dir = os.path.join(UPLOAD_DIR, uid)
@@ -81,8 +81,8 @@ async def convert():
   # Download the file
   local_file_path = await download_file(file_url, user_dir)
   
-  logging.info("User request was:")
-  logging.info(ffmpeg_command)
+  # log the request
+  logging.info(f"User request resulted in the command: {ffmpeg_command}")
   
   try:
     # Processing with FFmpeg
@@ -161,11 +161,13 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
 
 
 async def notify_failure(callback_url, message):
-    logging.info(message)
+    logging.info(f"Notifying failure: {message}")
     async with httpx.AsyncClient() as client:
-        data = {'ffmpeg_result': message}
-        response = await client.post(callback_url, data=data)
-        logging.info(response.text)
+        json_data = {'ffmpeg_result': message}
+        # Use the `json=` parameter to ensure the `Content-Type` is set to `application/json`
+        response = await client.post(callback_url, json=json_data)
+        logging.info(f"Notification response: {response.text}")
+
 
 async def upload_file(callback_url, output_file):
     logging.info(f"output_file: {output_file}")
