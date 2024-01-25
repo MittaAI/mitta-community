@@ -101,7 +101,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, uid):
 
   try:
       # Execute the FFmpeg command without changing the global working directory
-      process = subprocess.run(args, cwd=user_directory, capture_output=True, text=True)
+      process = subprocess.run(args, capture_output=True, text=True)
 
       # Handle FFmpeg execution result
       if process.returncode != 0:
