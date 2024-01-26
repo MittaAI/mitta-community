@@ -62,6 +62,7 @@ async def convert():
   
   # parameters
   user_id = data.get('user_id')
+  user_document = data.get('user_document')
   file_url = data.get('mitta_uri')
   callback_url = data.get('callback_url')
   ffmpeg_command = data.get('ffmpeg_command')
@@ -86,7 +87,7 @@ async def convert():
   
   try:
     # Processing with FFmpeg
-    asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, input_file, output_file, user_id))
+    asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, input_file, output_file, user_id, user_document))
     return jsonify({'result': 'success'})
   except:
     return jsonify({'result': 'failed: task did not run'})
@@ -108,7 +109,7 @@ async def download_file(url, directory):
   return file_path
 
 
-async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, user_id):
+async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, user_id, user_document):
   logging.info(f"Current working directory: {os.getcwd()}")
   logging.info(f"Uploads directory: {UPLOAD_DIR}")
   logging.info(f"User directory: {user_directory}")
@@ -159,7 +160,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
       # Success path: Check for the output file and proceed with upload
       output_file_path = os.path.join(user_directory, output_file)
       if os.path.exists(output_file_path):
-          await upload_file(callback_url, output_file_path)
+          await upload_file(callback_url, output_file_path, user_document)
       else:
           # Output file missing
           await notify_failure(callback_url, "FFmpeg succeeded but output file is missing.")
@@ -182,12 +183,12 @@ async def notify_failure(callback_url, message):
         logging.info(f"Notification response: {response.text}")
 
 
-async def upload_file(callback_url, output_file):
+async def upload_file(callback_url, output_file, user_document):
     logging.info(f"output_file: {output_file}")
     async with httpx.AsyncClient() as client:
         with open(output_file, 'rb') as f:
             files = {'file': (output_file, f)}
-            data = {'filename': output_file}
+            data = {'filename': output_file, 'user_document': user_document}
             response = await client.post(callback_url, files=files, data=data)
 
         if response.status_code != 200:
