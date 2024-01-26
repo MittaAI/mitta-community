@@ -76,6 +76,10 @@ h1 {
   text-transform: uppercase; 
 }
 
+.inputs {
+  width: 100%;
+}
+
 .input-group-text {
   cursor: pointer;
 }

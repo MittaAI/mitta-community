@@ -2,6 +2,8 @@
 $imageName = "convert-service"
 $containerName = "convert-container"
 
+Write-Host "Starting managment of convert-service..."
+
 # Infinite loop to ensure the container is always running
 while ($true) {
     # Check if the container is running
