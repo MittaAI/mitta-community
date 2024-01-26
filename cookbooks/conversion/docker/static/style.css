@@ -12,18 +12,33 @@
 
 /* General Page Styles */
 body {
-  font-family: 'Silka Regular';
-  background-color: #101010; /* Example background color */
-  color: #ffffff; /* Example text color */
+  font-family: 'Silka Regular', sans-serif; /* Fallback to sans-serif */
+  background-color: #101010;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: left;
+  margin: 0; /* Remove default margin */
+  caret-color: transparent;
 }
 
-/* Form Styles */
-div.auth {
-  /* Style for the authentication container */
+.convert {
+  background: radial-gradient(circle at center center, rgba(128, 128, 128, 0.3) 0%, rgba(128, 128, 128, 0) 100%);
+  background-size: cover;
+  min-height: 100vh; /* Ensure it covers the full height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f4f4f4;
+  padding: 20px; /* Add some padding */
 }
 
-div.input-group {
-  /* Style for the input group */
+.input-group {
+  max-width: 100%; /* Ensure it doesn't exceed the viewport width */
+}
+
+h1 {
+  font-family: 'Orbitron Regular', sans-serif; /* Fallback to sans-serif */
 }
 
 form {
@@ -56,25 +71,6 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  /* Styles for hovering over links */
-}
-
-.input-group {
-	width: 800px;
-}
-
-/* Custom gradient background and centering for .convert */
-.convert {
-  background: radial-gradient(circle at center center, rgba(128, 128, 128, 0.3) 0%, rgba(128, 128, 128, 0) 800px);
-  background-size: cover;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #f4f4f4;
-}
-
 h1 {
   font-family: 'Orbitron Regular';
   text-transform: uppercase; 
@@ -90,5 +86,7 @@ h1 {
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
-  /* Styles for smaller screens (e.g., tablets, mobile devices) */
+  .input-group {
+    width: auto; /* Allow it to adjust based on the screen size */
+  }
 }
