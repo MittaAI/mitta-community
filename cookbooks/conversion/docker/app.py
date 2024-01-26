@@ -65,7 +65,12 @@ async def upload():
 @app.route('/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
-    await broadcast({"status": "success", "message": "Showing the image...", "convert_uri": data.convert_uri})
+
+    # uuid and message
+    uuid = data.get('uuid', 'anoymous')
+    message = data.get('message', "Processing...")
+    
+    await broadcast({"status": "success", "message": message, "convert_uri": data.convert_uri}, recipient_id=uuid)
     return jsonify({"status": "success"})
 
 
