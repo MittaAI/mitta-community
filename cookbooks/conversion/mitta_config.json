@@ -8,7 +8,7 @@
         "src": "images/convert.png",
         "alt": "Convert"
       },
-      "title": "FFMpeg Conversion",
+      "title": "FFMpeg Convert",
       "description": "Use this pipeline to convert media files with conversational language using FFmpeg. Uploads are limited in size to 32MB.",
       "links": {
         "install": {

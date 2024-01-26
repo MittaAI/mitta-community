@@ -1,96 +1,69 @@
 @font-face {
-  font-family: 'Orbitron Regular';
+  font-family: 'Orbitron Regular', sans-serif;
   src: url('/static/Orbitron-Regular.ttf') format('truetype');
-  font-weight: 400; /* Regular */
+  font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Silka Regular';
+  font-family: 'Silka Regular', sans-serif;
   src: url('/static/silka-regular-webfont.ttf') format('truetype');
 }
 
-/* General Page Styles */
 body {
-  font-family: 'Silka Regular', sans-serif; /* Fallback to sans-serif */
+  font-family: 'Silka Regular', sans-serif;
   background-color: #101010;
   color: #ffffff;
   font-size: 1rem;
   line-height: 1.5;
   text-align: left;
-  margin: 0; /* Remove default margin */
+  margin: 0;
   caret-color: transparent;
 }
 
-.convert {
-  background: radial-gradient(circle at center center, rgba(128, 128, 128, 0.3) 0%, rgba(128, 128, 128, 0) 100%);
-  background-size: cover;
-  min-height: 100vh; /* Ensure it covers the full height */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #f4f4f4;
-  padding: 20px; /* Add some padding */
-}
-
-.input-group {
-  max-width: 100%; /* Ensure it doesn't exceed the viewport width */
-}
-
-h1 {
-  font-family: 'Orbitron Regular', sans-serif; /* Fallback to sans-serif */
-}
-
-form {
-  /* General form styles */
-}
-
-form label {
-  /* Styles for labels in the form */
-}
-
-form input[type=email], form input[type=password] {
-  /* Styles for email and password input fields */
-}
-
-/* Button Styles */
 button, a.btn {
-  /* General button styles */
-  -webkit-appearance: none; /* To remove default browser styles */
+  -webkit-appearance: none;
 }
 
-/* Specific button styles, e.g., submit and cancel buttons */
-button[type=submit], a.btn-outline-light, a.btn-outline-dark {
-  /* Add specific styling here */
-}
-
-/* Link Styles */
 a {
-  /* General link styles */
-  color: #96c9ff; /* Example link color */
+  color: #96c9ff;
   text-decoration: none;
 }
 
 h1 {
-  font-family: 'Orbitron Regular';
+  font-family: 'Orbitron Regular', sans-serif;
   text-transform: uppercase; 
-}
-
-.inputs {
-  width: 100%;
-}
-
-.input-group-text {
-  cursor: pointer;
 }
 
 .greater-than {
   color: #0adf1c;
 }
 
-/* Media Queries for Responsiveness */
+.convert {
+  background: radial-gradient(circle at center center, rgba(128, 128, 128, 0.3) 0%, rgba(128, 128, 128, 0) 100%);
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f4f4f4;
+  padding: 20px;
+}
+
+.inputs {
+  width: 100%;
+}
+
+.input-group {
+  max-width: 100%;
+}
+
+.input-group-text {
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .input-group {
-    width: auto; /* Allow it to adjust based on the screen size */
+    width: auto;
   }
 }
