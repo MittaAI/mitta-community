@@ -78,9 +78,9 @@ async def ws():
     connected_websockets[unique_id] = ws_obj  # Store the WebSocket object with the unique ID
 
     try:
+        await ws_obj.send_json({'uuid': unique_id})
         while True:
-            data = await websocket.receive()  # Keep the connection alive
-            # Process incoming data or messages here if needed
+            data = await websocket.receive()
     except:
         pass
     finally:
