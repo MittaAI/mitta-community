@@ -1,3 +1,7 @@
+# ffmpeg service container
+# All rights reserved. Copyright 2024, MittaAI
+# MIT License
+
 import os
 import json
 import asyncio
@@ -118,11 +122,10 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
   if args[0] == 'ffmpeg':
     args = args[1:]
 
-
   # check both the input file and output file for ..
   # second step of security handling
   if any(s in output_file for s in ["/", ".."]) or any(s in input_file for s in ["/", ".."]):
-      return jsonify({'result': 'failed: command stopped at security checkpoint. No callback will occur'})
+      await notify_failure(callback_url, 'failed: command stopped at security checkpoint')
 
   # Update paths for the input and output files within the command arguments
   if input_file in args:

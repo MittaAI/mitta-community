@@ -1,11 +1,38 @@
+import os
+import json
+
+from uuid import uuid4
+
 from quart import Quart, websocket, render_template, request, jsonify
 import httpx
-import json
-import os
 
 app = Quart(__name__, static_folder='static')
 
-connected_websockets = set()
+@app.websocket('/ws')
+async def ws():
+    unique_id = str(uuid4())  # Generate a unique ID for the session
+    ws_obj = websocket._get_current_object()
+    connected_websockets[unique_id] = ws_obj  # Store the WebSocket object with the unique ID
+
+    try:
+        while True:
+            data = await websocket.receive()  # Keep the connection alive
+            # Process incoming data or messages here if needed
+    except:
+        pass
+    finally:
+        connected_websockets.pop(unique_id, None)  # Remove the WebSocket from the dictionary on disconnect
+
+async def broadcast(message, recipient_id=None):
+    if recipient_id:
+        # If a recipient ID is provided, only send to that WebSocket
+        ws = connected_websockets.get(recipient_id)
+        if ws:
+            await ws.send_json(message)
+    else:
+        # If no recipient ID is provided, broadcast to all connected WebSockets
+        for ws in connected_websockets.values():
+            await ws.send_json(message)
 
 @app.route('/')
 async def home():
@@ -52,20 +79,34 @@ async def callback():
     await broadcast(data)
     return jsonify({"status": "success"})
 
+
+connected_websockets = {}
+
 @app.websocket('/ws')
 async def ws():
-    connected_websockets.add(websocket._get_current_object())
+    unique_id = str(uuid4())  # Generate a unique ID for the session
+    ws_obj = websocket._get_current_object()
+    connected_websockets[unique_id] = ws_obj  # Store the WebSocket object with the unique ID
+
     try:
         while True:
-            await websocket.receive()  # Just keeping the connection open
+            data = await websocket.receive()  # Keep the connection alive
+            # Process incoming data or messages here if needed
     except:
         pass
     finally:
-        connected_websockets.remove(websocket._get_current_object())
+        connected_websockets.pop(unique_id, None)  # Remove the WebSocket from the dictionary on disconnect
 
-async def broadcast(message):
-    for ws in connected_websockets:
-        await ws.send_json(message)
 
+async def broadcast(message, recipient_id=None):
+    if recipient_id:
+        # If a recipient ID is provided, only send to that WebSocket
+        ws = connected_websockets.get(recipient_id)
+        if ws:
+            await ws.send_json(message)
+    else:
+        # If no recipient ID is provided, broadcast to all connected WebSockets
+        for ws in connected_websockets.values():
+            await ws.send_json(message)
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
