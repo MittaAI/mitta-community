@@ -126,6 +126,7 @@ $(document).ready(function() {
       // Add any other data you want to send
       var instructions = $('input[type="text"].form-control').val();
       formData.append('instructions', instructions);
+      formData.append('uuid', uuid); // Include the UUID in the FormData
 
       // AJAX request to upload the file
       $.ajax({

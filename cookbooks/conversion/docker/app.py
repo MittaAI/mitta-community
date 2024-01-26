@@ -26,11 +26,13 @@ async def upload():
     mitta_token = os.getenv('MITTA_TOKEN')
     if 'file' in await request.files:
         file = (await request.files)['file']
-        instructions = (await request.form).get('instructions', '')
-
+        instructions = (await request.form).get('instructions', 'Convert to a 640 wide black and white gif')
+        uuid = (await request.form).get('uuid')
+        
         # Prepare the JSON payload
         json_payload = {
-            "ffmpeg_request": instructions
+            "ffmpeg_request": instructions,
+            "uuid": uuid
         }
         # Convert it to JSON string
         json_data = json.dumps(json_payload)
@@ -42,7 +44,8 @@ async def upload():
         data = {'json': json_data}  
 
         # Define the endpoint and token
-        url = f"https://mitta.ai/pipeline/zeXeO6d0IiQdF/task?token={mitta_token}"
+        pipeline = os.getenv('PIPELINE')
+        url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
 
         # Send the file using httpx
         async with httpx.AsyncClient(timeout=30) as client:  # Timeout of 30 seconds
