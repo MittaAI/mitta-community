@@ -13,7 +13,7 @@ app = cors(app, allow_origin=["http://localhost:8080", "https://ai.mitta.ai"])
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/convert', methods=['GET', 'POST'])
 async def home():
-    instructions = "Convert to a 640px wide PNG using the correct aspect ratio."  # Default instructions or retrieve from request
+    instructions = "Convert to a 640 wide black and white gif"  # Default instructions or retrieve from request
     if request.method == 'POST':
         form_data = await request.form
         instructions = form_data.get('instructions', instructions)
@@ -50,8 +50,10 @@ async def upload():
 
         # Check the response from the external handler
         if response.status_code == 200:
+            await broadcast({"status": "success", "message": "File uploaded successfully!"})
             return jsonify({"status": "success", "message": "File uploaded successfully"})
         else:
+            await broadcast({"status": "success", "message": "File upload failed, sorry."})
             return jsonify({"status": "error", "message": "Failed to upload file"})
 
     return jsonify({"status": "error", "message": "No file received"})
@@ -60,7 +62,7 @@ async def upload():
 @app.route('/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
-    await broadcast(data)
+    await broadcast({"status": "success", "message": "Showing the image...", "convert_uri": data.convert_uri})
     return jsonify({"status": "success"})
 
 

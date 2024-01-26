@@ -65,7 +65,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   ws.onmessage = function(evt) {
     var data = JSON.parse(evt.data);
-
+    console.log(data);
+    
     // Update the '#comms' element with the message from the server
     // If you want to display a specific part of the data, adjust the key (e.g., data.message)
     $('#comms').text(data.message || JSON.stringify(data));
