@@ -4,10 +4,12 @@ import json
 from uuid import uuid4
 
 from quart import Quart, websocket, render_template, request, jsonify
+from flask_cors import CORS
 import httpx
 
 app = Quart(__name__, static_folder='static')
 
+CORS(app, resources={r"/convert": {"origins": ["http://localhost:5000","https://mitta.ai"]}})  # Allow only specific route and origin
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/convert', methods=['GET', 'POST'])

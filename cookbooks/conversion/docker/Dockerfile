@@ -10,6 +10,7 @@ COPY . /app
 # Install Quart and Hypercorn
 RUN pip install quart hypercorn
 RUN pip install httpx
+RUN pip install flask-cors
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
