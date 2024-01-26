@@ -51,6 +51,8 @@
 <script type="text/javascript">
 document.addEventListener("DOMContentLoaded", function() {
   var ws = new WebSocket("wss://" + window.location.host + "/ws");
+  var uuid = '';
+
   ws.onopen = function() {
     console.log("WebSocket connection established");
   };
@@ -60,15 +62,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
   ws.onmessage = function(evt) {
     var data = JSON.parse(evt.data);
-    console.log(data);
-    
-    $('#comms').text(data.message);
+
+    // set uuid
+    if (data.uuid) {
+      uuid = data.uuid;
+    }
+
+    // update messages
+    if (data.message) {
+      $('#comms').text(data.message);
+    }
 
     clearTimeout(resetTimer);
     resetTimer = setTimeout(function() {
       $('#comms').text(comms);
     }, 30000);
 
+    // show file
     if (data.convert_uri) {
       downloadFile(data.convert_uri[0], data.filename[0]);
     } else {
