@@ -8,32 +8,6 @@ import httpx
 
 app = Quart(__name__, static_folder='static')
 
-@app.websocket('/ws')
-async def ws():
-    unique_id = str(uuid4())  # Generate a unique ID for the session
-    ws_obj = websocket._get_current_object()
-    connected_websockets[unique_id] = ws_obj  # Store the WebSocket object with the unique ID
-
-    try:
-        while True:
-            data = await websocket.receive()  # Keep the connection alive
-            # Process incoming data or messages here if needed
-    except:
-        pass
-    finally:
-        connected_websockets.pop(unique_id, None)  # Remove the WebSocket from the dictionary on disconnect
-
-async def broadcast(message, recipient_id=None):
-    if recipient_id:
-        # If a recipient ID is provided, only send to that WebSocket
-        ws = connected_websockets.get(recipient_id)
-        if ws:
-            await ws.send_json(message)
-    else:
-        # If no recipient ID is provided, broadcast to all connected WebSockets
-        for ws in connected_websockets.values():
-            await ws.send_json(message)
-
 @app.route('/')
 @app.route('/convert')
 async def home():
