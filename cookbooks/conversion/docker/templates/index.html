@@ -49,7 +49,7 @@
 </div>
 
 <script type="text/javascript">
-document.addEventListener("DOMContentLoaded", function() {
+$(document).ready(function() {
   var ws = new WebSocket("wss://" + window.location.host + "/ws");
   var uuid = '';
 
@@ -86,7 +86,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   };
 
-
   ws.onclose = function() {
     console.log("WebSocket connection closed");
   };
@@ -104,9 +103,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.body.removeChild(a);
     console.log("Download initiated for: " + filename);
   }
-});
 
-$(document).ready(function() {
   var instructionsFromBackend = "{{ instructions | safe }}";
 
   // Use jQuery to set the value of the instructions input field
