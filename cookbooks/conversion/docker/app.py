@@ -35,6 +35,7 @@ async def broadcast(message, recipient_id=None):
             await ws.send_json(message)
 
 @app.route('/')
+@app.route('/convert')
 async def home():
     return await render_template('index.html')
 
@@ -108,5 +109,7 @@ async def broadcast(message, recipient_id=None):
         # If no recipient ID is provided, broadcast to all connected WebSockets
         for ws in connected_websockets.values():
             await ws.send_json(message)
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
