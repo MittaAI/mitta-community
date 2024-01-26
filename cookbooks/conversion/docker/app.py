@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 
 from uuid import uuid4
 
@@ -9,6 +10,9 @@ import httpx
 
 app = Quart(__name__, static_folder='static')
 app = cors(app, allow_origin=["http://localhost:8080", "https://ai.mitta.ai"])
+
+# Configure basic logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/convert', methods=['GET', 'POST'])
@@ -46,7 +50,8 @@ async def upload():
         # Define the endpoint and token
         pipeline = os.getenv('PIPELINE')
         url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
-
+        logging.info(url)
+        
         # Send the file using httpx
         async with httpx.AsyncClient(timeout=30) as client:  # Timeout of 30 seconds
             response = await client.post(url, files=files, data=data)
@@ -69,7 +74,7 @@ async def callback():
     # uuid and message
     uuid = data.get('uuid', 'anoymous')
     message = data.get('message', "Processing...")
-    
+
     await broadcast({"status": "success", "message": message, "convert_uri": data.convert_uri}, recipient_id=uuid)
     return jsonify({"status": "success"})
 

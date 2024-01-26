@@ -50,7 +50,8 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  var ws = new WebSocket("wss://" + window.location.host + "/ws");
+  var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+  var ws = new WebSocket(protocol + window.location.host + "/ws");
   var uuid = '';
 
   ws.onopen = function() {
