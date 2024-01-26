@@ -61,7 +61,7 @@ async def convert():
       return jsonify({'result': 'failed: bad token'})
   
   # parameters
-  uid = data.get('uid')
+  user_id = data.get('user_id')
   file_url = data.get('mitta_uri')
   callback_url = data.get('callback_url')
   ffmpeg_command = data.get('ffmpeg_command')
@@ -73,7 +73,7 @@ async def convert():
     return jsonify({'result': 'failed: command stopped at security checkpoint. No callback will occur.'})
 
   # Creating user-specific directory\
-  user_dir = os.path.join(UPLOAD_DIR, uid)
+  user_dir = os.path.join(UPLOAD_DIR, user_id)
   logging.info(f"User's directory: {user_dir}")
   create_and_check_directory(user_dir)
 
@@ -86,7 +86,7 @@ async def convert():
   
   try:
     # Processing with FFmpeg
-    asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, input_file, output_file, uid))
+    asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, input_file, output_file, user_id))
     return jsonify({'result': 'success'})
   except:
     return jsonify({'result': 'failed: task did not run'})
@@ -108,7 +108,7 @@ async def download_file(url, directory):
   return file_path
 
 
-async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, uid):
+async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, user_id):
   logging.info(f"Current working directory: {os.getcwd()}")
   logging.info(f"Uploads directory: {UPLOAD_DIR}")
   logging.info(f"User directory: {user_directory}")
