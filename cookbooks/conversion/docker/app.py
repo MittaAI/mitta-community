@@ -48,10 +48,10 @@ async def upload():
         data = {'json': json_data}  
 
         # Define the endpoint and token
-        pipeline = os.getenv('PIPELINE')
+        pipeline = os.getenv('FFMPEG_PIPELINE')
         url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
         logging.info(url)
-        
+
         # Send the file using httpx
         async with httpx.AsyncClient(timeout=30) as client:  # Timeout of 30 seconds
             response = await client.post(url, files=files, data=data)

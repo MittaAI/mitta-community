@@ -50,6 +50,7 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
+  // doesn't work locally?
   var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
   var ws = new WebSocket(protocol + window.location.host + "/ws");
   var uuid = '';
