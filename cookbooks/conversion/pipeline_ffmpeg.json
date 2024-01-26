@@ -66,8 +66,7 @@
                     "pipeline": null,
                     "processor": "aiffmpeg",
                     "model": "gpt-3.5-turbo-1106",
-                    "openai_token": "[openai_token]",
-                    "ffmpeg_request": "convert to a 640 wide black and white gif"
+                    "openai_token": "[openai_token]"
                 },
                 "input_fields": [
                     {
