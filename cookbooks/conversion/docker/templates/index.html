@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
  
-  <title>Mitta AI FFmpeg</title>
+  <title>MittaAI FFmpeg</title>
 
   <meta name="description" content='Mitta AI FFmpeg' />
   <meta property='og:image' content="/static/sloth.png" />
@@ -13,12 +13,12 @@
   
   <meta property='og:title' content="Mitta AI FFmpeg"/>
   <meta property="og:image" content="/static/card.png" />
-  <meta property="og:description" content="Blazing Fast AI Pipelines" />
+  <meta property="og:description" content="Intelligent Document Transforming Pipelines for Data Scientists, Developers, and Creators." />
   <meta property="og:url" content="https://convert.mitta.us/" />
-  <meta property="og:title" content="MittaAI" />
+  <meta property="og:title" content="MittaAI FFmpeg" />
 
-  <meta name="twitter:card" content="summary_large_image" /> <!-- This specifies a large image card -->
-  <meta name="twitter:site" content="None" /> <!-- Replace with your Twitter handle -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="https://twitter.com/mittacorp" />
   <meta name="twitter:title" content="Mitta AI FFmpeg" />
   <meta name="twitter:description" content="Mitta AI FFmpeg" />
   <meta name="twitter:image" content="/static/card.png" />
@@ -29,18 +29,13 @@
   <link rel="stylesheet" href="/static/style.css">
 
   <script src="/static/jquery.min.js"></script>
-
-  <title>WebSocket Test</title>
-  <script type="text/javascript">
-
-  </script>
 </head>
 
 <body>
 <div class="container-fluid convert">
   <div class="row">
     <div class="col-lg-12">
-      <h1><span class="greater-than">&gt;</span> MittaAI</h1>
+      <h1 id="mitta"><span class="greater-than">&gt;</span> MittaAI</h1>
       <p id="comms">Enter a conversion request and click upload to select a file.</p>
       <div class="input-group mb-3 inputs">
         <input id="instructions" type="text" class="form-control" value="{instructions}" aria-label="instructions" aria-describedby="file-upload-button">
@@ -59,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
   ws.onopen = function() {
     console.log("WebSocket connection established");
   };
-  var resetTimer; // Holds the reference to the timer
+  var resetTimer;
 
   var comms = $('#comms').text();
 
@@ -67,19 +62,13 @@ document.addEventListener("DOMContentLoaded", function() {
     var data = JSON.parse(evt.data);
     console.log(data);
     
-    // Update the '#comms' element with the message from the server
-    // If you want to display a specific part of the data, adjust the key (e.g., data.message)
-    $('#comms').text(data.message || JSON.stringify(data));
+    $('#comms').text(data.message);
 
-    // Clear any existing timer to reset the message
     clearTimeout(resetTimer);
-
-    // Set a new timer to reset the message in 30 seconds
     resetTimer = setTimeout(function() {
-      $('#comms').text(comms); // Reset to the original message
-    }, 30000); // 30 seconds
+      $('#comms').text(comms);
+    }, 30000);
 
-    // Existing logic for handling 'convert_uri'
     if (data.convert_uri) {
       downloadFile(data.convert_uri[0], data.filename[0]);
     } else {
@@ -108,10 +97,14 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 $(document).ready(function() {
-  var instructionsFromBackend = "{{ instructions | safe }}"; // Use the 'safe' filter to ensure proper handling of special characters
+  var instructionsFromBackend = "{{ instructions | safe }}";
 
   // Use jQuery to set the value of the instructions input field
   $('#instructions').val(instructionsFromBackend);
+
+  $('#mitta').on('click', function() {
+    $('#fileInput').click();
+  });
 
   // When the 'Upload' span is clicked
   $('#file-upload-button').on('click', function() {
@@ -126,7 +119,7 @@ $(document).ready(function() {
 
     // Check if a file is selected
     if (file) {
-      // Process the file upload here
+      // Process the file upload
       var formData = new FormData();
       formData.append('file', file);
 
@@ -136,18 +129,16 @@ $(document).ready(function() {
 
       // AJAX request to upload the file
       $.ajax({
-        url: '/upload',  // Replace with your upload endpoint
+        url: '/upload',
         type: 'POST',
         data: formData,
-        processData: false,  // tell jQuery not to process the data
-        contentType: false,  // tell jQuery not to set contentType
+        processData: false,
+        contentType: false,
         success: function(response) {
           console.log('File uploaded successfully');
-          // You can handle the server response here
         },
         error: function(xhr, status, error) {
           console.error('File upload failed');
-          // Handle errors here
         }
       });
     }

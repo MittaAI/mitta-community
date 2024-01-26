@@ -32,7 +32,12 @@ a {
 
 h1 {
   font-family: 'Orbitron Regular', sans-serif;
-  text-transform: uppercase; 
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+input {
+  caret-color: auto;
 }
 
 .greater-than {
@@ -66,4 +71,8 @@ h1 {
   .input-group {
     width: auto;
   }
+}
+
+#mitta {
+
 }
