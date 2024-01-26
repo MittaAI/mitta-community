@@ -8,10 +8,17 @@ import httpx
 
 app = Quart(__name__, static_folder='static')
 
-@app.route('/')
-@app.route('/convert')
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/convert', methods=['GET', 'POST'])
 async def home():
-    return await render_template('index.html')
+    instructions = "Convert to a 640px wide PNG using the correct aspect ratio."  # Default instructions or retrieve from request
+    if request.method == 'POST':
+        form_data = await request.form
+        instructions = form_data.get('instructions', instructions)
+
+    return await render_template('index.html', instructions=instructions)
+
 
 @app.route('/upload', methods=['POST'])
 async def upload():
@@ -47,6 +54,7 @@ async def upload():
             return jsonify({"status": "error", "message": "Failed to upload file"})
 
     return jsonify({"status": "error", "message": "No file received"})
+
 
 @app.route('/callback', methods=['POST'])
 async def callback():

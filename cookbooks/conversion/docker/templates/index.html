@@ -41,9 +41,9 @@
   <div class="row">
     <div class="col-lg-12">
       <h1><span class="greater-than">&gt;</span> MittaAI</h1>
-      <p>Enter a conversational conversion request, then click upload to convert a file.</p>
+      <p id="comms">Enter a conversational conversion request, then click upload to convert a file.</p>
       <div class="input-group mb-3">
-        <input type="text" class="form-control" value="Convert to a 640px wide PNG using the correct aspect ratio." aria-label="instructions" aria-describedby="file-upload-button">
+        <input id="instructions" type="text" class="form-control" value="{instructions}" aria-label="instructions" aria-describedby="file-upload-button">
         <div class="input-group-append">
           <span class="input-group-text" id="file-upload-button">Upload</span>
         </div>
@@ -59,15 +59,34 @@ document.addEventListener("DOMContentLoaded", function() {
   ws.onopen = function() {
     console.log("WebSocket connection established");
   };
+  var resetTimer; // Holds the reference to the timer
+
+  var comms = $('#comms').text();
+
   ws.onmessage = function(evt) {
     var data = JSON.parse(evt.data);
-    updatePage(data);
-    if (data.convert_uri ) {
+
+    // Update the '#comms' element with the message from the server
+    // If you want to display a specific part of the data, adjust the key (e.g., data.message)
+    $('#comms').text(data.message || JSON.stringify(data));
+
+    // Clear any existing timer to reset the message
+    clearTimeout(resetTimer);
+
+    // Set a new timer to reset the message in 30 seconds
+    resetTimer = setTimeout(function() {
+      $('#comms').text(comms); // Reset to the original message
+    }, 30000); // 30 seconds
+
+    // Existing logic for handling 'convert_uri'
+    if (data.convert_uri) {
       downloadFile(data.convert_uri[0], data.filename[0]);
     } else {
       console.log(data);
     }
   };
+
+
   ws.onclose = function() {
     console.log("WebSocket connection closed");
   };
@@ -88,6 +107,11 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 $(document).ready(function() {
+  var instructionsFromBackend = "{{ instructions | safe }}"; // Use the 'safe' filter to ensure proper handling of special characters
+
+  // Use jQuery to set the value of the instructions input field
+  $('#instructions').val(instructionsFromBackend);
+
   // When the 'Upload' span is clicked
   $('#file-upload-button').on('click', function() {
     // Trigger the file input dialog
