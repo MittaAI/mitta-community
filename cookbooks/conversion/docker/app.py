@@ -20,6 +20,7 @@ async def home():
     # Initialize the default instructions
     instructions = [
         "Rotate image by 90 degrees",
+        "Resize width to 420 and crop to 420 high"
         "Convert to JPEG with quality 85",
         "Resize to 1080p HD resolution",
         "Extract first frame as PNG",
@@ -29,7 +30,7 @@ async def home():
         "Create a 5-second GIF from video",
         "Extract audio from video as MP3",
         "Convert to MP4 with H.264 encoding",
-        "Trim video to first 30 seconds",
+        "Trim video to first 10 seconds",
         "Convert to 360p WebM format",
         "Increase playback speed by 2x",
         "Create a thumbnail at the first minute",
