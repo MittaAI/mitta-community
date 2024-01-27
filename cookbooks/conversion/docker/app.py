@@ -99,7 +99,7 @@ async def callback():
                     logging.error(f"Failed to download file from {convert_uri}")
                     return jsonify({"status": "failed"})
 
-            convert_uri = "https://ai.mitta.ai/download/{filename}"
+            convert_uri = f"https://ai.mitta.ai/download/{filename}"
             logging.info(convert_uri)
         else:
             filename = ''
