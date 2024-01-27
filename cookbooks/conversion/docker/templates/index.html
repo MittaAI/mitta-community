@@ -128,6 +128,12 @@ $(document).ready(function() {
   $('#instructionInput').val("{{instructions[0]}}");
 
   // click handlers
+  $(document).on('click', function(event) {
+    if (!$(event.target).closest('#instructionInput, .dropdown-menu, .dropdown-menu a, #mitta, #file-upload-button, #fileInput, .dropdown-toggle').length) {
+      $('.dropdown-menu').hide();
+    }
+  });
+
   $('.dropdown-menu a').click(function() {
     $('#instructionInput').val($(this).text());
     $('.dropdown-menu').hide();
