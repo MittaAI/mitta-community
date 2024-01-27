@@ -88,7 +88,8 @@ async def callback():
 
             async with httpx.AsyncClient() as client:
                 mitta_token = os.getenv('MITTA_TOKEN')
-                response = await client.get(f"{convert_uri}?token={mitta_token}")
+                mitta_url = f"{convert_uri}?token={mitta_token}"
+                response = await client.get(mitta_url)
 
                 if response.status_code == 200:
                     with open(filepath, 'wb') as f:
