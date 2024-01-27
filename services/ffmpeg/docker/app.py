@@ -194,7 +194,7 @@ async def upload_file(callback_url, output_file, user_document):
               'filename': output_file,
               'user_document': user_document
             }
-            
+            logging.info(f"json_data: {json_data}")
             response = await client.post(callback_url, files=files, json=json_data)
 
         if response.status_code != 200:

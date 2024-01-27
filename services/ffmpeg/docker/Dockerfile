@@ -10,11 +10,11 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy the current directory contents into the container at /app
-COPY . /app
-
 # Install Quart and Hypercorn
 RUN pip install --no-cache-dir quart httpx werkzeug hypercorn
+
+# Copy the current directory contents into the container at /app
+COPY . /app
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
