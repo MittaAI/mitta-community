@@ -9,7 +9,7 @@ from quart_cors import cors
 import httpx
 
 app = Quart(__name__, static_folder='static')
-app = cors(app, allow_origin=["http://localhost:8080", "https://ai.mitta.ai"])
+app = cors(app, allow_origin=["http://localhost:5000", "https://ai.mitta.ai"])
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

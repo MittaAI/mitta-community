@@ -130,11 +130,19 @@ $(document).ready(function() {
   // click handlers
   $('.dropdown-menu a').click(function() {
     $('#instructionInput').val($(this).text());
-    $('.dropdown-menu').toggle();
+    $('.dropdown-menu').hide();
   });
 
   $('#mitta').on('click', function() {
     window.location = "https://mitta.ai"
+  });
+
+  $('#instructionInput').on('click', function() {
+    $('.dropdown-menu').hide();
+  });
+
+  $('#instructionInput').on('keyup', function() {
+    $('.dropdown-menu').hide();
   });
 
   $('#file-upload-button').on('click', function() {
@@ -146,8 +154,7 @@ $(document).ready(function() {
   });
 
   $('.dropdown-toggle').on('click', function() {
-    var $dropdownMenu = $(this).next('.dropdown-menu');
-    $dropdownMenu.toggle();
+    $('.dropdown-menu').toggle();
   });
 
   // file change handler and upload
