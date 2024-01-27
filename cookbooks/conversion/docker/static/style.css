@@ -67,6 +67,16 @@ input {
   cursor: pointer;
 }
 
+.input-group {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.input-group .form-control {
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
   .input-group {
     width: auto;
@@ -74,5 +84,5 @@ input {
 }
 
 #mitta {
-
+  cursor: pointer;
 }
