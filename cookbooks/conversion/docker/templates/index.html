@@ -173,7 +173,7 @@ $(document).ready(function() {
       formData.append('file', file);
 
       // Retrieve the selected instruction
-      var instructions = $('#instructions').find('option:selected').val();
+      var instructions = $('#instructionsInput').val();
       formData.append('instructions', instructions);
 
       // Include the UUID in the FormData
