@@ -62,7 +62,7 @@ async def convert():
   
   # parameters
   user_id = data.get('user_id')
-  user_document = data.get('user_document')
+  user_document = json.loads(data.get('user_document', '{}'))
   file_url = data.get('mitta_uri')
   callback_url = data.get('callback_url')
   ffmpeg_command = data.get('ffmpeg_command')
@@ -144,7 +144,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
   logging.info(f"ffmpeg_command is: {ffmpeg_command}")
 
   # change to logging
-  logging.info(f"Executing FFmpeg command in {user_directory}: {' '.join(ffmpeg_command)}")
+  logging.info(f"Executing FFmpeg command in {user_directory}: {''.join(ffmpeg_command)}")
 
   try:
       # Execute the FFmpeg command without changing the global working directory
