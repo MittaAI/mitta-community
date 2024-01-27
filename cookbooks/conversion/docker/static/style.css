@@ -86,3 +86,7 @@ input {
 #mitta {
   cursor: pointer;
 }
+
+#comms {
+  width: 470px;
+}

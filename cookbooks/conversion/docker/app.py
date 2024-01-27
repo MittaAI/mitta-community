@@ -70,9 +70,36 @@ async def callback():
 
     # uuid and message
     message = data.get('message', "Processing...")
-    convert_uri = data.get('convert_uri', [])
+    convert_uris = data.get('convert_uri', [])
     user_document = data.get('user_document', {})
     filename = data.get('filename', [])
+
+    # Check if convert_uri is provided and download the file
+    if convert_uris:
+        # Ensure the download directory exists
+        download_dir = 'download'
+        os.makedirs(download_dir, exist_ok=True)
+
+        # Download the first file in the list
+        convert_uri = convert_uris[0]
+        filename = filenames[0] if filenames
+        filepath = os.path.join(download_dir, filename)
+
+        async with httpx.AsyncClient() as client:
+            mitta_token = os.getenv('MITTA_TOKEN')
+            response = await client.get(f"{convert_uri}?token={mitta_token}")
+
+            if response.status_code == 200:
+                with open(filepath, 'wb') as f:
+                    f.write(response.content)
+                logging.info(f"File downloaded successfully: {filepath}")
+            else:
+                logging.error(f"Failed to download file from {convert_uri}")
+                return({"status": "failed"})
+
+        convert_uri = "https://ai.mitta.ai/download/{filename}"
+    else:
+        convert_uri = None
 
     if isinstance(user_document, dict):
         uuid = user_document.get('uuid', '')
@@ -95,6 +122,14 @@ async def callback():
 
 
 connected_websockets = {}
+
+from quart import send_from_directory
+
+@app.route('/download/<filename>')
+async def download_file(filename):
+    download_dir = 'download'  # Same directory you used for saving the files
+    return await send_from_directory(download_dir, filename, as_attachment=True)
+
 
 @app.websocket('/ws')
 async def ws():
