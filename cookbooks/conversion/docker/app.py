@@ -100,9 +100,9 @@ async def callback():
 
             convert_uri = "https://ai.mitta.ai/download/{filename}"
         else:
-            filename = None
+            filename = ''
     else:
-        convert_uri = None
+        convert_uri = ''
 
     if isinstance(user_document, dict):
         uuid = user_document.get('uuid', '')
