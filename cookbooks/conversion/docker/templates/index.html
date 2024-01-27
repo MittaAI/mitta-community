@@ -122,14 +122,14 @@ $(document).ready(function() {
   });
 
   function resetFileInput() {
-    $('#fileInput').remove(); // Remove the input
-    // Add a new input element
+    $('#fileInput').remove();
     $('.inputs').append('<input type="file" id="fileInput" style="display: none;">');
-    // Re-bind the change event to the new file input
     $('#fileInput').on('change', handleFileChange);
   }
 
-  $('#fileInput').on('change', function() {
+  $('#fileInput').on('change', handleFileChange);
+
+  function handleFileChange {
     // Get the file from the input
     var file = this.files[0];
 
