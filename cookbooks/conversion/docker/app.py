@@ -37,6 +37,8 @@ async def upload():
             "ffmpeg_request": instructions,
             "user_document": {"uuid": uuid}
         }
+        
+        logging.info(json_data)
 
         # Prepare the file to be uploaded to the external handler
         files = {'file': (file.filename, file.read(), file.content_type)}
@@ -77,7 +79,7 @@ async def callback():
         uuid = 'anonymous'
 
     logging.info(f"uuid: {uuid}")
-    
+
     await broadcast(
         {
             "status": "success", 

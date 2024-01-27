@@ -72,7 +72,6 @@ $(document).ready(function() {
     console.log("received a message")
     var data = JSON.parse(evt.data);
 
-    // set uuid
     if (data.uuid) {
       uuid = data.uuid;
     }
@@ -88,7 +87,7 @@ $(document).ready(function() {
     }, 30000);
 
     // show file
-    if (data.convert_uri) {
+    if (data.convert_uri != null) {
       downloadFile(data.convert_uri[0], data.filename[0]);
     } else {
       console.log(data);
