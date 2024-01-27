@@ -90,7 +90,7 @@ async def upload():
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(url, files=files)
             print(f"JSON task response: {response.json()}")
-            
+    
         # Check the response from the external handler
         if response.status_code == 200:
             await broadcast({"status": "success", "message": "File uploaded successfully!"})
