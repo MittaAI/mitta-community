@@ -191,8 +191,8 @@ async def upload_file(callback_url, output_file, user_document):
     async with httpx.AsyncClient() as client:
         with open(output_file, 'rb') as f:
             files = {'file': (output_file, f)}
-            data = {'filename': output_file, 'user_document': user_document}
-            response = await client.post(callback_url, files=files, data=data)
+            json_data = {'filename': output_file, 'user_document': user_document}
+            response = await client.post(callback_url, files=files, json=json_data)
 
         if response.status_code != 200:
             await notify_failure(callback_url, "Failed to upload the file after FFmpeg processing.")
