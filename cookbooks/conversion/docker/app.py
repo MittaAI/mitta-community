@@ -34,27 +34,21 @@ async def upload():
         uuid = (await request.form).get('uuid')
         
         # Prepare the JSON payload
-        json_payload = {
+        json_data = {
             "ffmpeg_request": instructions,
-            "uuid": uuid
+            "user_document": {"uuid": uuid}
         }
-        # Convert it to JSON string
-        json_data = json.dumps(json_payload)
 
         # Prepare the file to be uploaded to the external handler
         files = {'file': (file.filename, file.read(), file.content_type)}
         
-        # Use 'data' or 'json' as the field name, depending on your endpoint's expectation
-        data = {'json': json_data}  
-
         # Define the endpoint and token
         pipeline = os.getenv('FFMPEG_PIPELINE')
         url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
-        logging.info(url)
 
         # Send the file using httpx
         async with httpx.AsyncClient(timeout=30) as client:  # Timeout of 30 seconds
-            response = await client.post(url, files=files, data=data)
+            response = await client.post(url, files=files, json=json_data)
 
         # Check the response from the external handler
         if response.status_code == 200:
@@ -70,11 +64,12 @@ async def upload():
 @app.route('/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
+    logging.info(data)
 
     # uuid and message
-    uuid = data.get('uuid', 'anoymous')
+    uuid = data.get('uuid', 'anonymous')
     message = data.get('message', "Processing...")
-
+    user_document = data.get('')
     await broadcast({"status": "success", "message": message, "convert_uri": data.convert_uri}, recipient_id=uuid)
     return jsonify({"status": "success"})
 

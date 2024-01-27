@@ -181,7 +181,6 @@ async def notify_failure(callback_url, message):
     logging.info(f"Notifying failure: {message}")
     async with httpx.AsyncClient() as client:
         json_data = {'ffmpeg_result': message, 'filename': "None"}
-
         response = await client.post(callback_url, json=json_data)
         logging.info(f"Notification response: {response.text}")
 
@@ -191,7 +190,11 @@ async def upload_file(callback_url, output_file, user_document):
     async with httpx.AsyncClient() as client:
         with open(output_file, 'rb') as f:
             files = {'file': (output_file, f)}
-            json_data = {'filename': output_file, 'user_document': user_document}
+            json_data = {
+              'filename': output_file,
+              'user_document': user_document
+            }
+            
             response = await client.post(callback_url, files=files, json=json_data)
 
         if response.status_code != 200:
