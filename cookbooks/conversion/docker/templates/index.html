@@ -88,7 +88,7 @@ $(document).ready(function() {
 
     // show file
     if (data.convert_uri != '') {
-      downloadFile(data.convert_uri[0], data.filename[0]);
+      downloadFile(data.convert_uri, data.filename);
     } else {
       console.log(data);
     }
