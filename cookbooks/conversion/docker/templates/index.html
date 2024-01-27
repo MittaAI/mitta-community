@@ -38,7 +38,7 @@
       <h1 id="mitta"><span class="greater-than">&gt;</span> MittaAI</h1>
       <p id="comms">Enter a conversion request and click upload to select a file.</p>
       <div class="input-group mb-3 inputs">
-        <input id="instructions" type="text" class="form-control" value="{instructions}" aria-label="instructions" aria-describedby="file-upload-button">
+        <input id="instructions" type="text" class="form-control" value="{{instructions}}" aria-label="instructions" aria-describedby="file-upload-button">
         <div class="input-group-append">
           <span class="input-group-text" id="file-upload-button">Upload</span>
         </div>
@@ -52,17 +52,24 @@
 $(document).ready(function() {
   // doesn't work locally?
   var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-  var ws = new WebSocket(protocol + window.location.host + "/ws");
+  var hostname = window.location.protocol === 'https:' ? 'ai.mitta.ai' : 'localhost:5000';
+
+  console.log(protocol, hostname);
+  var ws = new WebSocket(protocol + hostname + "/ws");
   var uuid = '';
 
   ws.onopen = function() {
     console.log("WebSocket connection established");
   };
   var resetTimer;
-
+  resetTimer = setTimeout(function() {
+    $('#comms').text(comms);
+  }, 30000);
+    
   var comms = $('#comms').text();
 
   ws.onmessage = function(evt) {
+    console.log("received a message")
     var data = JSON.parse(evt.data);
 
     // set uuid
@@ -124,12 +131,12 @@ $(document).ready(function() {
   function resetFileInput() {
     $('#fileInput').remove();
     $('.inputs').append('<input type="file" id="fileInput" style="display: none;">');
-    $('#fileInput').on('change', handleFileChange);
+    $('#fileInput').on('change', handleFileChange());
   }
 
-  $('#fileInput').on('change', handleFileChange);
+  $('#fileInput').on('change', handleFileChange());
 
-  function handleFileChange {
+  function handleFileChange() {
     // Get the file from the input
     var file = this.files[0];
 
