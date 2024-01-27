@@ -88,5 +88,6 @@ input {
 }
 
 #comms {
-  width: 320px;
+  max-width: 320px;
+  font-size: 15px;
 }
