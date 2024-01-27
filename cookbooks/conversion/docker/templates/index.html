@@ -127,48 +127,49 @@ $(document).ready(function() {
   });
 
   $('#file-upload-button').on('click', function() {
-    $('#fileInput').click();
+      console.log("Upload button clicked");
+      $('#fileInput').trigger('click'); // Trigger the file input click
   });
 
-  function resetFileInput() {
-    $('#fileInput').remove();
-    $('.inputs').append('<input type="file" id="fileInput" style="display: none;">');
-    $('#fileInput').on('change', handleFileChange);
-  }
-
-  $('#fileInput').on('change', handleFileChange);
+  $('#fileInput').on('change', function() {
+      handleFileChange(); // Call the file handling function when a file is selected
+  });
 
   function handleFileChange() {
-    // Get the file from the input
-    var file = this.files[0];
+      var fileInput = $('#fileInput')[0]; // Correctly reference the file input
+      if (fileInput.files && fileInput.files[0]) {
+          var file = fileInput.files[0];
 
-    // Check if a file is selected
-    if (file) {
-      // Process the file upload
-      var formData = new FormData();
-      formData.append('file', file);
+          var formData = new FormData();
+          formData.append('file', file);
 
-      // Add any other data you want to send
-      var instructions = $('#instructions').val();
-      formData.append('instructions', instructions);
-      formData.append('uuid', uuid); // Include the UUID in the FormData
+          // Retrieve the selected instruction
+          var instructions = $('#instructions').find('option:selected').val();
+          formData.append('instructions', instructions);
 
-      // AJAX request to upload the file
-      $.ajax({
-        url: '/upload',
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-          resetFileInput();
-        },
-        error: function(xhr, status, error) {
+          // Include the UUID in the FormData
+          formData.append('uuid', uuid);
 
-          resetFileInput();
-        }
-      });
-    }
+          $.ajax({
+              url: '/upload',
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function(response) {
+                  console.log("File uploaded successfully");
+                  resetFileInput();
+              },
+              error: function(xhr, status, error) {
+                  console.log("Error in file upload:", status, error);
+                  resetFileInput();
+              }
+          });
+      }
+  }
+
+  function resetFileInput() {
+      $('#fileInput').val(''); // Reset the file input
   }
 });
 
