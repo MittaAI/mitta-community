@@ -67,10 +67,10 @@ async def upload():
         logging.info(f"Received instructions: {instructions}")
 
         # Prepare the JSON payload and encode it into bytes
-        # httpx recent versions don't like non-encoded payloads
+        # httpx recent versions may not like non-encoded payloads
         json_data = json.dumps({
-            "ffmpeg_request": instructions,
-            "user_document": {"uuid": uuid}
+            "user_document": {"uuid": uuid},
+            "ffmpeg_request": instructions
         }).encode('utf-8')
 
         logging.info(json_data)
@@ -89,7 +89,8 @@ async def upload():
         # Send the file using httpx
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(url, files=files)
-        print(response.json())
+        logging.info(f"JSON task response: {response.json()}")
+        
         # Check the response from the external handler
         if response.status_code == 200:
             await broadcast({"status": "success", "message": "File uploaded successfully!"})
