@@ -72,7 +72,7 @@ async def callback():
     message = data.get('message', "Processing...")
     convert_uris = data.get('convert_uri', [])
     user_document = data.get('user_document', {})
-    filename = data.get('filename', [])
+    filenames = data.get('filename', [])
 
     # Check if convert_uri is provided and download the file
     if convert_uris:
@@ -82,22 +82,25 @@ async def callback():
 
         # Download the first file in the list
         convert_uri = convert_uris[0]
-        filename = filenames[0] if filenames
-        filepath = os.path.join(download_dir, filename)
+        if filenames:
+            filename = filenames[0]
+            filepath = os.path.join(download_dir, filename)
 
-        async with httpx.AsyncClient() as client:
-            mitta_token = os.getenv('MITTA_TOKEN')
-            response = await client.get(f"{convert_uri}?token={mitta_token}")
+            async with httpx.AsyncClient() as client:
+                mitta_token = os.getenv('MITTA_TOKEN')
+                response = await client.get(f"{convert_uri}?token={mitta_token}")
 
-            if response.status_code == 200:
-                with open(filepath, 'wb') as f:
-                    f.write(response.content)
-                logging.info(f"File downloaded successfully: {filepath}")
-            else:
-                logging.error(f"Failed to download file from {convert_uri}")
-                return({"status": "failed"})
+                if response.status_code == 200:
+                    with open(filepath, 'wb') as f:
+                        f.write(response.content)
+                    logging.info(f"File downloaded successfully: {filepath}")
+                else:
+                    logging.error(f"Failed to download file from {convert_uri}")
+                    return jsonify({"status": "failed"})
 
-        convert_uri = "https://ai.mitta.ai/download/{filename}"
+            convert_uri = "https://ai.mitta.ai/download/{filename}"
+        else:
+            filename = None
     else:
         convert_uri = None
 
