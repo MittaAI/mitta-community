@@ -66,16 +66,20 @@ async def upload():
         # Log the received instructions for debugging
         logging.info(f"Received instructions: {instructions}")
 
-        # Prepare the JSON payload
-        json_data = {
+        # Prepare the JSON payload and encode it into bytes
+        # httpx recent versions don't like non-encoded payloads
+        json_data = json.dumps({
             "ffmpeg_request": instructions,
             "user_document": {"uuid": uuid}
-        }
-        
+        }).encode('utf-8')
+
         logging.info(json_data)
 
         # Prepare the file to be uploaded to the external handler
-        files = {'file': (file.filename, file.read(), file.content_type)}
+        files = {
+            'file': (file.filename, file.read(), file.content_type),
+            'json_data': (None, json_data, 'application/json')
+        }
         
         # Define the endpoint and token
         pipeline = os.getenv('FFMPEG_PIPELINE')
@@ -83,8 +87,8 @@ async def upload():
         url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
 
         # Send the file using httpx
-        async with httpx.AsyncClient(timeout=30) as client:  # Timeout of 30 seconds
-            response = await client.post(url, files=files, json=json_data)
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.post(url, files=files)
 
         # Check the response from the external handler
         if response.status_code == 200:
