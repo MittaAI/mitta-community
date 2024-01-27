@@ -1,17 +1,17 @@
 @font-face {
-  font-family: 'Orbitron Regular', sans-serif;
+  font-family: 'Orbitron Regular';
   src: url('/static/Orbitron-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Silka Regular', sans-serif;
+  font-family: 'Silka Regular';
   src: url('/static/silka-regular-webfont.ttf') format('truetype');
 }
 
 body {
-  font-family: 'Silka Regular', sans-serif;
+  font-family: 'Silka Regular';
   background-color: #101010;
   color: #ffffff;
   font-size: 1rem;
@@ -31,7 +31,7 @@ a {
 }
 
 h1 {
-  font-family: 'Orbitron Regular', sans-serif;
+  font-family: 'Orbitron Regular';
   text-transform: uppercase;
   cursor: pointer;
 }

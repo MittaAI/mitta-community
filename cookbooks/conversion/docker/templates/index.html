@@ -26,7 +26,7 @@
   <link rel="shortcut icon" href="/static/favicon.ico">
 
   <link rel="stylesheet" href="/static/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?version=1.0">
 
   <script src="/static/jquery.min.js"></script>
 </head>
@@ -121,6 +121,14 @@ $(document).ready(function() {
     $('#fileInput').click();
   });
 
+  function resetFileInput() {
+    $('#fileInput').remove(); // Remove the input
+    // Add a new input element
+    $('.inputs').append('<input type="file" id="fileInput" style="display: none;">');
+    // Re-bind the change event to the new file input
+    $('#fileInput').on('change', handleFileChange);
+  }
+
   $('#fileInput').on('change', function() {
     // Get the file from the input
     var file = this.files[0];
@@ -145,13 +153,11 @@ $(document).ready(function() {
         contentType: false,
         success: function(response) {
           console.log('File uploaded successfully');
-          // Clear the file input to allow re-uploading the same file
-          $('#fileInput').val('');
+          resetFileInput();
         },
         error: function(xhr, status, error) {
           console.error('File upload failed');
-          // Clear the file input even if there's an error
-          $('#fileInput').val('');
+          resetFileInput();
         }
       });
     }
