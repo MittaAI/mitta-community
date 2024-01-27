@@ -87,6 +87,10 @@ $(document).ready(function() {
     // look for the UUID
     if (data.uuid) {
       uuid = data.uuid;
+      if (uuid == 'anonymous') {
+        // reload page to get new socket
+        window.location.reload();
+      }
     }
 
     // update comms messages
