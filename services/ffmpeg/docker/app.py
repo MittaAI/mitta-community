@@ -181,7 +181,7 @@ async def notify_failure(callback_url, message):
     logging.info(f"Notifying failure: {message}")
     async with httpx.AsyncClient() as client:
         json_data = {'ffmpeg_result': message, 'filename': "None"}
-        # Use the `json=` parameter to ensure the `Content-Type` is set to `application/json`
+
         response = await client.post(callback_url, json=json_data)
         logging.info(f"Notification response: {response.text}")
 
