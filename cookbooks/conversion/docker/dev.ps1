@@ -2,7 +2,7 @@
 $imageName = "convert-service"
 $containerName = "convert-container"
 
-Write-Host "Starting managment of convert-service..."
+Write-Host "Starting management of convert-service..."
 
 # Infinite loop to ensure the container is always running
 while ($true) {
@@ -26,6 +26,10 @@ while ($true) {
         docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 $imageName
 
         Write-Host "Container restarted with port 5000 exposed."
+
+        # Optionally, display the latest logs after restarting
+        Write-Host "Displaying latest container logs:"
+        docker logs $containerName --tail 50
     }
 
     # Wait for 5 seconds before checking again
