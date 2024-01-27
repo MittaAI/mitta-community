@@ -17,11 +17,40 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/convert', methods=['GET', 'POST'])
 async def home():
-    instructions = "Convert to a 640 wide black and white gif"  # Default instructions or retrieve from request
+    # Initialize the default instructions
+    instructions = [
+        "Rotate image by 90 degrees",
+        "Convert to JPEG with quality 85",
+        "Resize to 1080p HD resolution",
+        "Extract first frame as PNG",
+        "Convert to grayscale",
+        "Apply sepia tone effect",
+        "Enhance brightness and contrast",
+        "Create a 5-second GIF from video",
+        "Extract audio from video as MP3",
+        "Convert to MP4 with H.264 encoding",
+        "Trim video to first 30 seconds",
+        "Convert to 360p WebM format",
+        "Increase playback speed by 2x",
+        "Create a thumbnail at the first minute",
+        "Overlay text 'LOL' on image",
+        "Flip image horizontally",
+        "Normalize audio in a video file",
+        "Compress to a smaller file size",
+        "Convert audio to MP3 format",
+        "Convert video to animated GIF",
+        "Extract subtitles from a video"
+    ]
+
     if request.method == 'POST':
         form_data = await request.form
-        instructions = form_data.get('instructions', instructions)
+        posted_instruction = form_data.get('instructions')
 
+        # If a new instruction is posted, add it to the top of the list
+        if posted_instruction and posted_instruction not in instructions:
+            instructions.insert(0, posted_instruction)
+
+    # Pass the (possibly updated) instructions list to the template
     return await render_template('index.html', instructions=instructions)
 
 
@@ -29,9 +58,13 @@ async def home():
 async def upload():
     if 'file' in await request.files:
         file = (await request.files)['file']
-        instructions = (await request.form).get('instructions', 'Convert to a 640 wide black and white gif')
-        uuid = (await request.form).get('uuid')
+        form_data = await request.form
+        instructions = form_data.get('instructions', 'Convert to a 640 wide gif')
+        uuid = form_data.get('uuid')
         
+        # Log the received instructions for debugging
+        logging.info(f"Received instructions: {instructions}")
+
         # Prepare the JSON payload
         json_data = {
             "ffmpeg_request": instructions,
@@ -69,7 +102,14 @@ async def callback():
     logging.info(data)
 
     # uuid and message
-    message = data.get('message', "Processing...")
+    message = "Processing..."  # Default message
+
+    # Iterate through the keys in the data dictionary
+    for key, value in data.items():
+        if 'message' in key:
+            message = value
+
+    # Other variables
     convert_uris = data.get('convert_uri', [])
     user_document = data.get('user_document', {})
     filenames = data.get('filename', [])
@@ -108,7 +148,7 @@ async def callback():
         filename = ''
 
     if isinstance(user_document, dict):
-        uuid = user_document.get('uuid', '')
+        uuid = user_document.get('uuid', 'anonymous')
     else:
         uuid = 'anonymous'
 

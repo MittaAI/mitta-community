@@ -14,7 +14,8 @@ while ($true) {
         Write-Host "Container not running. Attempting to rebuild and restart..."
 
         # Stop and remove existing container if it exists
-        docker ps -a | Select-String $containerName | ForEach-Object {
+        $existingContainer = docker ps -a | Select-String $containerName
+        if ($existingContainer) {
             docker stop $containerName
             docker rm $containerName
         }
@@ -26,12 +27,13 @@ while ($true) {
         docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 $imageName
 
         Write-Host "Container restarted with port 5000 exposed."
-
-        # Optionally, display the latest logs after restarting
-        Write-Host "Displaying latest container logs:"
-        docker logs $containerName --tail 50
     }
+
+    # Display the latest logs after checking the container status
+    Write-Host "Displaying latest container logs:"
+    docker logs $containerName --tail 50
 
     # Wait for 5 seconds before checking again
     Start-Sleep -Seconds 5
 }
+

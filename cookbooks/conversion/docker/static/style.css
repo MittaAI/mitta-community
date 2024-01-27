@@ -79,7 +79,7 @@ input {
 
 @media (max-width: 768px) {
   .input-group {
-    width: auto;
+    width: 100%;
   }
 }
 
@@ -88,5 +88,5 @@ input {
 }
 
 #comms {
-  width: 380px;
+  width: 320px;
 }

@@ -32,17 +32,20 @@
 </head>
 
 <body>
+
 <div class="container-fluid convert">
   <div class="row">
     <div class="col-lg-12">
-      <h1 id="mitta"><span class="greater-than">&gt;</span> MittaAI</h1>
-      <p id="comms">Type conversion request, then click upload.</p>
-      <div class="input-group mb-3 inputs">
-        <input id="instructions" type="text" class="form-control" value="{{instructions}}" aria-label="instructions" aria-describedby="file-upload-button">
-        <div class="input-group-append">
-          <span class="input-group-text" id="file-upload-button">Upload</span>
-        </div>
+      <h1 id="mitta"><span class="greater-than">&gt;</span> FFMpeg AI</h1>
+      <p id="comms">Converts images or media files to any type, size, or length. Select a conversion request from the list or enter your own, then click upload.</p>
+      <div class="mb-3 inputs">
+        <select id="instructions" class="form-control">
+          {% for instruction in instructions %}
+          <option value="{{ instruction }}">{{ instruction }}</option>
+          {% endfor %}
+        </select>
       </div>
+      <button class="btn btn-primary" id="file-upload-button">Upload</button>
     </div>
   </div>
   <input type="file" id="fileInput" style="display: none;">
@@ -113,25 +116,24 @@ $(document).ready(function() {
     console.log("Download initiated for: " + filename);
   }
 
-  var instructionsFromBackend = "{{ instructions | safe }}";
+    // Retrieve the selected option from the pulldown
+  var instructions = $('#instructions option:selected').val();
+  formData.append('instructions', instructions);
 
-  // Use jQuery to set the value of the instructions input field
   $('#instructions').val(instructionsFromBackend);
 
   $('#mitta').on('click', function() {
     window.location = "https://mitta.ai"
   });
 
-  // When the 'Upload' span is clicked
   $('#file-upload-button').on('click', function() {
-    // Trigger the file input dialog
     $('#fileInput').click();
   });
 
   function resetFileInput() {
-    $('#fileInput').remove(); // Remove the existing input
-    $('.inputs').append('<input type="file" id="fileInput" style="display: none;">'); // Add a new input
-    $('#fileInput').on('change', handleFileChange); // Re-bind the change event correctly
+    $('#fileInput').remove();
+    $('.inputs').append('<input type="file" id="fileInput" style="display: none;">');
+    $('#fileInput').on('change', handleFileChange);
   }
 
   $('#fileInput').on('change', handleFileChange);
@@ -159,11 +161,10 @@ $(document).ready(function() {
         processData: false,
         contentType: false,
         success: function(response) {
-          console.log('File uploaded successfully');
           resetFileInput();
         },
         error: function(xhr, status, error) {
-          console.error('File upload failed');
+
           resetFileInput();
         }
       });
@@ -172,7 +173,5 @@ $(document).ready(function() {
 });
 
 </script>
-
 </body>
-
 </html>
