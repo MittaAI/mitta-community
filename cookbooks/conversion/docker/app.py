@@ -70,8 +70,9 @@ async def callback():
 
     # uuid and message
     message = data.get('message', "Processing...")
-    convert_uri = data.get('convert_uri', None)
+    convert_uri = data.get('convert_uri', [])
     user_document = data.get('user_document', {})
+    filename = data.get('filename', [])
 
     if isinstance(user_document, dict):
         uuid = user_document.get('uuid', '')
@@ -84,7 +85,8 @@ async def callback():
         {
             "status": "success", 
             "message": message, 
-            "convert_uri": convert_uri
+            "convert_uri": convert_uri,
+            "filename": filename
         }, 
         recipient_id=uuid
     )
