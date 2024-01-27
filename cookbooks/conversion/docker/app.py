@@ -27,7 +27,6 @@ async def home():
 
 @app.route('/upload', methods=['POST'])
 async def upload():
-    mitta_token = os.getenv('MITTA_TOKEN')
     if 'file' in await request.files:
         file = (await request.files)['file']
         instructions = (await request.form).get('instructions', 'Convert to a 640 wide black and white gif')
@@ -44,6 +43,7 @@ async def upload():
         
         # Define the endpoint and token
         pipeline = os.getenv('FFMPEG_PIPELINE')
+        mitta_token = os.getenv('MITTA_TOKEN')
         url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
 
         # Send the file using httpx
@@ -67,10 +67,26 @@ async def callback():
     logging.info(data)
 
     # uuid and message
-    uuid = data.get('uuid', 'anonymous')
     message = data.get('message', "Processing...")
-    user_document = data.get('')
-    await broadcast({"status": "success", "message": message, "convert_uri": data.convert_uri}, recipient_id=uuid)
+    convert_uri = data.get('convert_uri', None)
+    user_document = data.get('user_document', {})
+
+    if isinstance(user_document, dict):
+        uuid = user_document.get('uuid', '')
+    else:
+        uuid = 'anonymous'
+
+    logging.info(f"uuid: {uuid}")
+    
+    await broadcast(
+        {
+            "status": "success", 
+            "message": message, 
+            "convert_uri": convert_uri
+        }, 
+        recipient_id=uuid
+    )
+
     return jsonify({"status": "success"})
 
 
