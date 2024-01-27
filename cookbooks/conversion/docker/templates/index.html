@@ -65,7 +65,7 @@ $(document).ready(function() {
   resetTimer = setTimeout(function() {
     $('#comms').text(comms);
   }, 30000);
-    
+
   var comms = $('#comms').text();
 
   ws.onmessage = function(evt) {
@@ -129,12 +129,12 @@ $(document).ready(function() {
   });
 
   function resetFileInput() {
-    $('#fileInput').remove();
-    $('.inputs').append('<input type="file" id="fileInput" style="display: none;">');
-    $('#fileInput').on('change', handleFileChange());
+    $('#fileInput').remove(); // Remove the existing input
+    $('.inputs').append('<input type="file" id="fileInput" style="display: none;">'); // Add a new input
+    $('#fileInput').on('change', handleFileChange); // Re-bind the change event correctly
   }
 
-  $('#fileInput').on('change', handleFileChange());
+  $('#fileInput').on('change', handleFileChange);
 
   function handleFileChange() {
     // Get the file from the input
