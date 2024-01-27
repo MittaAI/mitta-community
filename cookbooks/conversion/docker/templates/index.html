@@ -121,7 +121,6 @@ $(document).ready(function() {
     $('#fileInput').click();
   });
 
-  // Handle file selection
   $('#fileInput').on('change', function() {
     // Get the file from the input
     var file = this.files[0];
@@ -133,7 +132,7 @@ $(document).ready(function() {
       formData.append('file', file);
 
       // Add any other data you want to send
-      var instructions = $('input[type="text"].form-control').val();
+      var instructions = $('#instructions').val();
       formData.append('instructions', instructions);
       formData.append('uuid', uuid); // Include the UUID in the FormData
 
@@ -146,9 +145,13 @@ $(document).ready(function() {
         contentType: false,
         success: function(response) {
           console.log('File uploaded successfully');
+          // Clear the file input to allow re-uploading the same file
+          $('#fileInput').val('');
         },
         error: function(xhr, status, error) {
           console.error('File upload failed');
+          // Clear the file input even if there's an error
+          $('#fileInput').val('');
         }
       });
     }
