@@ -62,7 +62,7 @@ async def convert():
   
   # parameters
   user_id = data.get('user_id')
-  user_document = json.loads(data.get('user_document', '{}'))
+  user_document = data.get('user_document', {})
   file_url = data.get('mitta_uri')
   callback_url = data.get('callback_url')
   ffmpeg_command = data.get('ffmpeg_command')
@@ -151,7 +151,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
       # process = subprocess.run(' '.join(ffmpeg_command), cwd=user_directory, shell=True, capture_output=True, text=True)
 
       process = subprocess.run(args, cwd=user_directory, capture_output=True, text=True)
-
+      logging.info("subprocess ran")
       # Handle FFmpeg execution result
       if process.returncode != 0:
           # FFmpeg command failed, manually raise an exception
@@ -160,8 +160,10 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
       # Success path: Check for the output file and proceed with upload
       output_file_path = os.path.join(user_directory, output_file)
       if os.path.exists(output_file_path):
+          logging.info("uploading file")
           await upload_file(callback_url, output_file_path, user_document)
       else:
+          logging.info("file missing")
           # Output file missing
           await notify_failure(callback_url, "FFmpeg succeeded but output file is missing.")
 
@@ -170,6 +172,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
       await notify_failure(callback_url, f"FFmpeg command failed: {e.stderr}")
 
   except Exception as e:
+      logging.info(e)
       # Catch-all for any other exceptions during the process
       await notify_failure(callback_url, f"An unexpected error occurred: {e}")
 
