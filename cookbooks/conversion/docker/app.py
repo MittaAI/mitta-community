@@ -103,6 +103,7 @@ async def callback():
             filename = ''
     else:
         convert_uri = ''
+        filename = ''
 
     if isinstance(user_document, dict):
         uuid = user_document.get('uuid', '')
