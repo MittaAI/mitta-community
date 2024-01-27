@@ -26,8 +26,9 @@
   <link rel="shortcut icon" href="/static/favicon.ico">
 
   <link rel="stylesheet" href="/static/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/style.css?version=1.1">
+  <link rel="stylesheet" href="/static/style.css?version=1.2">
 
+  <script src="/static/popper.min.js"></script>
   <script src="/static/jquery.min.js"></script>
 </head>
 
@@ -39,11 +40,17 @@
       <h1 id="mitta"><span class="greater-than">&gt;</span> FFMpeg AI</h1>
       <p id="comms">Converts images or media files to any type, size, or length. Select a conversion request from the list or enter your own, then click upload.</p>
       <div class="mb-3 inputs">
-        <select id="instructions" class="form-control">
-          {% for instruction in instructions %}
-          <option value="{{ instruction }}">{{ instruction }}</option>
-          {% endfor %}
-        </select>
+        <div class="input-group">
+          <input type="text" class="form-control" id="instructionInput">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+            <div class="dropdown-menu">
+              {% for instruction in instructions %}
+              <a class="dropdown-item" href="#">{{ instruction }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
       </div>
       <button class="btn btn-primary" id="file-upload-button">Upload</button>
     </div>
@@ -53,10 +60,11 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  // doesn't work locally?
+  // doesn't work with local docker?
   var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
   var hostname = window.location.protocol === 'https:' ? 'ai.mitta.ai' : 'localhost:5000';
 
+  // assemble websocket
   console.log(protocol, hostname);
   var ws = new WebSocket(protocol + hostname + "/ws");
   var uuid = '';
@@ -64,6 +72,7 @@ $(document).ready(function() {
   ws.onopen = function() {
     console.log("WebSocket connection established");
   };
+
   var resetTimer;
   resetTimer = setTimeout(function() {
     $('#comms').text(comms);
@@ -71,17 +80,20 @@ $(document).ready(function() {
 
   var comms = $('#comms').text();
 
-  ws.onmessage = function(evt) {
-    console.log("received a message")
-    var data = JSON.parse(evt.data);
+  ws.onmessage = function(event) {
+    console.log("Received a message")
+    var data = JSON.parse(event.data);
 
+    // look for the UUID
     if (data.uuid) {
       uuid = data.uuid;
     }
 
-    // update messages
+    // update comms messages
     if (data.message) {
-      $('#comms').text(data.message);
+      $('#comms').fadeOut('slow', function() {
+        $(this).text(data.message).fadeIn('slow');
+      });
     }
 
     clearTimeout(resetTimer);
@@ -90,8 +102,8 @@ $(document).ready(function() {
     }, 30000);
 
     // show file
-
     if (data.convert_uri && data.convert_uri != '') {
+      console.log("Downloading " + data.filename + " from " + data.convert_uri);
       downloadFile(data.convert_uri, data.filename);
     } else {
       console.log(data);
@@ -101,11 +113,7 @@ $(document).ready(function() {
   ws.onclose = function() {
     console.log("WebSocket connection closed");
   };
-
-  function updatePage(data) {
-    console.log(JSON.stringify(data));
-  }
-
+  console.log("yup")
   function downloadFile(url, filename) {
     var a = document.createElement('a');
     a.href = url;
@@ -116,60 +124,64 @@ $(document).ready(function() {
     console.log("Download initiated for: " + filename);
   }
 
-    // Retrieve the selected option from the pulldown
-  var instructions = $('#instructions option:selected').val();
-  formData.append('instructions', instructions);
+  // default instructions
+  $('#instructionInput').val("{{instructions[0]}}");
 
-  $('#instructions').val(instructionsFromBackend);
+  // click handlers
+  $('.dropdown-menu a').click(function() {
+    $('#instructionInput').val($(this).text());
+    $('.dropdown-menu').toggle();
+  });
 
   $('#mitta').on('click', function() {
     window.location = "https://mitta.ai"
   });
 
   $('#file-upload-button').on('click', function() {
-      console.log("Upload button clicked");
-      $('#fileInput').trigger('click'); // Trigger the file input click
+      $('#fileInput').trigger('click');
   });
 
   $('#fileInput').on('change', function() {
-      handleFileChange(); // Call the file handling function when a file is selected
+      handleFileChange();
   });
 
+  $('.dropdown-toggle').on('click', function() {
+    var $dropdownMenu = $(this).next('.dropdown-menu');
+    $dropdownMenu.toggle();
+  });
+
+  // file change handler and upload
   function handleFileChange() {
-      var fileInput = $('#fileInput')[0]; // Correctly reference the file input
-      if (fileInput.files && fileInput.files[0]) {
-          var file = fileInput.files[0];
+    var fileInput = $('#fileInput')[0]; // Correctly reference the file input
+    if (fileInput.files && fileInput.files[0]) {
+      var file = fileInput.files[0];
 
-          var formData = new FormData();
-          formData.append('file', file);
+      var formData = new FormData();
+      formData.append('file', file);
 
-          // Retrieve the selected instruction
-          var instructions = $('#instructions').find('option:selected').val();
-          formData.append('instructions', instructions);
+      // Retrieve the selected instruction
+      var instructions = $('#instructions').find('option:selected').val();
+      formData.append('instructions', instructions);
 
-          // Include the UUID in the FormData
-          formData.append('uuid', uuid);
+      // Include the UUID in the FormData
+      formData.append('uuid', uuid);
 
-          $.ajax({
-              url: '/upload',
-              type: 'POST',
-              data: formData,
-              processData: false,
-              contentType: false,
-              success: function(response) {
-                  console.log("File uploaded successfully");
-                  resetFileInput();
-              },
-              error: function(xhr, status, error) {
-                  console.log("Error in file upload:", status, error);
-                  resetFileInput();
-              }
-          });
-      }
-  }
-
-  function resetFileInput() {
-      $('#fileInput').val(''); // Reset the file input
+      $.ajax({
+        url: '/upload',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+          console.log("File uploaded successfully");
+          $('#fileInput').val('');;
+        },
+        error: function(xhr, status, error) {
+          console.log("Error in file upload:", status, error);
+          $('#fileInput').val('');
+        }
+      });
+    }
   }
 });
 
