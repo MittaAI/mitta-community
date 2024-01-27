@@ -90,7 +90,7 @@ async def upload():
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(url, files=files)
             print(f"JSON task response: {response.json()}")
-    
+
         # Check the response from the external handler
         if response.status_code == 200:
             await broadcast({"status": "success", "message": "File uploaded successfully!"})
@@ -204,10 +204,6 @@ async def broadcast(message, recipient_id=None):
         # If a recipient ID is provided, only send to that WebSocket
         ws = connected_websockets.get(recipient_id)
         if ws:
-            await ws.send_json(message)
-    else:
-        # If no recipient ID is provided, broadcast to all connected WebSockets
-        for ws in connected_websockets.values():
             await ws.send_json(message)
 
 
