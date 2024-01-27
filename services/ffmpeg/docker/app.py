@@ -52,6 +52,7 @@ async def convert():
 
   ffmpeg_token = os.getenv('FFMPEG_TOKEN')
   data = await request.get_json()
+  logging.info(f"/convert data: {data}")
   
   # token check
   if not data.get('ffmpeg_token'):
@@ -63,6 +64,7 @@ async def convert():
   # parameters
   user_id = data.get('user_id')
   user_document = data.get('user_document', {})
+  logging.info(f"user_document: {user_document}")
   file_url = data.get('mitta_uri')
   callback_url = data.get('callback_url')
   ffmpeg_command = data.get('ffmpeg_command')
@@ -110,6 +112,7 @@ async def download_file(url, directory):
 
 
 async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, user_id, user_document):
+  logging.info(f"user_document: {user_document}")
   logging.info(f"Current working directory: {os.getcwd()}")
   logging.info(f"Uploads directory: {UPLOAD_DIR}")
   logging.info(f"User directory: {user_directory}")
