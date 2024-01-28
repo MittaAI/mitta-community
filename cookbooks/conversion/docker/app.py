@@ -138,6 +138,7 @@ async def callback():
         # Download the first file in the list
         convert_uri = convert_uris[0]
         if filenames:
+            # use the first file only
             filename = filenames[0]
             filepath = os.path.join(download_dir, filename)
 
@@ -158,6 +159,7 @@ async def callback():
             logging.info(convert_uri)
         else:
             filename = ''
+            convert_uri = ''
     else:
         convert_uri = ''
         filename = ''
