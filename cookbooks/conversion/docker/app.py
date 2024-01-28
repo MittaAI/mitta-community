@@ -153,7 +153,7 @@ async def callback():
                     return jsonify({"status": "failed"}), 404
 
             convert_uri = f"https://ai.mitta.ai/download/{filename}"
-            # logging.info(convert_uri)
+            logging.info(convert_uri)
         else:
             filename = ''
     else:
