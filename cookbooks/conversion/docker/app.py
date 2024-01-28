@@ -20,7 +20,7 @@ async def home():
     # Initialize the default instructions
     instructions = [
         "Rotate image by 90 degrees",
-        "Resize width to 420 and crop to 420 high"
+        "Resize width to 420 and crop to 420 high",
         "Convert to JPEG with quality 85",
         "Resize to 1080p HD resolution",
         "Extract first frame as PNG",
