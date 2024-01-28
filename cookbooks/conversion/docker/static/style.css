@@ -96,7 +96,10 @@ input {
   .input-group {
     width: 100%;
   }
-  #coms {
+}
+
+@media only screen and (max-width: 480px) {
+  #comms {
     max-width: 320px;
     min-width: 320px;
   }
