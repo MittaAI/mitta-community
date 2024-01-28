@@ -192,10 +192,12 @@ $(document).ready(function() {
         contentType: false,
         success: function(response) {
           console.log("File uploaded successfully");
+          $('#comms').val("File uploaded.");
           $('#fileInput').val('');;
         },
         error: function(xhr, status, error) {
           console.log("Error in file upload:", status, error);
+          $('#comms').val("File upload failed.");
           $('#fileInput').val('');
         }
       });

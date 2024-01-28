@@ -76,8 +76,8 @@ async def upload():
         with open(f'json_data_{uuid}.json', 'w') as json_file:
             json.dump(json_data, json_file)
 
-        logging.info(f"Sending json_data: {json_data}")
-        logging.info(f"File content_type is {file.content_type}")
+        # logging.info(f"Sending json_data: {json_data}")
+        # logging.info(f"File content_type is {file.content_type}")
 
         # Prepare the file to be uploaded to the external handler
         files = {
@@ -89,30 +89,30 @@ async def upload():
         pipeline = os.getenv('FFMPEG_PIPELINE')
         mitta_token = os.getenv('MITTA_TOKEN')
         url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
-
+        logging.info(url)
         # Send the file using httpx
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(url, files=files)
-            print(f"JSON task response: {response.json()}")
 
         # remove the file
         os.remove(f'json_data_{uuid}.json')
-        
+        logging.info(response.status_code)
         # Check the response from the external handler
         if response.status_code == 200:
-            await broadcast({"status": "success", "message": "File uploaded successfully!"})
-            return jsonify({"status": "success", "message": "File uploaded successfully"})
+            print(f"JSON task response: {response.json()}")
+            await broadcast({"status": "success", "message": "File uploaded successfully!"}, uuid)
+            return jsonify({"status": "success", "message": "File uploaded successfully"}), 200
         else:
             await broadcast({"status": "success", "message": "File upload failed, sorry."})
-            return jsonify({"status": "error", "message": "Failed to upload file"})
+            return jsonify({"status": "error", "message": "Failed to upload file"}), 401
 
-    return jsonify({"status": "error", "message": "No file received"})
+    return jsonify({"status": "error", "message": "No file received"}), 404
 
 
 @app.route('/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
-    logging.info(data)
+    # logging.info(data)
 
     # uuid and message
     message = "Processing..."  # Default message
@@ -147,13 +147,13 @@ async def callback():
                 if response.status_code == 200:
                     with open(filepath, 'wb') as f:
                         f.write(response.content)
-                    logging.info(f"File downloaded successfully: {filepath}")
+                    # logging.info(f"File downloaded successfully: {filepath}")
                 else:
                     logging.error(f"Failed to download file from {convert_uri}")
-                    return jsonify({"status": "failed"})
+                    return jsonify({"status": "failed"}), 404
 
             convert_uri = f"https://ai.mitta.ai/download/{filename}"
-            logging.info(convert_uri)
+            # logging.info(convert_uri)
         else:
             filename = ''
     else:
@@ -165,7 +165,7 @@ async def callback():
     else:
         uuid = 'anonymous'
 
-    logging.info(f"uuid: {uuid}")
+    # logging.info(f"uuid: {uuid}")
 
     await broadcast(
         {
@@ -177,7 +177,7 @@ async def callback():
         recipient_id=uuid
     )
 
-    return jsonify({"status": "success"})
+    return jsonify({"status": "success"}), 200
 
 
 connected_websockets = {}
