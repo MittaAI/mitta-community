@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
-
+# ensure directory exists
 def create_and_check_directory(directory_path):
     try:
         # Attempt to create the directory (and any necessary parent directories)
