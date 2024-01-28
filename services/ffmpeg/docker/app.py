@@ -10,6 +10,7 @@ import shlex
 import subprocess
 import logging
 import mimetypes
+from uuid import uuid4
 
 from urllib.parse import urlparse
 from werkzeug.utils import secure_filename
@@ -193,7 +194,8 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
     logging.info(f"output_file: {output_file}")
 
     # Prepare JSON data and write to a temporary file
-    json_filename = 'temp_json_data.json'
+    uuid = unique_id = str(uuid4())
+    json_filename = f"json_data_{uuid}.json"
     json_data = {
         'filename': output_file,
         'user_document': user_document
@@ -204,7 +206,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
     mime_type, _ = mimetypes.guess_type(output_file_path)
     if mime_type is None:
         mime_type = 'application/octet-stream'  # Default MIME type if unknown
-        logging.info(mime_type)
+    logging.info(f"Mime type: {mime_type}")
 
     with open(json_filename, 'w') as json_file:
         json.dump(json_data, json_file)
@@ -213,8 +215,8 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
         async with httpx.AsyncClient() as client:
             with open(output_file_path, 'rb') as f, open(json_filename, 'rb') as json_f:
                 files = {
-                    'file': (output_file_path, f, mime_type),
-                    'json_data': (json_filename, json_f, 'application/json')
+                    'file': (output_file, f, mime_type),
+                    'json_data': ('json_data.json', json_f, 'application/json')
                 }
                 response = await client.post(callback_url, files=files)
         logging.info(response.json())
