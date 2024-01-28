@@ -224,6 +224,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
     logging.info(f"Mime type: {mime_type}")
 
     async with httpx.AsyncClient() as client:
+        logging.info("in httpx call")
         with open(output_file_path, 'rb') as f, open(json_filename, 'rb') as json_f:
             files = {
                 'file': (output_file, f, mime_type),
