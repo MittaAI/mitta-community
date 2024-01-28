@@ -103,4 +103,8 @@ input {
     max-width: 320px;
     min-width: 320px;
   }
+  .dropdown-menu {
+    max-width: 320px;
+  }
+  }
 }
