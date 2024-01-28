@@ -195,7 +195,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
 
     # Prepare JSON data and write to a temporary file
     uuid = unique_id = str(uuid4())
-    json_filename = f"json_data_{uuid}.json"
+
     json_data = {
         'filename': output_file,
         'user_document': user_document
@@ -208,27 +208,28 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
         mime_type = 'application/octet-stream'  # Default MIME type if unknown
     logging.info(f"Mime type: {mime_type}")
 
+    json_filename = f"json_data_{uuid}.json"
     with open(json_filename, 'w') as json_file:
         json.dump(json_data, json_file)
 
-        # Upload files
-        async with httpx.AsyncClient() as client:
-            with open(output_file_path, 'rb') as f, open(json_filename, 'rb') as json_f:
-                files = {
-                    'file': (output_file, f, mime_type),
-                    'json_data': ('json_data.json', json_f, 'application/json')
-                }
-                response = await client.post(callback_url, files=files)
-        logging.info(response.json())
-        if response.status_code != 200:
-            await notify_failure(callback_url, "Failed to upload the file after FFmpeg processing.")
-        else:
-            # Handle successful upload if needed
-            pass
+    # Upload files
+    async with httpx.AsyncClient() as client:
+        with open(output_file_path, 'rb') as f, open(json_filename, 'rb') as json_f:
+            files = {
+                'file': (output_file, f, mime_type),
+                'json_data': ('json_data.json', json_f, 'application/json')
+            }
+            response = await client.post(callback_url, files=files)
+    logging.info(response.json())
+    if response.status_code != 200:
+        await notify_failure(callback_url, "Failed to upload the file after FFmpeg processing.")
+    else:
+        # Handle successful upload if needed
+        pass
 
-        # Cleanup: remove output file and temporary JSON file
-        os.remove(output_file_path)
-        os.remove(json_filename)
+    # Cleanup: remove output file and temporary JSON file
+    os.remove(output_file_path)
+    os.remove(json_filename)
 
 
 if __name__ == '__main__':
