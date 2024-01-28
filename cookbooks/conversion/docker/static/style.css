@@ -72,15 +72,13 @@ input {
   flex-wrap: nowrap;
 }
 
+.dropdown-menu {
+  max-height: 25%;
+}
+
 .input-group .form-control {
   flex-grow: 1;
   flex-shrink: 0;
-}
-
-@media (max-width: 768px) {
-  .input-group {
-    width: 100%;
-  }
 }
 
 #mitta {
@@ -88,7 +86,17 @@ input {
 }
 
 #comms {
-  max-width: 320px;
-  min-width: 320px;
+  max-width: 480px;
+  min-width: 480px;
   font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .input-group {
+    width: 100%;
+  }
+  #coms {
+    max-width: 320px;
+    min-width: 320px;
+  }
 }
