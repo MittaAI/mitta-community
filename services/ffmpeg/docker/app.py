@@ -25,19 +25,19 @@ UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
 
 def create_and_check_directory(directory_path):
-try:
-    # Attempt to create the directory (and any necessary parent directories)
-    os.makedirs(directory_path, exist_ok=True)
-    logging.info(f"Directory '{directory_path}' ensured to exist.")
-    
-    # Check if the directory exists to verify it was created
-    if os.path.isdir(directory_path):
-        logging.info(f"Confirmed: The directory '{directory_path}' exists.")
-    else:
-        logging.error(f"Error: The directory '{directory_path}' was not found after creation attempt.")
-except Exception as e:
-    # If an error occurred during the creation, log the error
-    logging.error(f"An error occurred while creating the directory: {e}")
+    try:
+        # Attempt to create the directory (and any necessary parent directories)
+        os.makedirs(directory_path, exist_ok=True)
+        logging.info(f"Directory '{directory_path}' ensured to exist.")
+        
+        # Check if the directory exists to verify it was created
+        if os.path.isdir(directory_path):
+            logging.info(f"Confirmed: The directory '{directory_path}' exists.")
+        else:
+            logging.error(f"Error: The directory '{directory_path}' was not found after creation attempt.")
+    except Exception as e:
+        # If an error occurred during the creation, log the error
+        logging.error(f"An error occurred while creating the directory: {e}")
 
 
 @app.route('/')
@@ -205,6 +205,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
     if mime_type is None:
         mime_type = 'application/octet-stream'  # Default MIME type if unknown
         logging.info(mime_type)
+
     with open(json_filename, 'w') as json_file:
         json.dump(json_data, json_file)
 

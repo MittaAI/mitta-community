@@ -7,11 +7,11 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Quart and Hypercorn
-RUN pip install --no-cache-dir quart httpx werkzeug hypercorn
-
 # Set the working directory in the container
 WORKDIR /app
+
+# Install Quart and Hypercorn
+RUN pip install --no-cache-dir quart httpx werkzeug hypercorn
 
 # Copy the current directory contents into the container at /app
 COPY . /app
