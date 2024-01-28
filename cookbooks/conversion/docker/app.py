@@ -27,7 +27,7 @@ async def home():
 
 
 @app.route('/convert', methods=['GET', 'POST'])
-async def home():
+async def convert():
     # Initialize the default instructions
     instructions = [
         "Rotate image by 90 degrees",
