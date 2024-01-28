@@ -131,7 +131,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
     # check both the input file and output file for ..
     # second step of security handling
     if any(s in output_file for s in ["/", ".."]) or any(s in input_file for s in ["/", ".."]):
-        await notify_failure(callback_url, 'failed: command stopped at security checkpoint')
+        await notify_failure(callback_url, user_document, 'failed: command stopped at security checkpoint')
 
     # Update paths for the input and output files within the command arguments
     if input_file in args:
@@ -170,22 +170,25 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
         else:
             logging.info("file missing")
             # Output file missing
-            await notify_failure(callback_url, "FFmpeg succeeded but output file is missing.")
+            await notify_failure(callback_url, user_document, "FFmpeg succeeded but output file is missing.")
 
     except subprocess.CalledProcessError as e:
         # Handle FFmpeg failure
-        await notify_failure(callback_url, f"FFmpeg command failed: {e.stderr}")
+        await notify_failure(callback_url, user_document, f"FFmpeg command failed: {e.stderr}")
 
     except Exception as e:
         logging.info(e)
         # Catch-all for any other exceptions during the process
-        await notify_failure(callback_url, f"An unexpected error occurred: {e}")
+        await notify_failure(callback_url, user_document, f"An unexpected error occurred: {e}")
 
 
-async def notify_failure(callback_url, message):
+async def notify_failure(callback_url, user_document, message=None):
     logging.info(f"Notifying failure: {message}")
     async with httpx.AsyncClient() as client:
-        json_data = {'ffmpeg_result': message}
+        json_data = {
+            'ffmpeg_result': message,
+            'user_document': user_document
+        }
         response = await client.post(callback_url, json=json_data)
         logging.info(f"Notification response: {response.text}")
 
@@ -223,7 +226,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
             response = await client.post(callback_url, files=files)
     logging.info(response.json())
     if response.status_code != 200:
-        await notify_failure(callback_url, "Failed to upload the file after FFmpeg processing.")
+        await notify_failure(callback_url, user_document, "Failed to upload the file after FFmpeg processing.")
     else:
         # Handle successful upload if needed
         pass
