@@ -182,28 +182,40 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
         await notify_failure(callback_url, user_document, f"An unexpected error occurred: {e}")
 
 
+def prepare_json_data(user_document, message=None, output_file=None):
+    json_data = {
+        'user_document': user_document
+    }
+    if message:
+        json_data['ffmpeg_result'] = message
+    if output_file:
+        json_data['filename'] = output_file
+
+    uuid = str(uuid4())
+    json_filename = f"json_data_{uuid}.json"
+    with open(json_filename, 'w') as json_file:
+        json.dump(json_data, json_file)
+
+    return json_filename
+
+
 async def notify_failure(callback_url, user_document, message=None):
     logging.info(f"Notifying failure: {message}")
+    json_filename = prepare_json_data(user_document, message)
+    
     async with httpx.AsyncClient() as client:
-        json_data = {
-            'ffmpeg_result': message,
-            'user_document': user_document
-        }
-        response = await client.post(callback_url, json=json_data)
+        with open(json_filename, 'rb') as json_file:
+            response = await client.post(callback_url, files={'json_data': ('json_data.json', json_file, 'application/json')})
         logging.info(f"Notification response: {response.text}")
+
+    os.remove(json_filename)
 
 
 async def upload_file(callback_url, output_file, output_file_path, user_document):
     logging.info(f"output_file: {output_file}")
 
-    # Prepare JSON data and write to a temporary file
-    uuid = unique_id = str(uuid4())
-
-    json_data = {
-        'user_document': user_document,
-        'filename': output_file,
-    }
-    logging.info(f"JSON data: {json_data}")
+    json_filename = prepare_json_data(user_document, output_file=output_file)
+    logging.info(f"JSON filename: {json_filename}")
 
     # Guess the MIME type of the file based on its extension
     mime_type, _ = mimetypes.guess_type(output_file_path)
@@ -211,12 +223,6 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
         mime_type = 'application/octet-stream'  # Default MIME type if unknown
     logging.info(f"Mime type: {mime_type}")
 
-    # write the file out to the drive
-    json_filename = f"json_data_{uuid}.json"
-    with open(json_filename, 'w') as json_file:
-        json.dump(json_data, json_file)
-
-    # Upload files
     async with httpx.AsyncClient() as client:
         with open(output_file_path, 'rb') as f, open(json_filename, 'rb') as json_f:
             files = {
@@ -227,14 +233,10 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
     logging.info(response.json())
     if response.status_code != 200:
         await notify_failure(callback_url, user_document, "Failed to upload the file after FFmpeg processing.")
-    else:
-        # Handle successful upload if needed
-        pass
 
-    # Cleanup: remove output file and temporary JSON file
+    # Cleanup: remove output file, temporary JSON file
     os.remove(output_file_path)
     os.remove(json_filename)
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
