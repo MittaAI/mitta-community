@@ -112,7 +112,8 @@ async def upload():
 @app.route('/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
-    # logging.info(data)
+    logging.info("in callback")
+    logging.info(data)
 
     # uuid and message
     message = "Processing..."  # Default message
@@ -129,6 +130,7 @@ async def callback():
 
     # Check if convert_uri is provided and download the file
     if convert_uris:
+        logging.info("in if convert_uris")
         # Ensure the download directory exists
         download_dir = 'download'
         os.makedirs(download_dir, exist_ok=True)
