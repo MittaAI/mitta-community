@@ -184,7 +184,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
 async def notify_failure(callback_url, message):
     logging.info(f"Notifying failure: {message}")
     async with httpx.AsyncClient() as client:
-        json_data = {'ffmpeg_result': message, 'filename': "None"}
+        json_data = {'ffmpeg_result': message}
         response = await client.post(callback_url, json=json_data)
         logging.info(f"Notification response: {response.text}")
 
@@ -217,7 +217,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
                     'json_data': (json_filename, json_f, 'application/json')
                 }
                 response = await client.post(callback_url, files=files)
-
+        logging.info(response.json())
         if response.status_code != 200:
             await notify_failure(callback_url, "Failed to upload the file after FFmpeg processing.")
         else:
@@ -225,7 +225,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
             pass
 
         # Cleanup: remove output file and temporary JSON file
-        os.remove(output_file)
+        os.remove(ouput_file_path)
         os.remove(json_filename)
 
 
