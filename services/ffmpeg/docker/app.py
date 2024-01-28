@@ -227,7 +227,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
             pass
 
         # Cleanup: remove output file and temporary JSON file
-        os.remove(ouput_file_path)
+        os.remove(output_file_path)
         os.remove(json_filename)
 
 
