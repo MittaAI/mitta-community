@@ -4,7 +4,7 @@ import logging
 
 from uuid import uuid4
 
-from quart import Quart, websocket, render_template, request, jsonify
+from quart import Quart, websocket, render_template, request, redirect, jsonify
 from quart_cors import cors
 import httpx
 
@@ -14,7 +14,18 @@ app = cors(app, allow_origin=["http://localhost:5000", "https://ai.mitta.ai"])
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+@app.route('/convert/static/<path:filename>')
+async def custom_static(filename):
+    static_folder_path = app.static_folder
+    file_path = os.path.join(static_folder_path, filename)
+    return await send_from_directory(static_folder_path, filename)
+
+
 @app.route('/', methods=['GET', 'POST'])
+async def home():
+    return redirect("https://mitta.ai")
+
+
 @app.route('/convert', methods=['GET', 'POST'])
 async def home():
     # Initialize the default instructions
