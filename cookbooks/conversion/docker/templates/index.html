@@ -116,8 +116,9 @@ $(document).ready(function() {
 
   ws.onclose = function() {
     console.log("WebSocket connection closed");
+    window.location.reload();
   };
-  console.log("yup")
+
   function downloadFile(url, filename) {
     var a = document.createElement('a');
     a.href = url;

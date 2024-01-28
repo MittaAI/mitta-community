@@ -73,7 +73,7 @@ async def upload():
             "ffmpeg_request": instructions
         }
 
-        with open('json_data.json', 'w') as json_file:
+        with open(f'json_data_{uuid}.json', 'w') as json_file:
             json.dump(json_data, json_file)
 
         logging.info(f"Sending json_data: {json_data}")
@@ -82,7 +82,7 @@ async def upload():
         # Prepare the file to be uploaded to the external handler
         files = {
             'file': (file.filename, file.read(), file.content_type),
-            'json_data': ('json_data.json', open('json_data.json', 'rb'), 'application/json')
+            'json_data': ('json_data.json', open(f'json_data_{uuid}.json', 'rb'), 'application/json')
         }
 
         # Define the endpoint and token
@@ -95,6 +95,9 @@ async def upload():
             response = await client.post(url, files=files)
             print(f"JSON task response: {response.json()}")
 
+        # remove the file
+        os.remove(f'json_data_{uuid}.json')
+        
         # Check the response from the external handler
         if response.status_code == 200:
             await broadcast({"status": "success", "message": "File uploaded successfully!"})
