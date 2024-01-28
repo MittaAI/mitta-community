@@ -199,12 +199,12 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
         'user_document': user_document
     }
     logging.info(f"JSON data: {json_data}")
-    
+
     # Guess the MIME type of the file based on its extension
     mime_type, _ = mimetypes.guess_type(output_file_path)
     if mime_type is None:
         mime_type = 'application/octet-stream'  # Default MIME type if unknown
-
+        logging.info(mime_type)
     with open(json_filename, 'w') as json_file:
         json.dump(json_data, json_file)
 
