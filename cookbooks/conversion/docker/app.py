@@ -68,19 +68,23 @@ async def upload():
 
         # Prepare the JSON payload and encode it into bytes
         # httpx recent versions may not like non-encoded payloads
-        json_data = json.dumps({
+        json_data = {
             "user_document": {"uuid": uuid},
             "ffmpeg_request": instructions
-        }).encode('utf-8')
+        }
 
-        logging.info(json_data)
+        with open('json_data.json', 'w') as json_file:
+            json.dump(json_data, json_file)
+
+        logging.info(f"Sending json_data: {json_data}")
+        logging.info(f"File content_type is {file.content_type}")
 
         # Prepare the file to be uploaded to the external handler
         files = {
             'file': (file.filename, file.read(), file.content_type),
-            'json_data': (None, json_data, 'application/json')
+            'json_data': ('json_data.json', open('json_data.json', 'rb'), 'application/json')
         }
-        
+
         # Define the endpoint and token
         pipeline = os.getenv('FFMPEG_PIPELINE')
         mitta_token = os.getenv('MITTA_TOKEN')
