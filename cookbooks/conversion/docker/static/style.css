@@ -63,6 +63,11 @@ input {
   max-width: 100%;
 }
 
+.dropdown-menu {
+  max-height: 200px; /* Adjust the height as needed */
+  overflow-y: auto;  /* Enable vertical scrolling */
+}
+
 .input-group-text {
   cursor: pointer;
 }
@@ -70,10 +75,6 @@ input {
 .input-group {
   display: flex;
   flex-wrap: nowrap;
-}
-
-.dropdown-menu {
-  max-height: 25%;
 }
 
 .input-group .form-control {
