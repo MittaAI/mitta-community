@@ -190,24 +190,35 @@ async def notify_failure(callback_url, message):
 
 async def upload_file(callback_url, output_file, user_document):
     logging.info(f"output_file: {output_file}")
+
+    # Prepare JSON data and write to a temporary file
+    json_filename = 'temp_json_data.json'
+    json_data = {
+        'filename': output_file,
+        'user_document': user_document
+    }
+    with open(json_filename, 'w') as json_file:
+        json.dump(json_data, json_file)
+
+    # Upload files
     async with httpx.AsyncClient() as client:
-        with open(output_file, 'rb') as f:
-            files = {'file': (output_file, f)}
-            json_data = {
-              'filename': output_file,
-              'user_document': user_document
+        with open(output_file, 'rb') as f, open(json_filename, 'rb') as json_f:
+            files = {
+                'file': (output_file, f),
+                'json_data': (json_filename, json_f, 'application/json')
             }
-            logging.info(f"json_data: {json_data}")
-            response = await client.post(callback_url, files=files, json=json_data)
+            response = await client.post(callback_url, files=files)
 
-        if response.status_code != 200:
-            await notify_failure(callback_url, "Failed to upload the file after FFmpeg processing.")
-        else:
-            # Handle successful upload if needed
-            pass
+    if response.status_code != 200:
+        await notify_failure(callback_url, "Failed to upload the file after FFmpeg processing.")
+    else:
+        # Handle successful upload if needed
+        pass
 
-    # Cleanup
+    # Cleanup: remove output file and temporary JSON file
     os.remove(output_file)
+    os.remove(json_filename)
+
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0', port=5000)
