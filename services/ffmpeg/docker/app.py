@@ -197,8 +197,8 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
     uuid = unique_id = str(uuid4())
 
     json_data = {
+        'user_document': user_document,
         'filename': output_file,
-        'user_document': user_document
     }
     logging.info(f"JSON data: {json_data}")
 
@@ -208,6 +208,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
         mime_type = 'application/octet-stream'  # Default MIME type if unknown
     logging.info(f"Mime type: {mime_type}")
 
+    # write the file out to the drive
     json_filename = f"json_data_{uuid}.json"
     with open(json_filename, 'w') as json_file:
         json.dump(json_data, json_file)
