@@ -62,7 +62,7 @@ async def convert():
             instructions.insert(0, posted_instruction)
 
     # Pass the (possibly updated) instructions list to the template
-    current_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00") # card publish
+    current_date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00") # card publish
     return await render_template('index.html', instructions=instructions, current_date=current_date)
 
 
