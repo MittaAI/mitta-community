@@ -40,7 +40,7 @@ async def convert():
         "Change image to grayscale",
         "Enhance image brightness and contrast",
         "Convert audio to MP3 format",
-        "Grab first 10 seconds of audio and MP3 it"
+        "Grab first 10 seconds of audio and MP3 it",
         "Resize video to 1080p HD resolution",
         "Extract first video frame as PNG",
         "Create a 5-second GIF from video",
