@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import datetime
 
 from uuid import uuid4
 
@@ -31,13 +32,17 @@ async def convert():
     # Initialize the default instructions
     instructions = [
         "Rotate image by 90 degrees",
-        "Resize width to 420 and crop to 420 high",
-        "Convert to JPEG with quality 85",
-        "Resize to 1080p HD resolution",
-        "Extract first frame as PNG",
-        "Convert to grayscale",
-        "Apply sepia tone effect",
-        "Enhance brightness and contrast",
+        "Flip image horizontally",
+        "Convert image to JPEG with quality 85",
+        "Scale image x to 320 & crop y to 320",
+        "Shrink the image by 50%",
+        "Convert image to a PNG",
+        "Change image to grayscale",
+        "Enhance image brightness and contrast",
+        "Convert audio to MP3 format",
+        "Grab first 10 seconds of audio and MP3 it"
+        "Resize video to 1080p HD resolution",
+        "Extract first video frame as PNG",
         "Create a 5-second GIF from video",
         "Extract audio from video as MP3",
         "Convert to MP4 with H.264 encoding",
@@ -45,13 +50,7 @@ async def convert():
         "Convert to 360p WebM format",
         "Increase playback speed by 2x",
         "Create a thumbnail at the first minute",
-        "Overlay text 'LOL' on image",
-        "Flip image horizontally",
-        "Normalize audio in a video file",
-        "Compress to a smaller file size",
-        "Convert audio to MP3 format",
-        "Convert video to animated GIF",
-        "Extract subtitles from a video"
+        "Normalize audio in a video file"
     ]
 
     if request.method == 'POST':
@@ -63,7 +62,8 @@ async def convert():
             instructions.insert(0, posted_instruction)
 
     # Pass the (possibly updated) instructions list to the template
-    return await render_template('index.html', instructions=instructions)
+    current_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00") # card publish
+    return await render_template('index.html', instructions=instructions, current_date=current_date)
 
 
 @app.route('/upload', methods=['POST'])
