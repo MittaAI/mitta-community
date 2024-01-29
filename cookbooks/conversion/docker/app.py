@@ -34,7 +34,7 @@ async def convert():
         "Rotate image by 90 degrees",
         "Flip image horizontally",
         "Convert image to JPEG with quality 85",
-        "Scale image x to 320 & crop y to 320",
+        "Scale landscape image to 320 tall, then crop to 320 wide",
         "Shrink the image by 50%",
         "Convert image to a PNG",
         "Change image to grayscale",
