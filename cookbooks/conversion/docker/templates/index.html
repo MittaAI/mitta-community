@@ -97,12 +97,25 @@ $(document).ready(function() {
 
   // Load instructions from the cookie and prepend them to the dropdown
   var savedInstructions = getCookie('instructions');
+  var serverInstructions = {{ instructions | tojson }};
+
   if (savedInstructions) {
     savedInstructions = JSON.parse(savedInstructions);
+
     savedInstructions.forEach(function(instruction) {
       $('.dropdown-menu').prepend('<a class="dropdown-item" href="#">' + instruction + '</a>');
+      // Remove this instruction from serverInstructions if it exists
+      var index = serverInstructions.indexOf(instruction);
+      if (index > -1) {
+        serverInstructions.splice(index, 1);
+      }
     });
   }
+
+  // Append remaining server instructions to the dropdown
+  serverInstructions.forEach(function(instruction) {
+    $('.dropdown-menu').append('<a class="dropdown-item" href="#">' + instruction + '</a>');
+  });
 
   var resetTimer;
   resetTimer = setTimeout(function() {
@@ -221,9 +234,9 @@ $(document).ready(function() {
       }
 
       // Save instruction locally if not already
-      if (!savedInstructions.includes(instruction) && !{{ instructions | tojson }}.includes(instruction)) {
-          savedInstructions.push(instruction);
-          setCookie('instructions', JSON.stringify(savedInstructions), 7);
+      if (!savedInstructions.includes(instruction)) {
+        savedInstructions.push(instruction);
+        setCookie('instructions', JSON.stringify(savedInstructions), 7);
       }
 
       $.ajax({
