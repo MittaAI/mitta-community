@@ -174,6 +174,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
 
     except subprocess.CalledProcessError as e:
         # Handle FFmpeg failure
+        user_document['bad_ffmpeg_command'] = ffmpeg_command
         await notify_failure(callback_url, user_document, f"FFmpeg command failed: {e.stderr}")
 
     except Exception as e:
