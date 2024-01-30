@@ -38,6 +38,7 @@ async def convert():
         "Shrink the image by 50%",
         "Convert image to a PNG",
         "Change image to grayscale",
+        "Apply a nice sepia tone to the image",
         "Increase saturation by 50%",
         "Decrease saturation by 50% and apply a slight brown tint",
         "Convert audio to MP3 format",
