@@ -103,7 +103,7 @@ $(document).ready(function() {
       $('.dropdown-menu').prepend('<a class="dropdown-item" href="#">' + instruction + '</a>');
     });
   }
-  
+
   var resetTimer;
   resetTimer = setTimeout(function() {
     $('#comms').text(comms);
@@ -202,7 +202,7 @@ $(document).ready(function() {
   // file change handler and upload
   function handleFileChange() {
     var fileInput = $('#fileInput')[0];
-    if (fileInput.files && fileFileInput.files[0]) {
+    if (fileInput.files && fileInput.files[0]) {
       var file = fileInput.files[0];
       var formData = new FormData();
       formData.append('file', file);
