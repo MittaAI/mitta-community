@@ -162,15 +162,6 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
             # FFmpeg command failed, manually raise an exception
             raise subprocess.CalledProcessError(process.returncode, process.args, output=process.stdout, stderr=process.stderr)
 
-        # Success path: Check for the output file and proceed with upload
-        output_file_path = os.path.join(user_directory, output_file)
-        if os.path.exists(output_file_path):
-            logging.info("uploading file")
-            await upload_file(callback_url, output_file, output_file_path, user_document)
-        else:
-            logging.info("file missing")
-            # Output file missing
-            await notify_failure(callback_url, user_document, "FFmpeg succeeded but output file is missing.")
 
     except subprocess.CalledProcessError as e:
         # Handle FFmpeg failure
@@ -180,7 +171,20 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
     except Exception as e:
         logging.info(e)
         # Catch-all for any other exceptions during the process
-        await notify_failure(callback_url, user_document, f"An unexpected error occurred: {e}")
+        await notify_failure(callback_url, user_document, f"FFmpeg command failed: An unexpected error occurred.")
+
+    try:
+        # Success path: Check for the output file and proceed with upload
+        output_file_path = os.path.join(user_directory, output_file)
+        if os.path.exists(output_file_path):
+            logging.info("uploading file")
+            await upload_file(callback_url, output_file, output_file_path, user_document)
+        else:
+            logging.info("file missing")
+            # Output file missing
+            await notify_failure(callback_url, user_document, "FFmpeg succeeded but output file is missing.")
+    except:
+        await notify_failure(callback_url, user_document, f"FFmpeg ran successfully, but failed to upload the file.")
 
 
 def prepare_json_data(user_document, message=None, output_file=None):
