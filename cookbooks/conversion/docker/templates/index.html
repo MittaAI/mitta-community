@@ -72,6 +72,38 @@ $(document).ready(function() {
     console.log("WebSocket connection established");
   };
 
+  // Function to set a cookie
+  function setCookie(name, value, days) {
+      var expires = "";
+      if (days) {
+          var date = new Date();
+          date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+          expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+  }
+
+  // Function to get a cookie
+  function getCookie(name) {
+      var nameEQ = name + "=";
+      var ca = document.cookie.split(';');
+      for(var i = 0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+  }
+
+  // Load instructions from the cookie and prepend them to the dropdown
+  var savedInstructions = getCookie('instructions');
+  if (savedInstructions) {
+    savedInstructions = JSON.parse(savedInstructions);
+    savedInstructions.forEach(function(instruction) {
+      $('.dropdown-menu').prepend('<a class="dropdown-item" href="#">' + instruction + '</a>');
+    });
+  }
+  
   var resetTimer;
   resetTimer = setTimeout(function() {
     $('#comms').text(comms);
@@ -169,19 +201,30 @@ $(document).ready(function() {
 
   // file change handler and upload
   function handleFileChange() {
-    var fileInput = $('#fileInput')[0]; // Correctly reference the file input
-    if (fileInput.files && fileInput.files[0]) {
+    var fileInput = $('#fileInput')[0];
+    if (fileInput.files && fileFileInput.files[0]) {
       var file = fileInput.files[0];
-
       var formData = new FormData();
       formData.append('file', file);
 
-      // Retrieve the selected instruction
-      var instructions = $('#instructionInput').val();
-      formData.append('instructions', instructions);
+      var instruction = $('#instructionInput').val();
+      formData.append('instructions', instruction);
 
-      // Include the UUID in the FormData
       formData.append('uuid', uuid);
+
+      // Retrieve existing instructions from the cookie
+      var savedInstructions = getCookie('instructions');
+      if (!savedInstructions) {
+          savedInstructions = [];
+      } else {
+          savedInstructions = JSON.parse(savedInstructions);
+      }
+
+      // Save instruction locally if not already
+      if (!savedInstructions.includes(instruction) && !{{ instructions | tojson }}.includes(instruction)) {
+          savedInstructions.push(instruction);
+          setCookie('instructions', JSON.stringify(savedInstructions), 7);
+      }
 
       $.ajax({
         url: '/upload',
