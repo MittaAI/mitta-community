@@ -1,0 +1,110 @@
+@font-face {
+  font-family: 'Orbitron Regular';
+  src: url('/convert/static/Orbitron-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Silka Regular';
+  src: url('/convert/static/silka-regular-webfont.ttf') format('truetype');
+}
+
+body {
+  font-family: 'Silka Regular';
+  background-color: #101010;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: left;
+  margin: 0;
+  caret-color: transparent;
+}
+
+button, a.btn {
+  -webkit-appearance: none;
+}
+
+a {
+  color: #96c9ff;
+  text-decoration: none;
+}
+
+h1 {
+  font-family: 'Orbitron Regular';
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+input {
+  caret-color: auto;
+}
+
+.greater-than {
+  color: #0adf1c;
+}
+
+.convert {
+  background: radial-gradient(circle at center center, rgba(128, 128, 128, 0.3) 0%, rgba(128, 128, 128, 0) 100%);
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f4f4f4;
+  padding: 20px;
+}
+
+.inputs {
+  width: 100%;
+}
+
+.input-group {
+  max-width: 100%;
+}
+
+.dropdown-menu {
+  max-height: 200px; /* Adjust the height as needed */
+  overflow-y: auto;  /* Enable vertical scrolling */
+}
+
+.input-group-text {
+  cursor: pointer;
+}
+
+.input-group {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.input-group .form-control {
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
+#mitta {
+  cursor: pointer;
+}
+
+#comms {
+  max-width: 480px;
+  min-width: 480px;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .input-group {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  #comms {
+    max-width: 320px;
+    min-width: 320px;
+  }
+  .dropdown-menu {
+    max-width: 320px;
+  }
+  }
+}

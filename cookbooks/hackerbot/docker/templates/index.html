@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+  <title>MittaAI | AI News</title>
+
+  <meta name="description" content="Explore and summarize trending AI and tech topics from Hacker News. Utilize our AI-powered /crawl feature for quick, insightful summaries of posts." />
+  <meta name="image" content="https://ai.mitta.ai/crawl/static/feature-image.png">
+  <meta property="og:type" content="web service" />
+  <meta property="og:image" content="https://ai.mitta.ai/crawl/static/feature-image.png" />
+  <meta property="og:description" content="Discover and understand the latest in AI and technology through our innovative /crawl feature, extracting key insights from Hacker News posts." />
+  <meta property="og:url" content="https://ai.mitta.ai/crawl" />
+  <meta property="og:title" content="MittaAI /crawl - AI-Powered Tech News Summarizer" />
+  <meta property="article:published_time" content="{{current_date}}" />
+  <meta name="author" content="MittaAI Team">
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@mittacorp" />
+  <meta name="twitter:title" content="Discover AI and Tech Trends with MittaAI /crawl" />
+  <meta name="twitter:description" content="Stay updated on AI and tech with the MittaAI /crawl feature, summarizing top Hacker News posts efficiently." />
+  <meta name="twitter:image" content="https://ai.mitta.ai/crawl/static/feature-image.png" />
+
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@mittacorp" />
+  <meta name="twitter:title" content="Mitta AI FFmpeg" />
+  <meta name="twitter:description" content="Converts images and media files to a new file using plain text requests. AI pipeline powered by MittaAI." />
+  <meta name="twitter:image" content="https://ai.mitta.ai/convert/static/card.png" />
+
+  <link rel="shortcut icon" href="/convert/static/favicon.ico">
+
+  <link rel="stylesheet" href="/convert/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/convert/static/style.css?version=1.6">
+
+  <script src="/convert/static/popper.min.js"></script>
+  <script src="/convert/static/jquery.min.js"></script>
+</head>
+
+<body>
+
+<div class="container-fluid convert">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 id="mitta"><span class="greater-than">&gt;</span>AI News</h1>
+      <p id="comms">Stay updated with the latest tech news from <a href="https://news.ycombinator.com/">Hacker News</a>.  NOTE: It is your responsiblity to ensure content is created following MittaAI's guidelines on <a href="https://mitta.ai/legal#responsibility-for-retrieved-and-ai-transformed-data">AI generated content</a>. Now, enter a search topic or select one from the list.</p>
+      <div class="mb-3 inputs">
+        <div class="input-group">
+          <input type="text" class="form-control" id="instructionInput">
+          <div class="input-group-append">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+            <div class="dropdown-menu">
+              {% for instruction in instructions %}
+              <a class="dropdown-item" href="#">{{ instruction }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="submit-button">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // WebSocket setup for server communication
+  var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+  var hostname = window.location.protocol === 'https:' ? 'ai.mitta.ai' : 'localhost:5000';
+  var ws = new WebSocket(protocol + hostname + "/ws");
+
+  ws.onopen = function() {
+    console.log("WebSocket connection established");
+  };
+
+  var resetTimer;
+  resetTimer = setTimeout(function() {
+    $('#comms').text(comms);
+  }, 30000);
+
+
+  ws.onmessage = function(event) {
+    console.log("Received a message")
+    var data = JSON.parse(event.data);
+
+    // look for the UUID
+    if (data.uuid) {
+      uuid = data.uuid;
+      if (uuid == 'anonymous') {
+        // reload page to get new socket
+        window.location.reload();
+      }
+    }
+
+    // update comms messages
+    if (data.message) {
+      console.log(data.message);
+      $('#comms').fadeOut('slow', function() {
+        $(this).text(data.message).fadeIn('slow');
+      });
+    }
+
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(function() {
+      $('#comms').text(comms);
+    }, 30000);
+  };
+
+  ws.onclose = function() {
+    console.log("WebSocket connection closed");
+  };
+
+  function updateCommsText(newText) {
+      $('#comms').fadeOut('slow', function() {
+          $(this).text(newText).fadeIn('slow');
+      });
+  }
+
+  // Form submission handler using jQuery AJAX
+  $('#submit-button').on('click', function() {
+    var instructions = $('#instructionInput').val();
+
+    // AJAX request to send instructions to the server
+    $.ajax({
+      url: '/upload', // Change this to your upload endpoint
+      type: 'POST',
+      data: {
+        instructions: instructions
+      },
+      success: function(response) {
+        console.log("Request submitted successfully");
+        updateCommsText("News request submitted.");
+      },
+      error: function(xhr, status, error) {
+        console.log("Error submitting crawl:", status, error);
+        updateCommsText("Request failed!");
+        window.location.reload();
+      }
+    });
+  });
+
+  // default instructions
+  $('#instructionInput').val("{{instructions[0]}}");
+
+  // click handlers
+  $(document).on('click', function(event) {
+    if (!$(event.target).closest('#instructionInput, .dropdown-menu, .dropdown-menu a, #mitta, #file-upload-button, #fileInput, .dropdown-toggle').length) {
+      $('.dropdown-menu').hide();
+    }
+  });
+
+  // Dropdown handlers
+  $('.dropdown-menu a').click(function() {
+    $('#instructionInput').val($(this).text());
+    $('.dropdown-menu').hide();
+  });
+
+  $('#instructionInput').on('click', function() {
+    $('.dropdown-menu').hide();
+  });
+
+  $('#instructionInput').on('keyup', function() {
+    $('.dropdown-menu').hide();
+  });
+
+  $('.dropdown-toggle').on('click', function() {
+    $('.dropdown-menu').toggle();
+  });
+
+});
+</script>
+</body>
+</html>
