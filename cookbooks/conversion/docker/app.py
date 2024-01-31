@@ -68,7 +68,7 @@ async def convert():
     return await render_template('index.html', instructions=instructions, current_date=current_date)
 
 
-@app.route('/convert/upload', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 async def upload():
     if 'file' in await request.files:
         file = (await request.files)['file']
@@ -122,7 +122,7 @@ async def upload():
     return jsonify({"status": "error", "message": "No file received"}), 404
 
 
-@app.route('/convert/callback', methods=['POST'])
+@app.route('/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
     logging.info("in callback")
@@ -168,7 +168,7 @@ async def callback():
                     logging.error(f"Failed to download file from {convert_uri}")
                     return jsonify({"status": "failed"}), 404
 
-            convert_uri = f"https://ai.mitta.ai/convert/download/{filename}"
+            convert_uri = f"https://ai.mitta.ai/download/{filename}"
             logging.info(convert_uri)
         else:
             filename = ''
@@ -201,7 +201,7 @@ connected_websockets = {}
 
 from quart import send_from_directory
 
-@app.route('/convert/download/<filename>')
+@app.route('/download/<filename>')
 async def download_file(filename):
     download_dir = 'download'  # Same directory you used for saving the files
     return await send_from_directory(download_dir, filename, as_attachment=True)

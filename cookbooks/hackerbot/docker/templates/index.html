@@ -9,9 +9,9 @@
   <meta name="description" content="Discover and understand the latest in AI and technology, extracting key insights from Hacker News posts." />
   <meta name="image" content="https://ai.mitta.ai/crawl/static/card.png">
   <meta property="og:type" content="web service" />
-  <meta property="og:image" content="https://ai.mitta.ai/crawl/static/card.png" />
+  <meta property="og:image" content="https://news.mitta.ai/static/card.png" />
   <meta property="og:description" content="Discover and understand the latest in AI and technology, extracting key insights from Hacker News posts." />
-  <meta property="og:url" content="https://ai.mitta.ai/crawl" />
+  <meta property="og:url" content="https://news.mitta.ai/crawl" />
   <meta property="og:title" content="MittaAI /crawl - AI-Powered Tech News Summarizer" />
   <meta property="article:published_time" content="{{current_date}}" />
   <meta name="author" content="MittaAI Team">
@@ -20,15 +20,15 @@
   <meta name="twitter:site" content="@mittacorp" />
   <meta name="twitter:title" content="Mitta AI FFmpeg" />
   <meta name="twitter:description" content="Grabs the latest tech news with AI. AI pipeline powered by MittaAI." />
-  <meta name="twitter:image" content="https://ai.mitta.ai/news/static/card.png" />
+  <meta name="twitter:image" content="https://news.mitta.ai/static/card.png" />
 
-  <link rel="shortcut icon" href="/news/static/favicon.ico">
+  <link rel="shortcut icon" href="/static/favicon.ico">
 
-  <link rel="stylesheet" href="/news/static/bootstrap.min.css">
-  <link rel="stylesheet" href="/news/static/style.css?version=1.6">
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/style.css?version=1.6">
 
-  <script src="/news/static/popper.min.js"></script>
-  <script src="/nves/static/jquery.min.js"></script>
+  <script src="/static/popper.min.js"></script>
+  <script src="/static/jquery.min.js"></script>
 </head>
 
 <body>
@@ -246,7 +246,7 @@ $(document).ready(function() {
 
     // AJAX request to send instructions to the server
     $.ajax({
-      url: '/news/upload', // Change this to your upload endpoint
+      url: '/upload', // Change this to your upload endpoint
       type: 'POST',
       data: formData,
       processData: false,

@@ -10,12 +10,12 @@ from quart_cors import cors
 import httpx
 
 app = Quart(__name__, static_folder='static')
-app = cors(app, allow_origin=["https://72f3-173-174-35-128.ngrok-free.app", "http://localhost:5000", "https://ai.mitta.ai"])
+app = cors(app, allow_origin=["https://72f3-173-174-35-128.ngrok-free.app", "https://ai.mitta.ai"])
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-@app.route('/news/static/<path:filename>')
+@app.route('/static/<path:filename>')
 async def custom_static(filename):
     static_folder_path = app.static_folder
     file_path = os.path.join(static_folder_path, filename)
@@ -68,7 +68,7 @@ async def crawl():
     return await render_template('index.html', instructions=instructions, current_date=current_date)
 
 
-@app.route('/news/upload', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 async def upload():
     form_data = await request.form
     instructions = form_data.get('instructions', 'Get news about AI')
@@ -132,7 +132,7 @@ def extract_value(data, key):
     return value
 
 
-@app.route('/news/callback', methods=['POST'])
+@app.route('/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
     logging.info("in callback")
@@ -193,7 +193,7 @@ async def callback():
                     logging.error(f"Failed to download file from {convert_uri}")
                     return jsonify({"status": "failed"}), 404
 
-            access_uri = f"https://ai.mitta.ai/news/download/{filename}"
+            access_uri = f"https://ai.mitta.ai/download/{filename}"
             message = None
             logging.info(access_uri)
 
@@ -220,7 +220,7 @@ connected_websockets = {}
 
 from quart import send_from_directory
 
-@app.route('/news/download/<filename>')
+@app.route('/download/<filename>')
 async def download_file(filename):
     download_dir = 'download'  # Same directory you used for saving the files
     return await send_from_directory(download_dir, filename, as_attachment=True)
