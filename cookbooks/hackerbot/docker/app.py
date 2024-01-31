@@ -15,7 +15,7 @@ app = cors(app, allow_origin=["https://72f3-173-174-35-128.ngrok-free.app", "htt
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-@app.route('/convert/static/<path:filename>')
+@app.route('/news/static/<path:filename>')
 async def custom_static(filename):
     static_folder_path = app.static_folder
     file_path = os.path.join(static_folder_path, filename)
@@ -27,10 +27,11 @@ async def home():
     return redirect("https://mitta.ai")
 
 
-@app.route('/crawl', methods=['GET', 'POST'])
+@app.route('/news', methods=['GET', 'POST'])
 async def crawl():
     # Initialize the default instructions
     instructions = [
+        "Most popular current article",
         "Latest AI advancements",
         "Startup funding rounds",
         "Cybersecurity trends",
@@ -50,7 +51,8 @@ async def crawl():
         "Renewable energy tech",
         "Tech IPOs and stock market",
         "5G and wireless technology",
-        "Robotics and automation"
+        "Robotics and automation",
+        "Elon Musk's tiny penis"
     ]
 
     if request.method == 'POST':
@@ -66,14 +68,16 @@ async def crawl():
     return await render_template('index.html', instructions=instructions, current_date=current_date)
 
 
-@app.route('/upload', methods=['POST'])
+@app.route('/news/upload', methods=['POST'])
 async def upload():
     form_data = await request.form
     instructions = form_data.get('instructions', 'Get news about AI')
     uuid = form_data.get('uuid')
-    logging.info(uuid)
+    
     # Log the received instructions for debugging
     logging.info(f"Received instructions: {instructions}")
+    logging.info(f"UUID: {uuid}")
+
 
     # Prepare the JSON payload and encode it into bytes
     # httpx recent versions may not like non-encoded payloads
@@ -94,8 +98,8 @@ async def upload():
     pipeline = os.getenv('NEWS_PIPELINE')
     mitta_token = os.getenv('MITTA_TOKEN')
     url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
-    url = f"https://kordless.ngrok.io/pipeline/{pipeline}/task?token={mitta_token}"
     logging.info(url)
+    
     # Send the file using httpx
     async with httpx.AsyncClient(timeout=30) as client:
         response = await client.post(url, files=files)
@@ -112,34 +116,66 @@ async def upload():
         await broadcast({"status": "success", "message": "Pipeline failure."})
         return jsonify({"status": "error", "message": "Failed to send to pipeline"}), 401
 
-@app.route('/callback', methods=['POST'])
+
+def extract_value(data, key):
+    print(data)
+    value = data.get(key, [])
+    
+    if isinstance(value, list):
+        if value and isinstance(value[0], list):
+            if value[0]:
+                return value[0][0]
+            return None
+        elif value:
+            return value[0]
+        return None
+    return value
+
+
+@app.route('/news/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
     logging.info("in callback")
     logging.info(data)
 
     # uuid and message
-    message = "Processing..."  # Default message
-
-    # Iterate through the keys in the data dictionary
-    for key, value in data.items():
-        if 'message' in key:
-            message = value
-
-    # Other variables
+    message = data.get('message', "Received data.")
+    summary = extract_value(data, 'summary')
+    comments = extract_value(data, 'comments')
+    hn_url = extract_value(data, 'hn_url')
+    story_url = extract_value(data, 'story_url')
+    title = extract_value(data, 'title')
+    access_uri = extract_value(data, 'access_uri')
+    
+    # covert uri, if available
     convert_uris = data.get('convert_uri', [])
-    user_document = data.get('user_document', {})
     filenames = data.get('filename', [])
 
+    # don't show message if we have data
+    if summary or comments or hn_url or story_url:
+        message = None
+
+    # get uuid
+    user_document = data.get('user_document', {})
+    if isinstance(user_document, dict):
+        uuid = user_document.get('uuid', 'anonymous')
+    else:
+        uuid = 'anonymous'
+
+    logging.info(uuid)
+
     # Check if convert_uri is provided and download the file
+    filename = ''
+    access_uri = ''
     if convert_uris:
-        logging.info("in if convert_uris")
         # Ensure the download directory exists
         download_dir = 'download'
         os.makedirs(download_dir, exist_ok=True)
 
         # Download the first file in the list
         convert_uri = convert_uris[0]
+        logging.info(convert_uri)
+        logging.info(filenames)
         if filenames:
             # use the first file only
             filename = filenames[0]
@@ -153,34 +189,27 @@ async def callback():
                 if response.status_code == 200:
                     with open(filepath, 'wb') as f:
                         f.write(response.content)
-                    # logging.info(f"File downloaded successfully: {filepath}")
                 else:
                     logging.error(f"Failed to download file from {convert_uri}")
                     return jsonify({"status": "failed"}), 404
 
-            convert_uri = f"https://ai.mitta.ai/download/{filename}"
-            logging.info(convert_uri)
-        else:
-            filename = ''
-            convert_uri = ''
-    else:
-        convert_uri = ''
-        filename = ''
-
-    if isinstance(user_document, dict):
-        uuid = user_document.get('uuid', 'anonymous')
-    else:
-        uuid = 'anonymous'
-
-    # logging.info(f"uuid: {uuid}")
+            access_uri = f"https://ai.mitta.ai/news/download/{filename}"
+            message = None
+            logging.info(access_uri)
 
     await broadcast(
         {
-            "status": "success", 
-            "message": message, 
-            "convert_uri": convert_uri,
-            "filename": filename
-        }, 
+            "status": "success",
+            "message": message,
+            "title": title,
+            "comments": comments,
+            "hn_url": hn_url,
+            "story_url": story_url,
+            "summary": summary,
+            "filename": filename,
+            "access_uri": access_uri,
+            "uuid": uuid
+        },
         recipient_id=uuid
     )
 
@@ -191,7 +220,7 @@ connected_websockets = {}
 
 from quart import send_from_directory
 
-@app.route('/download/<filename>')
+@app.route('/news/download/<filename>')
 async def download_file(filename):
     download_dir = 'download'  # Same directory you used for saving the files
     return await send_from_directory(download_dir, filename, as_attachment=True)
@@ -214,6 +243,7 @@ async def ws():
 
 
 async def broadcast(message, recipient_id=None):
+    logging.info(message)
     if recipient_id:
         # If a recipient ID is provided, only send to that WebSocket
         ws = connected_websockets.get(recipient_id)

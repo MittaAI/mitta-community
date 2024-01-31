@@ -86,7 +86,7 @@ input {
   cursor: pointer;
 }
 
-#comms {
+#comms, #legal {
   max-width: 480px;
   min-width: 480px;
   font-size: 15px;
