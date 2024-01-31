@@ -99,7 +99,7 @@ input {
 }
 
 @media only screen and (max-width: 480px) {
-  #comms {
+  #comms, #legal {
     max-width: 320px;
     min-width: 320px;
   }
