@@ -1,13 +1,13 @@
 @font-face {
   font-family: 'Orbitron Regular';
-  src: url('/convert/static/Orbitron-Regular.ttf') format('truetype');
+  src: url('/static/Orbitron-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Silka Regular';
-  src: url('/convert/static/silka-regular-webfont.ttf') format('truetype');
+  src: url('/static/silka-regular-webfont.ttf') format('truetype');
 }
 
 body {
