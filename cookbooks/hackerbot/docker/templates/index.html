@@ -69,6 +69,7 @@ $(document).ready(function() {
   var ws = new WebSocket(protocol + hostname + "/ws");
   var uuid = '';
 
+  // open websocket
   ws.onopen = function() {
     console.log("WebSocket connection established");
   };
