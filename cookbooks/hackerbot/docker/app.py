@@ -193,7 +193,7 @@ async def callback():
                     logging.error(f"Failed to download file from {convert_uri}")
                     return jsonify({"status": "failed"}), 404
 
-            access_uri = f"https://ai.mitta.ai/download/{filename}"
+            access_uri = f"https://news.mitta.ai/download/{filename}"
             message = None
             logging.info(access_uri)
 
