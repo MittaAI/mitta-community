@@ -110,7 +110,7 @@ input {
 }
 
 @media only screen and (max-width: 480px) {
-  #comms, #legal {
+  #comms, #image, #story {
     max-width: 320px;
     min-width: 320px;
   }

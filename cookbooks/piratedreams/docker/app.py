@@ -108,8 +108,15 @@ async def ask():
     # Define the endpoint and token
     pipeline = os.getenv('MITTA_PIPELINE')
     mitta_token = os.getenv('MITTA_TOKEN')
-    url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
-    # url = f"https://kordless.ngrok.io/pipeline/{pipeline}/task?token={mitta_token}"
+    
+
+    # dev dev
+    if os.getenv('MITTA_DEV'):
+        # url = f"https://kordless.ngrok.io/pipeline/{pipeline}/task?token={mitta_token}"
+        url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
+    else:
+        url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
+
     logging.info(url)
     
     # Send the file using httpx
