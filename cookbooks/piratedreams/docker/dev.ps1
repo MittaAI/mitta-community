@@ -3,6 +3,7 @@ $imageName = $null
 $containerName = $null
 $env:MITTA_TOKEN = $null
 $env:MITTA_PIPELINE = $null
+$env:MITTA_DEV = True
 
 $configFilePath = ".\config.json"
 

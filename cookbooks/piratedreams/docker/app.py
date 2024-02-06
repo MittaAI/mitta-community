@@ -33,7 +33,7 @@ async def dream():
         "A storm approaches and I need shelter!",
         "There be sand in my boots!",
         "Where is my map?",
-        "There's a cave in the cliffs."
+        "There is a cave in the cliffs."
     ]
 
     # AI suggested
@@ -42,7 +42,7 @@ async def dream():
         "I find a rusty old key amongst the seaweed.",
         "There is an abandoned campsite with a flickering lantern.",
         "A shipwreck lies off the shore, barely visible through the fog.",
-        "Strange footprints lead away from the water's edge.",
+        "Strange footprints lead away from the waters edge.",
         "I spot a distant sail on the horizon.",
         "A mysterious bottle with a message inside washes up.",
         "I hear the sound of singing from over the dunes.",
@@ -206,7 +206,10 @@ async def callback():
         audio_filepath, audio_success = await download_uri_content(audio_uri, token)
         if audio_success:
             audio_filename = os.path.basename(audio_filepath)
-            audio_access_uri = f"http://localhost:5000/download/{audio_filename}"
+            if os.getenv('MITTA_DEV'):
+                audio_access_uri = f"http://localhost:5000/download/{audio_filename}"
+            else:
+                audio_access_uri = f"https://dreams.mitta.ai/download/{audio_filename}"
             audio_access_uris.append(audio_access_uri)
 
     if audio_access_uris:
@@ -222,7 +225,10 @@ async def callback():
         image_filepath, image_success = await download_uri_content(image_uri, token)
         if image_success:
             image_filename = os.path.basename(image_filepath)
-            image_access_uri = f"http://localhost:5000/download/{image_filename}"
+            if os.getenv('MITTA_DEV'):
+                image_access_uri = f"http://localhost:5000/download/{image_filename}"
+            else:
+                image_access_uri = f"https://dreams.mitta.ai/download/{image_filename}"
             image_access_uris.append(image_access_uri)
 
     if image_access_uris:

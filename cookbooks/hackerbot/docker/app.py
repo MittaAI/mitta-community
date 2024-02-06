@@ -118,7 +118,6 @@ async def upload():
 
 
 def extract_value(data, key):
-    print(data)
     value = data.get(key, [])
     
     if isinstance(value, list):
