@@ -82,6 +82,10 @@ async def dream():
 
 @app.route('/ask', methods=['POST'])
 async def ask():
+    # Define the endpoint and token
+    pipeline = os.getenv('MITTA_PIPELINE')
+    mitta_token = os.getenv('MITTA_TOKEN')
+
     form_data = await request.form
     instructions = form_data.get('instructions', 'Hello there, Mr. Pirate!')
     uuid = form_data.get('uuid')
@@ -92,9 +96,16 @@ async def ask():
 
     # Prepare the JSON payload and encode it into bytes
     # httpx recent versions may not like non-encoded payloads
+    if os.getenv('MITTA_DEV') == "True":
+        callback = f"https://kordless.ngrok.io/callback?token={mitta_token}"
+        logging.info("in dev")
+    else:
+        callback = f"https://dreams.mitta.ai/callback?token={mitta_token}"
+    logging.info(callback)
     json_data = {
         "user_document": {"uuid": uuid},
-        "instructions": instructions
+        "instructions": instructions,
+        "callback_uri": callback
     }
 
     with open(f'json_data_{uuid}.json', 'w') as json_file:
@@ -105,19 +116,12 @@ async def ask():
         'json_data': ('json_data.json', open(f'json_data_{uuid}.json', 'rb'), 'application/json')
     }
 
-    # Define the endpoint and token
-    pipeline = os.getenv('MITTA_PIPELINE')
-    mitta_token = os.getenv('MITTA_TOKEN')
-    
-
     # dev dev
     if os.getenv('MITTA_DEV'):
-        # url = f"https://kordless.ngrok.io/pipeline/{pipeline}/task?token={mitta_token}"
-        url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
+        url = f"https://kordless.ngrok.io/pipeline/{pipeline}/task?token={mitta_token}"
+        # url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
     else:
         url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
-
-    logging.info(url)
     
     # Send the file using httpx
     async with httpx.AsyncClient(timeout=30) as client:

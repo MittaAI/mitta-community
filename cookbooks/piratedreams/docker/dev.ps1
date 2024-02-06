@@ -18,6 +18,7 @@ if (Test-Path -Path $configFilePath) {
     $imageName = $configContent.imageName
     $containerName = $configContent.containerName
     $env:MITTA_TOKEN = $configContent.MITTA_TOKEN
+    $env:MITTA_DEV = $configContent.MITTA_DEV
     $env:MITTA_PIPELINE = $configContent.MITTA_PIPELINE
 }
 else {
@@ -55,7 +56,7 @@ while ($true) {
 
         # Run the Docker container with a restart policy and port mapping
         # Run the Docker container with environment variables, a restart policy, and port mapping
-        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 -e MITTA_TOKEN=$env:MITTA_TOKEN -e MITTA_PIPELINE=$env:MITTA_PIPELINE $imageName
+        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 -e MITTA_TOKEN=$env:MITTA_TOKEN -e MITTA_PIPELINE=$env:MITTA_PIPELINE -e MITTA_DEV=$env:MITTA_DEV $imageName
 
         Write-Host "Container rebuilt and restarted with port 5000 exposed."
     }
