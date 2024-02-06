@@ -61,7 +61,7 @@ async def dream():
     random.shuffle(instructions)
 
     # Generate a random number between 1 and 2
-    num = random.randint(1, 9)
+    num = random.randint(1, 14)
 
     # Template the filename with the random number
     pirate_filename = f"pirate{num}.png"
