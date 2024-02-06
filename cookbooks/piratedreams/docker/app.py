@@ -40,13 +40,13 @@ async def dream():
     instructions.extend([
         "A parrot lands on my shoulder, squawking mysteries.",
         "I find a rusty old key amongst the seaweed.",
-        "There's an abandoned campsite with a flickering lantern.",
+        "There is an abandoned campsite with a flickering lantern.",
         "A shipwreck lies off the shore, barely visible through the fog.",
         "Strange footprints lead away from the water's edge.",
         "I spot a distant sail on the horizon.",
         "A mysterious bottle with a message inside washes up.",
         "I hear the sound of singing from over the dunes.",
-        "An old, weathered sign points to 'Treasure Cove'.",
+        "An old, weathered sign points to Treasure Cove.",
         "A monkey thief has run off with my hat!",
         "The moon reveals a path not seen by day.",
         "A hidden map piece flutters in the wind, stuck in a palm tree.",
@@ -56,7 +56,7 @@ async def dream():
         "Footprints lead to a secluded spot, beside them, an exotic bloom.",
         "The echo of a soft song, drawing me towards a hidden cove.",
         "A shadow flits by, too graceful to be just a trick of the light.",
-        "A lass' bathing suit is hanging on a tree. Suddenly I hear a soft voice behind me."
+        "A bathing suit made of shells is drapped over a log in front of me."
     ])
     random.shuffle(instructions)
 

@@ -26,4 +26,4 @@ The Pirate Dreams cookbook provides a pipeline which synthesizes a story using a
 The pirate, standing tall on his ship's deck, addresses a native of the island. The pirate ship, a magnificent vessel, is visible in the background, its wooden frame weathered by countless adventures on the high seas. In the native's hands, a plump coconut glistens under the sun's golden rays.  With a hearty voice, the pirate exclaims, 'Arr! Well, ahoy there, ye native scallywag! Ye've got a keen eye for ships, I'll give ye that. Me vessel be a beauty indeed, sturdy and strong like a true pirate ship should be, aye!' Grinning mischievously, he eagerly accepts the native's kind offer of a coconut, outstretching his rough palm to receive it.
 ```
 
-![Dreams](https://github.com/MittaAI/mitta-community/blob/main/cookbooks/piratedreams/05mjRjlgp8I2g9xE.png?raw=true)
+![Dreams](https://github.com/MittaAI/mitta-community/blob/main/cookbooks/piratedreams/images/dreams.png?raw=true)

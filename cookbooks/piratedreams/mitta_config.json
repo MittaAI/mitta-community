@@ -1,0 +1,24 @@
+{
+  "header": "Dreams Pipeline",
+  "description": "Create images from a pirate's mind's eye. Uses conversational inputs to create an image generation flow that augments the image prompt with objects generated for the scene.",
+  "youtube_url": "https://www.youtube.com/embed/wglj1U-UUEs?si=9kBDh-_MTFosqpoW",
+  "cookbook_cards": [
+    { 
+      "image": {
+        "src": "images/pirate2.png",
+        "alt": "Darkbeard"
+      },
+      "title": "Pirate Dreams",
+      "description": "Use this pipeline to generate strongly themed images of various scenes.",
+      "links": {
+        "install": {
+          "href": "pipeline_dreams.json",
+          "text": "Install"
+        },
+        "github": {
+          "href": "https://github.com/MittaAI/mitta-community/tree/main/cookbooks/conversion"
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
     "pipe_id": "q3hOkhQTNKRrF",
-    "name": "pirate-dreams",
+    "name": "dreams",
     "nodes": [
         {
             "node": {
@@ -11,7 +11,7 @@
                     "openai_token": "[openai_token]",
                     "model": "gpt-3.5-turbo"
                 },
-                "name": "barnacle",
+                "name": "shell",
                 "node_id": "PHVlbD97drQ4b",
                 "processor": "aichat",
                 "template_id": "2Jb51qj4DSFAx",
@@ -31,7 +31,7 @@
                         "type": "strings"
                     }
                 ],
-                "name": "didactic",
+                "name": "slug",
                 "output_fields": [
                     {
                         "name": "assistant_content",
@@ -54,7 +54,7 @@
                     "num_objects": 5,
                     "iterate_field": "assistant_content"
                 },
-                "name": "rabbit",
+                "name": "coconut",
                 "node_id": "6BoCvkzt0ctfA",
                 "processor": "aidict",
                 "template_id": "TCgeuiQ9oFTKb",
@@ -75,7 +75,7 @@
                         "type": "strings"
                     }
                 ],
-                "name": "hulking",
+                "name": "husk",
                 "output_fields": [
                     {
                         "name": "objects",
@@ -97,7 +97,7 @@
                     "openai_token": "[openai_token]",
                     "model": "gpt-3.5-turbo"
                 },
-                "name": "squirrel",
+                "name": "crab",
                 "node_id": "zy0medaPrvjxy",
                 "processor": "aichat",
                 "template_id": "AOotXzurpAgZm",
@@ -121,7 +121,7 @@
                         "type": "strings"
                     }
                 ],
-                "name": "adamant",
+                "name": "meat",
                 "output_fields": [
                     {
                         "name": "prompts",
@@ -163,7 +163,7 @@
                         "type": "strings"
                     }
                 ],
-                "name": "discreet",
+                "name": "cocktail",
                 "output_fields": [
                     {
                         "name": "mitta_uri",
@@ -198,7 +198,7 @@
                     "callback_token": "[callback_token]"
                 },
                 "input_fields": null,
-                "name": "amethyst",
+                "name": "hook",
                 "output_fields": [],
                 "processor": "callback",
                 "template_id": "3ltuGZctN9UZL",
