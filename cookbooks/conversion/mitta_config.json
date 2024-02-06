@@ -1,7 +1,7 @@
 {
   "header": "FFmpeg Pipeline",
   "description": "Convert various media file types using an `aiffmpeg` processor powered pipeline. You can use the processor in other pipelines to transform generated files.",
-  "youtube_url": "https://www.youtube.com/embed/wglj1U-UUEs?si=9kBDh-_MTFosqpoW",
+  "youtube_url": "https://www.youtube.com/embed/zAdhqL1yr5Y?si=_9Za6FTDvPCh18x2",
   "cookbook_cards": [
     { 
       "image": {
