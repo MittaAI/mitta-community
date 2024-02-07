@@ -56,8 +56,7 @@ async def dream():
         "A finely crafted necklace found in the sand, still warm.",
         "Footprints lead to a secluded spot, beside them, an exotic bloom.",
         "The echo of a soft song, drawing me towards a hidden cove.",
-        "A shadow flits by, too graceful to be just a trick of the light.",
-        "A bathing suit made of shells is drapped over a log in front of me."
+        "A shell bikini is here, and then a tap on my shoulder."
     ])
     random.shuffle(instructions)
 
