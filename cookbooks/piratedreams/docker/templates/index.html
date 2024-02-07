@@ -78,16 +78,6 @@ $(document).ready(function() {
     $('#controls').delay(4000).fadeIn(1500);
   }, 3000);
   
-  // assemble websocket
-  console.log(protocol, hostname);
-  var ws = new WebSocket(protocol + hostname + "/ws");
-  var uuid = '';
-
-  // open websocket
-  ws.onopen = function() {
-    console.log("WebSocket connection established");
-  };
-
   // Function to set a cookie
   function setCookie(name, value, days) {
       var expires = "";
@@ -111,12 +101,6 @@ $(document).ready(function() {
       return null;
   }
 
-  // Clear the 'instructions' cookie by setting its expiration date to the past
-  $('#clear-history-button').on('click', function() {
-      document.cookie = 'instructions=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      window.location.reload();
-  });
-
   // Load instructions from the cookie and prepend them to the dropdown
   var savedInstructions = getCookie('instructions');
   var serverInstructions = {{ instructions | tojson }};
@@ -134,13 +118,6 @@ $(document).ready(function() {
     });
   }
 
-  $('#instructionInput').keypress(function(event) {
-      if (event.which == 13) { // 13 is the key code for Enter
-          event.preventDefault(); // Prevent the default action to stop submitting the form in a traditional way
-          $('#submit-button').click(); // Trigger the click event on the submit button
-      }
-  });
-
   // Append remaining server instructions to the dropdown
   serverInstructions.forEach(function(instruction) {
     $('.dropdown-menu').append('<a class="dropdown-item" href="#">' + instruction + '</a>');
@@ -149,113 +126,6 @@ $(document).ready(function() {
   var resetTimer;
   resetTimer = setTimeout(function() {
   }, 30000);
-
-  ws.onmessage = function(event) {
-    var data = JSON.parse(event.data);
-    
-    // log data
-    console.log(data);
-
-    // look for the UUID and reload if it's not set
-    if (data.uuid) {
-        uuid = data.uuid;
-        if (uuid == 'anonymous') {
-            // reload page to get new socket
-            window.location.reload();
-        }
-    }
-
-    formattedMessage = defaultMessage
-
-    if (data.image_access_uri) {
-      $('#comms').fadeOut('slow');
-      var img = $('#image');
-
-      // Ensure the image is initially hidden to prevent it from flashing before loading the new source
-      img.hide();
-
-      // Set the new image source
-      img.attr('src', data.image_access_uri);
-
-      // Fade in the image slowly after the source has been set
-      img.on('load', function() {
-        $(this).fadeIn('slow');
-      });
-    }
-
-    if (data.book_content && data.book_title) {
-        // Prepare the content with an h4 for the title and a p for the content
-        var contentToUpdate = '<h4 class="mt-3">' + data.book_title + '</h4><p>' + data.book_content + '</p>';
-
-        // Target the #story div and update its content with a fade transition
-        $('#story').fadeOut('slow', function() {
-            // Replace the content inside the #story div
-            $(this).html(contentToUpdate).fadeIn('slow');
-        });
-    }
-
-
-    if (data.comms) {
-        var formattedMessage = $('<div/>').text(data.comms);
-        $('#comms').fadeOut('slow', function() {
-          $(this).html(formattedMessage).fadeIn('slow');
-        });
-    }
-
-    // Function to play a single audio file
-    function playAudio(uri, delay) {
-        return new Promise((resolve) => {
-            var audio = new Audio(uri);
-            audio.play().then(() => {
-                audio.onended = () => {
-                    // Wait for the specified delay after the audio ends before resolving the promise
-                    setTimeout(resolve, delay);
-                };
-            }).catch(e => console.error("Failed to play audio:", e));
-        });
-    }
-
-    // Function to detect if the user's device is an iPhone
-    function isIphone() {
-        return /iPhone/.test(navigator.userAgent) && !window.MSStream;
-    }
-
-    // Check if it's an iPhone
-    if (isIphone()) {
-        // Add a play button for iPhone users
-        $('#button-container').html('<button class="btn btn-primary" id="play-audio-button">Play Audio</button>');
-
-        // Play audio handler for iPhone
-        $('#play-audio-button').on('click', function() {
-            if (data.audio_access_uris && data.audio_access_uris.length > 0) {
-                // Sequentially play each audio file with a delay
-                let playSequence = Promise.resolve();
-                data.audio_access_uris.forEach((uri) => {
-                    playSequence = playSequence.then(() => playAudio(uri, 1000)); // Adjust delay as needed
-                });
-            }
-        });
-    } else {
-        // Original code for non-iPhone devices
-        if (data.audio_access_uris && data.audio_access_uris.length > 0) {
-            $('#comms').fadeOut('slow', function() {
-                // Sequentially play each audio file with a delay
-                let playSequence = Promise.resolve();
-                data.audio_access_uris.forEach((uri) => {
-                    playSequence = playSequence.then(() => playAudio(uri, 1000)); // Adjust delay as needed
-                });
-            });
-        }
-    }
-
-    clearTimeout(resetTimer);
-    resetTimer = setTimeout(function() {
-      $('#comms').html(defaultMessage);
-      $('#image').fadeOut('slow');
-      $('#story').fadeOut('slow');
-    }, 360000); // six minutes
-  
-  };
 
   function loadImage(access_uri) {
       var img = $('<img/>', {
@@ -267,11 +137,6 @@ $(document).ready(function() {
       $('#image').html(img); // Add the image to the div
       img.fadeIn('slow'); // Animate the image appearance
   }
-
-  ws.onclose = function() {
-    console.log("WebSocket connection closed");
-    window.location.reload();
-  };
 
   // Form submission handler using jQuery AJAX
   $('#embark-button').on('click', function() {
@@ -308,7 +173,7 @@ $(document).ready(function() {
       success: function(response) {
         console.log("Request submitted successfully");
         $('#comms').fadeOut('slow', function() {
-          $(this).html("Establishing audio connection to the pirate's mind.").fadeIn('slow');
+          $(this).html("Establishing connection to the pirate's mind.").fadeIn('slow');
         });
       },
       error: function(xhr, status, error) {
@@ -322,27 +187,28 @@ $(document).ready(function() {
   // default instructions
   $('#instructionInput').val("{{instructions[0]}}");
 
-  // click handlers
+  // Click handlers
+  // --------------
   $(document).on('click', function(event) {
     if (!$(event.target).closest('#instructionInput, .dropdown-menu, .dropdown-menu a, #mitta, #file-upload-button, #fileInput, .dropdown-toggle').length) {
       $('.dropdown-menu').hide();
     }
   });
 
-  // Function to trigger the button click on Enter key press
-  function triggerClickOnEnter(event) {
-    // Check if the Enter key was pressed
-    if (event.key === 'Enter') {
-      // Trigger the embark button click
-      document.getElementById('embark-button').click();
-    }
-  }
+  // Clear the 'instructions' cookie by setting its expiration date to the past
+  $('#clear-history-button').on('click', function() {
+      document.cookie = 'instructions=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      window.location.reload();
+  });
 
-  // Add keydown event listener to the whole document
-  // You can change 'document' to a more specific element if needed
-  document.addEventListener('keydown', triggerClickOnEnter);
+  $('#instructionInput').keypress(function(event) {
+      if (event.which == 13) { // 13 is the key code for Enter
+          event.preventDefault(); // Prevent the default action to stop submitting the form in a traditional way
+          $('#submit-button').click(); // Trigger the click event on the submit button
+      }
+  });
 
-  // download image
+  // Download image
   $('#image').click(function() {
       var imageUrl = $(this).attr('src'); // Directly use the src attribute of the img tag
       if (imageUrl) {
@@ -363,27 +229,173 @@ $(document).ready(function() {
       }
   });
 
-  $('#mitta').on('click', function() {
-    window.location = "https://mitta.ai"
-  });
-  
+  // Advertising
+  $('#mitta').on('click', function() {window.location = "https://mitta.ai"});
+
   // Dropdown handlers
-  $('.dropdown-menu a').click(function() {
-    $('#instructionInput').val($(this).text());
-    $('.dropdown-menu').hide();
-  });
+  $('.dropdown-menu a').click(function() {$('#instructionInput').val($(this).text()); $('.dropdown-menu').hide(); });
+  $('#instructionInput').on('click', function() {$('.dropdown-menu').hide(); });
+  $('#instructionInput').on('keyup', function() {$('.dropdown-menu').hide(); });
+  $('.dropdown-toggle').on('click', function() {$('.dropdown-menu').toggle(); });
 
-  $('#instructionInput').on('click', function() {
-    $('.dropdown-menu').hide();
-  });
+  // Assemble websocket
+  // ------------------
+  var ws;
+  var uuid = getCookie('uuid');
 
-  $('#instructionInput').on('keyup', function() {
-    $('.dropdown-menu').hide();
-  });
+  var retryCount = 0;
+  console.log(uuid);
 
-  $('.dropdown-toggle').on('click', function() {
-    $('.dropdown-menu').toggle();
-  });
+  function connectWebSocket() {
+    // Create websocket
+    ws = new WebSocket(protocol + hostname + "/ws");
+    
+    // Open Websocket
+    ws.onopen = function() {
+      console.log("WebSocket connection established");
+      retryCount = 0;
+      if (uuid) {
+        ws.send(JSON.stringify({uuid: uuid}));
+      } else {
+        // No cookie for UUID
+        console.log("sending empty payload");
+        ws.send(JSON.stringify({}));
+      }
+    };
+
+    // Closed websocket
+    ws.onclose = function() {
+      console.log("WebSocket connection closed");
+      $('#comms').html(defaultMessage).fadeIn(1500);
+      attemptReconnect();
+    };
+
+    // Message websocket
+    ws.onmessage = function(event) {
+      var data = JSON.parse(event.data);
+      
+      // log data
+      console.log(data);
+
+      // look for the UUID
+      if (data.uuid && data.uuid !== uuid) {
+          uuid = data.uuid;
+          setCookie('uuid', uuid, 7); // Store the UUID in a cookie for 7 days
+      }
+
+      formattedMessage = defaultMessage
+
+      if (data.image_access_uri) {
+        $('#comms').fadeOut('slow');
+        var img = $('#image');
+
+        // Ensure the image is initially hidden to prevent it from flashing before loading the new source
+        img.hide();
+
+        // Set the new image source
+        img.attr('src', data.image_access_uri);
+
+        // Fade in the image slowly after the source has been set
+        img.on('load', function() {
+          $(this).fadeIn('slow');
+        });
+      }
+
+      if (data.book_content && data.book_title) {
+          // Prepare the content with an h4 for the title and a p for the content
+          var contentToUpdate = '<h4 class="mt-3">' + data.book_title + '</h4><p>' + data.book_content + '</p>';
+
+          // Target the #story div and update its content with a fade transition
+          $('#story').fadeOut('slow', function() {
+              // Replace the content inside the #story div
+              $(this).html(contentToUpdate).fadeIn('slow');
+          });
+      }
+
+
+      if (data.comms) {
+          var formattedMessage = $('<div/>').text(data.comms);
+          $('#comms').fadeOut('slow', function() {
+            $(this).html(formattedMessage).fadeIn('slow');
+          });
+      }
+
+      // Function to play a single audio file
+      function playAudio(uri, delay) {
+          return new Promise((resolve) => {
+              var audio = new Audio(uri);
+              audio.play().then(() => {
+                  audio.onended = () => {
+                      // Wait for the specified delay after the audio ends before resolving the promise
+                      setTimeout(resolve, delay);
+                  };
+              }).catch(e => console.error("Failed to play audio:", e));
+          });
+      }
+
+      // Function to detect if the user's device is an iPhone
+      function isIphone() {
+          return /iPhone/.test(navigator.userAgent) && !window.MSStream;
+      }
+
+      // Check if it's an iPhone
+      if (isIphone()) {
+          // Add a play button for iPhone users
+          $('#button-container').html('<button class="btn btn-primary" id="play-audio-button">Play Audio</button>');
+
+          // Play audio handler for iPhone
+          $('#play-audio-button').on('click', function() {
+              if (data.audio_access_uris && data.audio_access_uris.length > 0) {
+                  // Sequentially play each audio file with a delay
+                  let playSequence = Promise.resolve();
+                  data.audio_access_uris.forEach((uri) => {
+                      playSequence = playSequence.then(() => playAudio(uri, 1000)); // Adjust delay as needed
+                  });
+              }
+          });
+      } else {
+          // Original code for non-iPhone devices
+          if (data.audio_access_uris && data.audio_access_uris.length > 0) {
+              $('#comms').fadeOut('slow', function() {
+                  // Sequentially play each audio file with a delay
+                  let playSequence = Promise.resolve();
+                  data.audio_access_uris.forEach((uri) => {
+                      playSequence = playSequence.then(() => playAudio(uri, 1000)); // Adjust delay as needed
+                  });
+              });
+          }
+      }
+
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(function() {
+        $('#comms').html(defaultMessage);
+        $('#image').fadeOut('slow');
+        $('#story').fadeOut('slow');
+      }, 360000); // six minutes
+    
+    };
+  }
+
+  // Websocket reconnect functions
+  function attemptReconnect() {
+      var delay = calculateBackoff(retryCount);
+      setTimeout(function() {
+          console.log(`Attempting to reconnect... Retry #${retryCount + 1}`);
+          retryCount++;
+          connectWebSocket();
+      }, delay);
+  }
+
+  function calculateBackoff(retryCount) {
+      // Exponential backoff formula
+      var maxDelay = 30000; // Maximum delay of 30 seconds
+      var baseDelay = 1000; // Initial delay of 1 second
+      var delay = Math.min(baseDelay * Math.pow(2, retryCount), maxDelay);
+      return delay;
+  }
+
+  // Fire up the sockets
+  connectWebSocket();
 
 });
 

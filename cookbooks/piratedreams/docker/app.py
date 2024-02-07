@@ -3,6 +3,7 @@ import json
 import logging
 import datetime
 import random
+import asyncio
 from urllib.parse import urlparse, unquote
 
 from uuid import uuid4
@@ -101,7 +102,7 @@ async def ask():
         logging.info("in dev")
     else:
         callback = f"https://dreams.mitta.ai/callback?token={mitta_token}"
-    logging.info(callback)
+
     json_data = {
         "user_document": {"uuid": uuid},
         "instructions": instructions,
@@ -116,10 +117,11 @@ async def ask():
         'json_data': ('json_data.json', open(f'json_data_{uuid}.json', 'rb'), 'application/json')
     }
 
-    # dev dev
+    # dev on dev
     if os.getenv('MITTA_DEV'):
-        url = f"https://kordless.ngrok.io/pipeline/{pipeline}/task?token={mitta_token}"
-        # url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
+        # comment out the ngrok one if you are testing to production pipelines
+        # url = f"https://kordless.ngrok.io/pipeline/{pipeline}/task?token={mitta_token}"
+        url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
     else:
         url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
     
@@ -147,7 +149,6 @@ def extract_filename_from_url(url):
     filename = decoded_path.split('/')[-1]
     
     return filename
-
 
 
 async def download_uri_content(uri, token, download_dir='download'):
@@ -267,22 +268,31 @@ connected_websockets = {}
 
 @app.websocket('/ws')
 async def ws():
-    unique_id = str(uuid4())  # Generate a unique ID for the session
+    logging.info("entering wait for data")
+
+    # Wait until we get data
+    data = await websocket.receive_json() 
+    unique_id = data.get('uuid', str(uuid4()))
+
+    # Store the Websocket
     ws_obj = websocket._get_current_object()
-    connected_websockets[unique_id] = ws_obj  # Store the WebSocket object with the unique ID
+    connected_websockets[unique_id] = ws_obj
 
     try:
         await ws_obj.send_json({'uuid': unique_id})
         while True:
             data = await websocket.receive()
-    except:
-        pass
+    except Exception as e:
+        logging.error(f"WebSocket error: {e}")
     finally:
-        connected_websockets.pop(unique_id, None)  # Remove the WebSocket from the dictionary on disconnect
+        connected_websockets.pop(unique_id, None)
+
+
 
 
 async def broadcast(message, recipient_id=None):
     logging.info(message)
+    logging.info(recipient_id)
     if recipient_id:
         # If a recipient ID is provided, only send to that WebSocket
         ws = connected_websockets.get(recipient_id)
