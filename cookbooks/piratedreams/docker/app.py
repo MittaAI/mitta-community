@@ -231,20 +231,23 @@ async def callback():
 
     # Download mitta_uri content if provided, but only the first image
     image_access_uris = []
+    logging.info(image_uris)
     if image_uris:
         image_uri = image_uris[0]  # Only process the first URI
+        logging.info(image_uri)
         image_filepath, image_success = await download_uri_content(image_uri, token)
         if image_success:
+            logging.info("downloaded image")
             image_filename = os.path.basename(image_filepath)
             if os.getenv('MITTA_DEV'):
                 image_access_uri = f"http://localhost:5000/download/{image_filename}"
             else:
                 image_access_uri = f"https://dreams.mitta.ai/download/{image_filename}"
             image_access_uris.append(image_access_uri)
-
+    logging.info(image_access_uris)
     if image_access_uris:
         response_data.update({
-            "image_filename": os.path.basename(image_uris[0]),
+            "image_filename": os.path.basename(image_filename),
             "image_access_uri": image_access_uris[0],
         })
 
