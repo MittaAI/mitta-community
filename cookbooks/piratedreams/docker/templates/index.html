@@ -50,7 +50,7 @@
         </div>
         <button class="btn btn-primary" id="embark-button">Dream</button>
         <button class="btn btn-outline-dark" id="clear-history-button">Clear History</button>
-        <div id="button-container"></div>
+        <div id="button-container" class="mt-2"></div>
       </div>
       <!-- Image holder for visual feedback -->
       <div class="rounded mt-4">
@@ -143,6 +143,7 @@ $(document).ready(function() {
     $('#image').fadeOut('slow');
     $('#story').fadeOut('slow');
     $('#comms').fadeOut('slow');
+    $("#button-container").fadeOut('slow')
 
     var instruction = $('#instructionInput').val();
     var formData = new FormData();
@@ -342,6 +343,7 @@ $(document).ready(function() {
       function setupIphoneAudioPlayback(audioUris) {
         // Add a play button for iPhone users
         $('#button-container').html('<button class="btn btn-primary" id="play-audio-button">Play Audio</button>');
+        $('#button-container').fadeIn('slow');
 
         // Play audio handler for iPhone
         $('#play-audio-button').on('click', function() {
