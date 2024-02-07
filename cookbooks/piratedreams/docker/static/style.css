@@ -65,6 +65,7 @@ input {
 }
 
 .dropdown-menu {
+  min-width: 480px;
   max-width: 480px; /* Adjust this value based on your design requirements */
   max-height: 200px; /* Adjust the height as needed */
   overflow-y: auto; /* Enable vertical scrolling for overflow content */
