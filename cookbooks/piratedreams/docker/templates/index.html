@@ -109,8 +109,7 @@ $(document).ready(function() {
     savedInstructions = JSON.parse(savedInstructions);
 
     savedInstructions.forEach(function(instruction) {
-      $('.dropdown-menu').prepend('<a class="dropdown-item" href="#">' + instruction + '</a>');
-      // Remove this instruction from serverInstructions if it exists
+      $('.dropdown-menu').prepend('<a class="dropdown-item" href="">' + instruction + '</a>');
       var index = serverInstructions.indexOf(instruction);
       if (index > -1) {
         serverInstructions.splice(index, 1);

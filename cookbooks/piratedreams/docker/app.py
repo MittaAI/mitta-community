@@ -130,7 +130,9 @@ async def ask():
 
     # remove the file
     os.remove(f'json_data_{uuid}.json')
-    logging.info(response.status_code)
+    
+    # logging.info(response.status_code)
+    
     # Check the response from the external handler
     if response.status_code == 200:
         print(f"JSON task response: {response.json()}")
@@ -187,7 +189,7 @@ async def download_uri_content(uri, token, download_dir='download'):
 @app.route('/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
-    logging.info(data)
+    # logging.info(data)
 
     # Extract specific fields
     audio_uris = data.get('audio_uri', [])
@@ -231,20 +233,18 @@ async def callback():
 
     # Download mitta_uri content if provided, but only the first image
     image_access_uris = []
-    logging.info(image_uris)
+
     if image_uris:
         image_uri = image_uris[0]  # Only process the first URI
-        logging.info(image_uri)
         image_filepath, image_success = await download_uri_content(image_uri, token)
         if image_success:
-            logging.info("downloaded image")
             image_filename = os.path.basename(image_filepath)
             if os.getenv('MITTA_DEV'):
                 image_access_uri = f"http://localhost:5000/download/{image_filename}"
             else:
                 image_access_uri = f"https://dreams.mitta.ai/download/{image_filename}"
             image_access_uris.append(image_access_uri)
-    logging.info(image_access_uris)
+
     if image_access_uris:
         response_data.update({
             "image_filename": os.path.basename(image_filename),
@@ -270,7 +270,7 @@ connected_websockets = {}
 
 @app.websocket('/ws')
 async def ws():
-    logging.info("entering wait for data")
+    # logging.info("entering wait for data")
 
     # Wait until we get data
     data = await websocket.receive_json() 
@@ -293,8 +293,8 @@ async def ws():
 
 
 async def broadcast(message, recipient_id=None):
-    logging.info(message)
-    logging.info(recipient_id)
+    # logging.info(message)
+    # logging.info(recipient_id)
     if recipient_id:
         # If a recipient ID is provided, only send to that WebSocket
         ws = connected_websockets.get(recipient_id)
