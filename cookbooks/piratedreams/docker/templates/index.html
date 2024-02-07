@@ -213,9 +213,9 @@ $(document).ready(function() {
       var imageUrl = $(this).attr('src'); // Directly use the src attribute of the img tag
       if (imageUrl) {
         $('#comms').fadeOut('slow', function() {
-          $(this).html("The pirate stuffs a scrap of paper in a bottle, flinging it into the ocean.").fadeIn('slow');
+          $(this).html("Stuffing things in bottles and flinging into ocean.").fadeIn('slow');
         });
-      
+
         // Create a temporary link element
         var downloadLink = $('<a>')
             .attr('href', imageUrl)
@@ -322,48 +322,52 @@ $(document).ready(function() {
 
       // Function to play a single audio file
       function playAudio(uri, delay) {
-          return new Promise((resolve) => {
-              var audio = new Audio(uri);
-              audio.play().then(() => {
-                  audio.onended = () => {
-                      // Wait for the specified delay after the audio ends before resolving the promise
-                      setTimeout(resolve, delay);
-                  };
-              }).catch(e => console.error("Failed to play audio:", e));
-          });
+        return new Promise((resolve) => {
+          var audio = new Audio(uri);
+          audio.play().then(() => {
+            audio.onended = () => {
+              // Wait for the specified delay after the audio ends before resolving the promise
+              setTimeout(resolve, delay);
+            };
+          }).catch(e => console.error("Failed to play audio:", e));
+        });
       }
 
       // Function to detect if the user's device is an iPhone
       function isIphone() {
-          return /iPhone/.test(navigator.userAgent) && !window.MSStream;
+        return /iPhone/.test(navigator.userAgent) && !window.MSStream;
       }
 
-      // Check if it's an iPhone
-      if (isIphone()) {
-          // Add a play button for iPhone users
-          $('#button-container').html('<button class="btn btn-primary" id="play-audio-button">Play Audio</button>');
+      // Function to handle the setup for iPhone audio playback
+      function setupIphoneAudioPlayback(audioUris) {
+        // Add a play button for iPhone users
+        $('#button-container').html('<button class="btn btn-primary" id="play-audio-button">Play Audio</button>');
 
-          // Play audio handler for iPhone
-          $('#play-audio-button').on('click', function() {
-              if (data.audio_access_uris && data.audio_access_uris.length > 0) {
-                  // Sequentially play each audio file with a delay
-                  let playSequence = Promise.resolve();
-                  data.audio_access_uris.forEach((uri) => {
-                      playSequence = playSequence.then(() => playAudio(uri, 1000)); // Adjust delay as needed
-                  });
-              }
+        // Play audio handler for iPhone
+        $('#play-audio-button').on('click', function() {
+          // Sequentially play each audio file with a delay
+          let playSequence = Promise.resolve();
+          audioUris.forEach((uri) => {
+            playSequence = playSequence.then(() => playAudio(uri, 1000)); // Adjust delay as needed
           });
-      } else {
+        });
+      }
+
+      // Check if audio URIs are available and set up accordingly
+      if (data.audio_access_uris && data.audio_access_uris.length > 0) {
+        if (isIphone()) {
+          // Set up audio playback for iPhone only when URIs are available
+          setupIphoneAudioPlayback(data.audio_access_uris);
+        } else {
           // Original code for non-iPhone devices
-          if (data.audio_access_uris && data.audio_access_uris.length > 0) {
-              $('#comms').fadeOut('slow', function() {
-                  // Sequentially play each audio file with a delay
-                  let playSequence = Promise.resolve();
-                  data.audio_access_uris.forEach((uri) => {
-                      playSequence = playSequence.then(() => playAudio(uri, 1000)); // Adjust delay as needed
-                  });
-              });
-          }
+          $('#comms').fadeOut('slow', function() {
+            // Sequentially play each audio file with a delay
+            let playSequence = Promise.resolve();
+            data.audio_access_uris.forEach((uri) => {
+              playSequence = playSequence.then(() => playAudio(uri, 1000)); // Adjust delay as needed
+            });
+          });
+        }
       }
 
       clearTimeout(resetTimer);
