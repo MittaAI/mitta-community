@@ -175,18 +175,10 @@ $(document).ready(function() {
       url: '/ask', // Update this URL to your endpoint
       type: 'POST',
       data: formData,
-      processData: false, // Don't process the files
-      contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+      processData: false,
+      contentType: false,
       success: function(response) {
-        // Handle success. For example, display the new image and story
-        // Assuming response contains {image_url: '...', story: '...'}
-        if (response.image_url) {
-          $('#image').attr('src', response.image_url).fadeIn('slow');
-        }
-        if (response.story) {
-          $('#story').html(response.story).fadeIn('slow');
-        }
-        $('#comms').html("Establishing connection to the passed out pirate.").fadeIn('slow');
+        $('#comms').html("Establishing connection to pirate.").fadeIn('slow');
       },
       error: function(xhr, status, error) {
         // Handle error

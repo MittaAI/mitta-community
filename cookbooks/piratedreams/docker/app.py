@@ -143,7 +143,7 @@ async def ask():
     # Check the response from the external handler
     if response.status_code == 200:
         print(f"JSON task response: {response.json()}")
-        await broadcast({"status": "success", "message": "Received request!"}, uuid)
+        await broadcast({"status": "success", "message": "Received request!", "comms": "Pirate uplink established."}, uuid)
         return jsonify({"status": "success", "message": "Request received"}), 200
     else:
         await broadcast({"status": "success", "message": "Pipeline failure."})
@@ -295,8 +295,6 @@ async def ws():
         logging.error(f"WebSocket error: {e}")
     finally:
         connected_websockets.pop(unique_id, None)
-
-
 
 
 async def broadcast(message, recipient_id=None):
