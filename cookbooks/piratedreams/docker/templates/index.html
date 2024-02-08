@@ -25,7 +25,7 @@
   <link rel="shortcut icon" href="/static/favicon.ico">
 
   <link rel="stylesheet" href="/static/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/style.css?version=1.13">
+  <link rel="stylesheet" href="/static/style.css?version=1.14">
 
   <script src="/static/popper.min.js"></script>
   <script src="/static/jquery.min.js"></script>
@@ -90,7 +90,7 @@ $(document).ready(function() {
           date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
           expires = "; expires=" + date.toUTCString();
       }
-      document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+      document.cookie = name + "=" + encodeURIComponent(value || "") + expires + "; path=/";
   }
 
   // Function to get a cookie
@@ -100,31 +100,37 @@ $(document).ready(function() {
       for(var i = 0; i < ca.length; i++) {
           var c = ca[i];
           while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-          if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
       }
       return null;
   }
 
-  // Load instructions from the cookie and prepend them to the dropdown
+  // take server instructions, merge with cookies and set the dropdown
+  var serverInstructions = "{{ instructions }}";
+  var decodedServerInstructions = atob(serverInstructions);
+  var serverInstructionsArray = JSON.parse(decodedServerInstructions);
   var savedInstructions = getCookie('instructions');
-  var serverInstructions = {{ instructions | tojson }};
 
   if (savedInstructions) {
     savedInstructions = JSON.parse(savedInstructions);
-
     savedInstructions.forEach(function(instruction) {
       $('.dropdown-menu').prepend('<a class="dropdown-item" href="#">' + instruction + '</a>');
-      var index = serverInstructions.indexOf(instruction);
+      var index = serverInstructionsArray.indexOf(instruction);
       if (index > -1) {
-        serverInstructions.splice(index, 1);
+        serverInstructionsArray.splice(index, 1);
       }
     });
   }
 
-  // Append remaining server instructions to the dropdown
-  serverInstructions.forEach(function(instruction) {
+  serverInstructionsArray.forEach(function(instruction) {
     $('.dropdown-menu').append('<a class="dropdown-item" href="#">' + instruction + '</a>');
   });
+
+  if (serverInstructionsArray.length > 0) {
+    $('#instructionInput').val(serverInstructionsArray[0]);
+  } else if (savedInstructions && savedInstructions.length > 0) {
+    $('#instructionInput').val(savedInstructions[0]);
+  }
 
   var resetTimer;
   resetTimer = setTimeout(function() {
@@ -190,9 +196,6 @@ $(document).ready(function() {
     });
   });
 
-
-  // default instructions
-  $('#instructionInput').val("{{instructions[0]}}");
 
   // Click handlers
   // --------------

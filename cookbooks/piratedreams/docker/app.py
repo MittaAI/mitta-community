@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 import logging
 import datetime
 import random
@@ -43,7 +44,7 @@ async def dream():
         "I find a rusty old key amongst the seaweed.",
         "There is an abandoned campsite with a flickering lantern.",
         "A shipwreck lies off the shore, barely visible through the fog.",
-        "Strange footprints lead away from the waters edge.",
+        "Strange footprints lead away from the water's edge.",
         "I spot a distant sail on the horizon.",
         "A mysterious bottle with a message inside washes up.",
         "I hear the sound of singing from over the dunes.",
@@ -56,9 +57,11 @@ async def dream():
         "A finely crafted necklace found in the sand, still warm.",
         "Footprints lead to a secluded spot, beside them, an exotic bloom.",
         "The echo of a soft song, drawing me towards a hidden cove.",
-        "A shell bikini is here, and then a tap on my shoulder.",
-        "A damsel in distress! The cannons roar and she runs into my arms."
+        "A native woman wakes me up. She is wearing a shell bikini.",
+        "The cannons roar, and a damsel in distress falls before me."
     ])
+
+    # shuffle instructions
     random.shuffle(instructions)
 
     # Generate a random number between 1 and 2
@@ -75,9 +78,12 @@ async def dream():
         if posted_instruction and posted_instruction not in instructions:
             instructions.insert(0, posted_instruction)
 
+    # encode instructions
+    encoded_instructions = base64.b64encode(json.dumps(instructions).encode('utf-8')).decode('utf-8')
+
     # Pass the (possibly updated) instructions list to the template
     current_date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00") # card publish
-    return await render_template('index.html', instructions=instructions, current_date=current_date, pirate_filename=pirate_filename)
+    return await render_template('index.html', instructions=encoded_instructions, current_date=current_date, pirate_filename=pirate_filename)
 
 
 
