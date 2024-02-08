@@ -149,7 +149,7 @@ $(document).ready(function() {
     var instruction = $('#instructionInput').val();
 
     var formData = new FormData();
-    formData.append('instruction', instruction); // Ensure this matches your backend's expected key
+    formData.append('instructions', instruction); // Ensure this matches your backend's expected key
 
     // Optionally append UUID if it exists
     var uuid = getCookie('uuid'); // Assuming getCookie is correctly implemented
