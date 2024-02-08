@@ -56,12 +56,13 @@ async def dream():
         "A finely crafted necklace found in the sand, still warm.",
         "Footprints lead to a secluded spot, beside them, an exotic bloom.",
         "The echo of a soft song, drawing me towards a hidden cove.",
-        "A shell bikini is here, and then a tap on my shoulder."
+        "A shell bikini is here, and then a tap on my shoulder.",
+        "A damsel in distress! The cannons roar and she runs into my arms."
     ])
     random.shuffle(instructions)
 
     # Generate a random number between 1 and 2
-    num = random.randint(1, 15)
+    num = random.randint(1, 18)
 
     # Template the filename with the random number
     pirate_filename = f"pirate{num}.png"
