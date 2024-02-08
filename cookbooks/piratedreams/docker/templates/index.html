@@ -71,6 +71,10 @@ $(document).ready(function() {
   var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
   var hostname = window.location.protocol === 'https:' ? 'dreams.mitta.ai' : 'localhost:5000';
 
+  // Get the UUID
+  var uuid = getCookie('uuid');
+  console.log(uuid);
+
   // default message
   var defaultMessage = "Discover hidden treasures and unravel pirate lore! You are a pirate who has just awakened on a desert island. Select a thought or write your own and then click <strong>dream</strong>.";
   setTimeout(function() {
@@ -109,7 +113,7 @@ $(document).ready(function() {
     savedInstructions = JSON.parse(savedInstructions);
 
     savedInstructions.forEach(function(instruction) {
-      $('.dropdown-menu').prepend('<a class="dropdown-item" href="">' + instruction + '</a>');
+      $('.dropdown-menu').prepend('<a class="dropdown-item" href="#">' + instruction + '</a>');
       var index = serverInstructions.indexOf(instruction);
       if (index > -1) {
         serverInstructions.splice(index, 1);
@@ -137,52 +141,55 @@ $(document).ready(function() {
       img.fadeIn('slow'); // Animate the image appearance
   }
 
-  // Form submission handler using jQuery AJAX
   $('#embark-button').on('click', function() {
-    $('#image').fadeOut('slow');
-    $('#story').fadeOut('slow');
-    $('#comms').fadeOut('slow');
-    $("#button-container").fadeOut('slow')
+    console.log("embark clicked")
+    // Fade out elements to prepare for new content
+    $('#image, #story, #comms, #button-container').fadeOut('slow');
 
+    // Retrieve the instruction and create FormData
     var instruction = $('#instructionInput').val();
     var formData = new FormData();
-    formData.append('instructions', instruction);
-    formData.append('uuid', uuid);
+    formData.append('instruction', instruction); // Ensure this matches your backend's expected key
 
-    // Retrieve existing instructions from the cookie
-    var savedInstructions = getCookie('instructions');
-    if (!savedInstructions) {
-        savedInstructions = [];
-    } else {
-        savedInstructions = JSON.parse(savedInstructions);
+    // Optionally append UUID if it exists
+    var uuid = getCookie('uuid'); // Assuming getCookie is correctly implemented
+    if (uuid) {
+      formData.append('uuid', uuid);
     }
 
-    // Save instruction locally if not already
+    // Update or create 'instructions' cookie
+    var savedInstructions = getCookie('instructions') ? JSON.parse(getCookie('instructions')) : [];
     if (!savedInstructions.includes(instruction)) {
       savedInstructions.push(instruction);
-      setCookie('instructions', JSON.stringify(savedInstructions), 7);
+      setCookie('instructions', JSON.stringify(savedInstructions), 7); // Save for 7 days
     }
 
-    // AJAX request to send instructions to the server
+    // AJAX request to send the instruction to the server
     $.ajax({
-      url: '/ask', // Change this to your upload endpoint
+      url: '/ask', // Update this URL to your endpoint
       type: 'POST',
       data: formData,
-      processData: false,
-      contentType: false,
+      processData: false, // Don't process the files
+      contentType: false, // Set content type to false as jQuery will tell the server its a query string request
       success: function(response) {
-        console.log("Request submitted successfully");
-        $('#comms').fadeOut('slow', function() {
-          $(this).html("Establishing connection to the pirate's mind.").fadeIn('slow');
-        });
+        // Handle success. For example, display the new image and story
+        // Assuming response contains {image_url: '...', story: '...'}
+        if (response.image_url) {
+          $('#image').attr('src', response.image_url).fadeIn('slow');
+        }
+        if (response.story) {
+          $('#story').html(response.story).fadeIn('slow');
+        }
+        $('#comms').html("Loading a dream into the pirate.").fadeIn('slow');
       },
       error: function(xhr, status, error) {
-        console.log("Error submitting crawl:", status, error);
-        updateCommsText("Request failed!");
-        window.location.reload();
+        // Handle error
+        $('#comms').html("Failed to dream. Please try again.").fadeIn('slow');
+        console.error("Error: ", status, error);
       }
     });
   });
+
 
   // default instructions
   $('#instructionInput').val("{{instructions[0]}}");
@@ -203,49 +210,62 @@ $(document).ready(function() {
   });
 
   $('#instructionInput').keypress(function(event) {
-      if (event.which == 13) { // 13 is the key code for Enter
-          event.preventDefault(); // Prevent the default action to stop submitting the form in a traditional way
-          $('#submit-button').click(); // Trigger the click event on the submit button
-      }
+    console.log("Instruction keypress");
+    if (event.which == 13) { // 13 is the key code for Enter
+        event.preventDefault(); // Prevent the default action to stop submitting the form in a traditional way
+        $('#submit-button').click(); // Trigger the click event on the submit button
+    }
   });
 
   // Download image
   $('#image').click(function() {
-      var imageUrl = $(this).attr('src'); // Directly use the src attribute of the img tag
-      if (imageUrl) {
-        $('#comms').fadeOut('slow', function() {
-          $(this).html("Stuffing things in bottles and flinging into ocean.").fadeIn('slow');
-        });
+    var imageUrl = $(this).attr('src'); // Directly use the src attribute of the img tag
+    if (imageUrl) {
+      $('#comms').fadeOut('slow', function() {
+        $(this).html("Stuffing things in bottles and flinging into ocean.").fadeIn('slow');
+      });
 
-        // Create a temporary link element
-        var downloadLink = $('<a>')
-            .attr('href', imageUrl)
-            .attr('download', 'downloaded_image.jpg') // Optional: Specify a default filename for the download
-            .css('display', 'none');
+      // Create a temporary link element
+      var downloadLink = $('<a>')
+          .attr('href', imageUrl)
+          .attr('download', 'downloaded_image.jpg') // Optional: Specify a default filename for the download
+          .css('display', 'none');
 
-        // Append the link to the body, trigger the click, and then remove it
-        $('body').append(downloadLink);
-        downloadLink[0].click();
-        downloadLink.remove();
-      }
+      // Append the link to the body, trigger the click, and then remove it
+      $('body').append(downloadLink);
+      downloadLink[0].click();
+      downloadLink.remove();
+    }
   });
 
   // Advertising
-  $('#mitta').on('click', function() {window.location = "https://mitta.ai"});
+  $('#mitta').on('click', function() {
+    window.location = "https://mitta.ai";
+  });
 
   // Dropdown handlers
-  $('.dropdown-menu a').click(function() {$('#instructionInput').val($(this).text()); $('.dropdown-menu').hide(); });
-  $('#instructionInput').on('click', function() {$('.dropdown-menu').hide(); });
-  $('#instructionInput').on('keyup', function() {$('.dropdown-menu').hide(); });
-  $('.dropdown-toggle').on('click', function() {$('.dropdown-menu').toggle(); });
+  $('.dropdown-menu a').click(function() {
+    event.preventDefault();
+    $('#instructionInput').val($(this).text());
+    $('.dropdown-menu').hide();
+  });
+
+  $('#instructionInput').on('click', function() {
+    $('.dropdown-menu').hide();
+  });
+
+  $('#instructionInput').on('keyup', function() {
+    $('.dropdown-menu').hide();
+  });
+
+  $('.dropdown-toggle').on('click', function() {
+    $('.dropdown-menu').toggle();
+  });
 
   // Assemble websocket
   // ------------------
   var ws;
-  var uuid = getCookie('uuid');
-
   var retryCount = 0;
-  console.log(uuid);
 
   function connectWebSocket() {
     // Create websocket
