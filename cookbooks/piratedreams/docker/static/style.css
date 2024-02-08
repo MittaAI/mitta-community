@@ -65,14 +65,15 @@ input {
 }
 
 .dropdown-menu {
-  min-width: 480px;
   max-width: 480px; /* Adjust this value based on your design requirements */
+  min-width: 480px;
   max-height: 200px; /* Adjust the height as needed */
   overflow-y: auto; /* Enable vertical scrolling for overflow content */
   overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 .dropdown-item {
+  min-width: 480px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis; /* Adds an ellipsis (...) at the end of the text if it overflows */
@@ -126,11 +127,14 @@ input {
   .dreams {
     align-items: stretch;
   }
+
   .dropdown-menu {
+    min-width: 240px;
     max-width: 320px;
     overflow: hidden; /* Ensures content does not overflow the dropdown menu */
   }
   .dropdown-item {
+    min-width: 240px;
     max-width: 320px;
     white-space: nowrap;
     overflow: hidden;
