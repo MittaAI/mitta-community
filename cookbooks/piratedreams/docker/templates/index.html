@@ -180,11 +180,11 @@ $(document).ready(function() {
         if (response.story) {
           $('#story').html(response.story).fadeIn('slow');
         }
-        $('#comms').html("Loading a dream into the pirate.").fadeIn('slow');
+        $('#comms').html("Establishing connection to the passed out pirate.").fadeIn('slow');
       },
       error: function(xhr, status, error) {
         // Handle error
-        $('#comms').html("Failed to dream. Please try again.").fadeIn('slow');
+        $('#comms').html("Failed to rouse pirate. Try again.").fadeIn('slow');
         console.error("Error: ", status, error);
       }
     });
