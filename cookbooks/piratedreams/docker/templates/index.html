@@ -142,12 +142,12 @@ $(document).ready(function() {
   }
 
   $('#embark-button').on('click', function() {
-    console.log("embark clicked")
     // Fade out elements to prepare for new content
     $('#image, #story, #comms, #button-container').fadeOut('slow');
 
     // Retrieve the instruction and create FormData
     var instruction = $('#instructionInput').val();
+
     var formData = new FormData();
     formData.append('instruction', instruction); // Ensure this matches your backend's expected key
 
@@ -210,7 +210,6 @@ $(document).ready(function() {
   });
 
   $('#instructionInput').keydown(function(event) {
-    console.log("Instruction keypress");
     if (event.which == 13) { // 13 is the key code for Enter
         event.preventDefault(); // Prevent the default action to stop submitting the form in a traditional way
         $('#embark-button').click(); // Trigger the click event on the submit button
@@ -406,7 +405,7 @@ $(document).ready(function() {
   function attemptReconnect() {
       var delay = calculateBackoff(retryCount);
       setTimeout(function() {
-          console.log(`Attempting to reconnect... Retry #${retryCount + 1}`);
+          console.log(`Attempting to reconnect...Garrr #${retryCount + 1}`);
           retryCount++;
           connectWebSocket();
       }, delay);
