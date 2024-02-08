@@ -209,11 +209,11 @@ $(document).ready(function() {
     window.location.reload();
   });
 
-  $('#instructionInput').keypress(function(event) {
+  $('#instructionInput').keydown(function(event) {
     console.log("Instruction keypress");
     if (event.which == 13) { // 13 is the key code for Enter
         event.preventDefault(); // Prevent the default action to stop submitting the form in a traditional way
-        $('#submit-button').click(); // Trigger the click event on the submit button
+        $('#embark-button').click(); // Trigger the click event on the submit button
     }
   });
 
