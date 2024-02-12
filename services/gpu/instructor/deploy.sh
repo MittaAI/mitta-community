@@ -77,11 +77,7 @@ SCRIPT=$(cat <<EOF
 #!/bin/bash
 if [ -d "/opt/mitta-community/" ]; then
   echo "Starting Instructor services..."
-  
-  # Install cuda drivers, every time
   /opt/deeplearning/install-driver.sh
-
-  # Start Instructor
   cd /opt/mitta-community/services/gpu/instructor/
   bash start-instructor.sh
 
