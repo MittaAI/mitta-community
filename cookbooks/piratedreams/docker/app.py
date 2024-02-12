@@ -26,6 +26,7 @@ async def custom_static(filename):
     return await send_from_directory(static_folder_path, filename)
 
 
+# https://dreams.mitta.ai/
 @app.route('/', methods=['GET', 'POST'])
 async def dream():
     # Initialize the default instructions
