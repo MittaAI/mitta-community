@@ -1,8 +1,5 @@
 InstructorEmbedding==1.0.1
 torch==2.0.1
-httplib2==0.22.0
-numpy==1.25.2
-tqdm==4.66.1
 transformers==4.33.1
 sentence_transformers==2.2.2
 flask==2.3.3

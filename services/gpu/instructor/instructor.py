@@ -9,7 +9,7 @@ import random
 import re
 import logging
 
-logging.basicConfig(filename='sloth.log', level=logging.INFO)
+logging.basicConfig(filename='instructor.log', level=logging.INFO)
 
 app = Flask(__name__)
 
