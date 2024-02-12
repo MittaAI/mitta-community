@@ -1,0 +1,20 @@
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+events {
+        worker_connections 768;
+        # multi_accept on;
+}
+http {
+        upstream instructor {
+                server localhost:8989;
+        }
+        server {
+                listen  9898;
+                location / {
+                        auth_basic "instructor";
+                        auth_basic_user_file /etc/nginx/htpasswd;
+                        proxy_pass http://instructor/;
+                }
+        }
+}
