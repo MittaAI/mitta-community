@@ -94,8 +94,8 @@ else
   apt-get install python3-pip -y
   apt-get install git -y
   apt-get install gcc -y
-  
-  # install cuda drivers, every time
+ 
+  # cuda drivers
   /opt/deeplearning/install-driver.sh
   
   # download code
@@ -110,8 +110,6 @@ else
   # grab the tokens and write to nginx htpasswrd and env
   cd /root
   python3 bid_token.py instructor
-
-  # fschat
 
   # huggingface
   pip install --upgrade huggingface_hub
