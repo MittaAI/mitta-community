@@ -1,5 +1,5 @@
 #!/bin/bash
-CONFIG_FILE="deploy_config.sh"
+CONFIG_FILE="config.sh"
 
 # Function to prompt user for missing variables
 prompt_missing_variables() {
