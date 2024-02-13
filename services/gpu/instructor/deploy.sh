@@ -68,14 +68,50 @@ else
   # Add your deployment script commands here
 fi
 
+# Get the current remote URL for 'origin'
+remote_url=$(git remote get-url origin)
+
+# Check if the URL is an SSH URL and convert it to HTTPS
+if [[ "$remote_url" =~ ^git@github.com:(.+)/(.+).git$ ]]; then
+    user="${BASH_REMATCH[1]}"
+    repo="${BASH_REMATCH[2]}"
+    REPO_URL="https://github.com/${user}/${repo}.git"
+# Else, assume it's already an HTTPS URL, just remove the authentication part if present
+else
+    REPO_URL=$(echo $remote_url | sed -E 's/https:\/\/[^@]+@/https:\/\//')
+    echo $https_url
+fi
+
+# Check if REPO_URL is not empty
+if [ -z "$REPO_URL" ]; then
+    echo "Failed to retrieve GitHub repository URL. Please make sure you're in a Git repository."
+    exit 1
+fi
+
+# Extract the repository name from the URL
+REPO_NAME=$(basename -s .git $REPO_URL)
+
 if [ -z "$ZONE" ]; then
 	echo "Need a valid zone to start [us-central1-a|us-east1-b]: --zone=us-central1-a"
 	exit 1
 fi
 
+case $ZONE in
+    us-central1-a)
+        echo "Using $ZONE to start $NAME-$NEW_UUID..."
+        ;;
+    us-east1-b)
+        echo "Using $ZONE to start $NAME-$NEW_UUID..."
+        ;;
+    *)
+        echo "Invalid zone specified: $ZONE"
+        exit 1
+        ;;
+esac
+
 SCRIPT=$(cat <<EOF
 #!/bin/bash
-if [ -d "/opt/mitta-community/" ]; then
+if [ -d "/opt/$REPO_NAME/" ]; then
   echo "Starting Instructor services..."
   /opt/deeplearning/install-driver.sh
   cd /opt/mitta-community/services/gpu/instructor/
@@ -100,8 +136,8 @@ else
   
   # download code
   cd /opt/
-  git clone https://github.com/MittaAI/mitta-community.git
-  cd /opt/mitta-community/services/gpu/instructor/
+  git clone $REPO_URL
+  cd /opt/$REPO_NAME/services/gpu/instructor/
 
   # copy files
   cp bid_token.py /root/
@@ -115,14 +151,14 @@ else
   pip install --upgrade huggingface_hub
 
   # requirements
-  cd /opt/mitta-community/services/gpu/instructor/
+  cd /opt/$REPO_NAME/services/gpu/instructor/
   pip install -r requirements.txt
 
   # restart ngninx
   systemctl restart nginx.service
 
   # start instructor service
-  bash start-instructor.sh
+  bash start-instructor.sh &
 
   date >> /opt/done.time
 
@@ -144,8 +180,8 @@ $PREEMPTIBLE \
 --no-shielded-secure-boot \
 --shielded-vtpm \
 --shielded-integrity-monitoring \
---labels=type=beast \
---tags beast,token-$TOKEN \
+--labels=type=instructor \
+--tags instructor,token-$TOKEN \
 --reservation-affinity=any \
 --metadata startup-script="$SCRIPT"
 sleep 15
@@ -155,6 +191,6 @@ gcloud compute instances add-metadata $NAME-$NEW_UUID --zone $ZONE --metadata-fr
 
 IP=$(gcloud compute instances describe $NAME-$NEW_UUID --zone $ZONE  | grep natIP | cut -d: -f2 | sed 's/^[ \t]*//;s/[ \t]*$//')
 
-# gcloud compute firewall-rules create beast --target-tags beast --allow tcp:8888
+gcloud compute firewall-rules create instructor --target-tags instructor --allow tcp:9898
 echo "Password token is: $TOKEN"
 echo "IP is: $IP"
