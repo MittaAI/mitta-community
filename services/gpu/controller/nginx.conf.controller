@@ -1,0 +1,20 @@
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+events {
+        worker_connections 768;
+        # multi_accept on;
+}
+http {
+        upstream controller {
+                server localhost:7878;
+        }
+        server {
+                listen  8787;
+                location / {
+                        auth_basic "controller";
+                        auth_basic_user_file /etc/nginx/htpasswd;
+                        proxy_pass http://controller/;
+                }
+        }
+}

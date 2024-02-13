@@ -71,6 +71,18 @@ else
   # Add your deployment script commands here
 fi
 
+# Get the GitHub repository URL
+REPO_URL=$(git config --get remote.origin.url)
+
+# Check if REPO_URL is not empty
+if [ -z "$REPO_URL" ]; then
+    echo "Failed to retrieve GitHub repository URL. Please make sure you're in a Git repository."
+    exit 1
+fi
+
+# Extract the repository name from the URL
+REPO_NAME=$(basename -s .git $REPO_URL)
+
 if [ -z "$ZONE" ]; then
     echo "Need a valid zone to start [us-central1-a|us-east1-b]: --zone=us-central1-a"
     exit 1
@@ -91,8 +103,9 @@ esac
 
 SCRIPT=$(cat <<EOF
 #!/bin/bash
-if [ -d "/opt/Laminoid/" ]; then
+if [ -d "/opt/$REPO_NAME/" ]; then
   echo "starting controller"
+  bash start-controller.sh
 else
   sudo su -
   date >> /opt/start.time
@@ -114,8 +127,8 @@ else
 
   # download code
   cd /opt/
-  git clone https://github.com/kordless/Laminoid.git
-  cd /opt/Laminoid/
+  git clone $REPO_URL
+  cd /opt/$REPO_NAME/services/gpu/controller/
 
   # copy files
   cp bid_token.py /root/
@@ -128,7 +141,7 @@ else
   # restart ngninx
   systemctl restart nginx.service
 
-  cd /opt/Laminoid/controller
+  cd /opt/$REPO_NAME/services/gpu/controller/
   ./start-controller.sh &
 
   date >> /opt/done.time
@@ -151,7 +164,7 @@ $PREEMPTIBLE \
 --shielded-vtpm \
 --shielded-integrity-monitoring \
 --labels=type=beast \
---tags sloth,token-$TOKEN \
+--tags controller,token-$TOKEN \
 --reservation-affinity=any \
 --metadata startup-script="$SCRIPT"
 sleep 15
