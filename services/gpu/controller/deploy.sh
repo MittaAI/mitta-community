@@ -149,11 +149,15 @@ else
   cd /root
   python3 bid_token.py controller
 
+  # requirements
+  cd /opt/$REPO_NAME/services/gpu/controller/
+  pip install -r requirements.txt
+
   # restart ngninx
   systemctl restart nginx.service
 
-  cd /opt/$REPO_NAME/services/gpu/controller/
-  ./start-controller.sh &
+  # start controller services
+  bash start-controller.sh &
 
   date >> /opt/done.time
 
@@ -174,7 +178,7 @@ $PREEMPTIBLE \
 --no-shielded-secure-boot \
 --shielded-vtpm \
 --shielded-integrity-monitoring \
---labels=type=beast \
+--labels=type=controller \
 --tags controller,token-$TOKEN \
 --reservation-affinity=any \
 --metadata startup-script="$SCRIPT"
@@ -185,6 +189,6 @@ gcloud compute instances add-metadata $NAME-$NEW_UUID --zone $ZONE --metadata-fr
 
 IP=$(gcloud compute instances describe $NAME-$NEW_UUID --zone $ZONE  | grep natIP | cut -d: -f2 | sed 's/^[ \t]*//;s/[ \t]*$//')
 
-# gcloud compute firewall-rules create beast --target-tags beast --allow tcp:8389
+gcloud compute firewall-rules create controller --target-tags beast --allow tcp:8787
 echo "Password token is: $TOKEN"
 echo "IP is: $IP"
