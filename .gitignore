@@ -3,7 +3,7 @@
 secrets.sh
 credentials.json
 config.json
-deploy_config.sh
+config.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
