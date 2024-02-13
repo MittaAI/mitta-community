@@ -72,7 +72,7 @@ else
 fi
 
 # Get the GitHub repository URL
-REPO_URL=$(git config --get remote.origin.url)
+REPO_URL=$(git remote show origin | grep 'Fetch URL' | sed 's/.*:\/\///')
 
 # Check if REPO_URL is not empty
 if [ -z "$REPO_URL" ]; then
