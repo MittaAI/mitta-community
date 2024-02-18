@@ -120,7 +120,7 @@ RUN wget -O ffmpeg-6.1.1.tar.xz https://ffmpeg.org/releases/ffmpeg-6.1.1.tar.xz 
 WORKDIR /app
 
 # Install Quart and Hypercorn
-RUN pip install --no-cache-dir quart httpx werkzeug hypercorn
+RUN pip install --no-cache-dir quart httpx werkzeug hypercorn quart_cors
 
 # Copy the current directory contents into the container at /app
 COPY . /app

@@ -182,6 +182,6 @@ gcloud compute instances add-metadata $NAME-$NEW_UUID --zone $ZONE --metadata-fr
 
 IP=$(gcloud compute instances describe $NAME-$NEW_UUID --zone $ZONE  | grep natIP | cut -d: -f2 | sed 's/^[ \t]*//;s/[ \t]*$//')
 
-gcloud compute firewall-rules create instructor --target-tags instructor --allow tcp:9898
+gcloud compute firewall-rules create pdf --target-tags pdf --allow tcp:9898
 echo "Password token is: $TOKEN"
 echo "IP is: $IP"
