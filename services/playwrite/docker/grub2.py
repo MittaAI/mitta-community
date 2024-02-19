@@ -6,6 +6,7 @@ from playwright.async_api import async_playwright
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 import openai
 import os
+import logging
 
 # Import helper functions and decorators
 from function_wrapper import function_info_decorator, tools, callable_registry
@@ -51,7 +52,7 @@ async def execute_function_by_name(function_name, **kwargs):
 
 # dynamic functions called by AI
 @function_info_decorator
-async def thumbnail(url: str, filename: str = f"example.png") -> str:
+async def thumbnail(url: str, grub_path: str = f"example.png") -> str:
     """
     Takes a screenshot of the specified URL and saves it to the given filename asynchronously.
 
@@ -66,17 +67,18 @@ async def thumbnail(url: str, filename: str = f"example.png") -> str:
         browser = await p.webkit.launch()
         page = await browser.new_page()
         await page.goto(url)
-        await page.screenshot(path=path)
+        logging.info(grub_path)
+        await page.screenshot(path=grub_path)
         await browser.close()
     return path
 
 
 @retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
-async def chat_completion_request_async(messages, tools=None, tool_choice=None, model="gpt-3.5-turbo-1106"):
+async def chat_completion_request_async(messages=None, openai_token=None, tools=None, tool_choice=None, model="gpt-3.5-turbo-1106"):
     """
     Make an asynchronous request to OpenAI's chat completion API.
     """
-    client = openai.AsyncOpenAI(api_key=openai.api_key)
+    client = openai.AsyncOpenAI(api_key=openai_token)
     try:
         return await client.chat.completions.create(model=model, messages=messages, tools=tools, tool_choice=tool_choice)
     except Exception as e:
@@ -105,7 +107,8 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
     if chat_response:
         try:
             function_name = chat_response.choices[0].message.tool_calls[0].function.name
-            arguments = json.loads(chat_response.choices[0].message.tool_calls[0].function.arguments_json)
+            arguments_json = chat_response.choices[0].message.tool_calls[0].function.arguments
+            arguments = json.loads(arguments_json)
 
             # Update the filename to include the full path within the user-specific directory
             if 'filename' in arguments:

@@ -9,7 +9,7 @@ import io
 from quart import Quart, jsonify, render_template, request, send_from_directory, redirect
 from quart_cors import cors
 
-from screenshot import ai
+from grub2 import ai
 
 app = Quart(__name__, template_folder='templates', static_folder='static')
 app = cors(app, allow_origin="*")  # Adjust CORS as needed
@@ -71,6 +71,8 @@ def create_and_check_directory(directory_path):
 
 async def process_query_background(username, query, openai_token, upload_dir, callback_url, document):
     try:
+        logging.info("in process query")
+        logging.info(upload_dir)
         screenshot, additional_data = await ai(username=username, query=query, openai_token=openai_token, upload_dir=upload_dir)
         
         if screenshot:
@@ -85,7 +87,6 @@ async def process_query_background(username, query, openai_token, upload_dir, ca
     except Exception as e:
         logging.error(f"Error processing query: {e}")
         await notify_failure(callback_url, document, str(e))
-
 
 async def perform_callback(url, document):
     # logic to perform a callback

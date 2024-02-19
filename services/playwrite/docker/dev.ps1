@@ -7,6 +7,8 @@ Write-Host "Starting management of $imageName..."
 
 # Infinite loop to ensure the container is always running
 while ($true) {
+    Start-Sleep -Seconds 
+
     # Check if the container is running
     $containerRunning = docker ps | Select-String $containerName
 
@@ -33,9 +35,6 @@ while ($true) {
     # Display the latest logs after checking the container status
     Write-Host "Displaying latest container logs:"
     docker logs $containerName --tail 50
-
-    # Wait for 5 seconds before checking again
-    Start-Sleep -Seconds 5
 
     # Execute commands inside the container
     # Write-Host "Executing command inside the container..."

@@ -1,0 +1,7 @@
+{
+    "grub_token": "f00bar",
+    "username": "hilarious-quetzal-of-excitement",
+    "query": "crawl mitta.ai",
+    "callback_url": "https://kordless.ngrok.io/hilarious-quetzal-of-excitement/callback?token=g7q5V1SZ74MWudzO_INnIxvlpKxB4oAVyXF46a",
+    "openai_token": "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"
+}
