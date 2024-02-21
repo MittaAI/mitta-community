@@ -3,7 +3,7 @@ import os
 import subprocess
 
 # Define the path to the configuration file
-config_file_path = 'curl_config.json'
+config_file_path = 'config.json'
 
 # Check if the configuration file exists
 if not os.path.exists(config_file_path):
@@ -15,7 +15,7 @@ if not os.path.exists(config_file_path):
     config_data = {
         "grub_token": "f00bar",
         "username": "hilarious-quetzal-of-excitement",
-        "query": "crawl mitta.ai",
+        "query": "crawl hackernews new posts",
         "callback_url": f"https://kordless.ngrok.io/hilarious-quetzal-of-excitement/callback?token={mitta_callback_token}",
         "openai_token": openai_token
     }
@@ -27,16 +27,6 @@ else:
     # If the file exists, read the current configuration
     with open(config_file_path, 'r') as config_file:
         config_data = json.load(config_file)
-    
-    # Prompt for the Mitta callback token to update it
-    mitta_callback_token = input("Enter your Mitta callback token: ")
-    
-    # Update the callback URL in the configuration with the new Mitta callback token
-    config_data["callback_url"] = f"https://kordless.ngrok.io/hilarious-quetzal-of-excitement/callback?token={mitta_callback_token}"
-    
-    # Write the updated configuration back to the file
-    with open(config_file_path, 'w') as config_file:
-        json.dump(config_data, config_file, indent=4)
 
 # Use the configuration data to set up the curl command
 curl_command = [

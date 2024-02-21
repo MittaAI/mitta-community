@@ -80,7 +80,7 @@ async def chat_completion_request_async(messages, tools=None, tool_choice=None, 
 async def ai(query=""):
     # Your existing setup code remains the same
     messages = [
-        {"role": "system", "content": "Don't make assumptions...sometimes URLs will be embedded in other URLs, so preserve the whole thing as one URL"},
+        {"role": "system", "content": "Don't make assumptions..."},
         {"role": "user", "content": query}
     ]
 

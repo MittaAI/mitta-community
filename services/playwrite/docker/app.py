@@ -6,6 +6,7 @@ import json
 import random
 import string
 import io
+import mimetypes
 from quart import Quart, jsonify, render_template, request, send_from_directory, redirect
 from quart_cors import cors
 
@@ -33,6 +34,7 @@ async def grub():
     # Token check
     if not document or document.get('grub_token') != grub_token:
         return jsonify({'result': 'failed', 'reason': 'Invalid or missing token'}), 401
+    document.pop('grub_token')
 
     # Extract necessary data
     username = document.get('username')
@@ -49,54 +51,22 @@ async def grub():
     # Respond immediately to the client
     asyncio.create_task(process_query_background(username, query, openai_token, UPLOAD_DIR, callback_url, document))
     
-    return jsonify({'status': 'success', 'message': 'Query is being processed'}), 202
-
-
-# ensure directory exists
-def create_and_check_directory(directory_path):
-    try:
-        # Attempt to create the directory (and any necessary parent directories)
-        os.makedirs(directory_path, exist_ok=True)
-        logging.info(f"Directory '{directory_path}' ensured to exist.")
-        
-        # Check if the directory exists to verify it was created
-        if os.path.isdir(directory_path):
-            logging.info(f"Confirmed: The directory '{directory_path}' exists.")
-        else:
-            logging.error(f"Error: The directory '{directory_path}' was not found after creation attempt.")
-    except Exception as e:
-        # If an error occurred during the creation, log the error
-        logging.error(f"An error occurred while creating the directory: {e}")
+    return jsonify({'status': 'success', 'message': 'Query is being processed', 'callback_url': callback_url}), 202
 
 
 async def process_query_background(username, query, openai_token, upload_dir, callback_url, document):
-    try:
-        logging.info("in process query")
-        logging.info(upload_dir)
-        screenshot, additional_data = await ai(username=username, query=query, openai_token=openai_token, upload_dir=upload_dir)
-        
-        if screenshot:
-            document.update(additional_data)  # Merge additional data into the payload
-            
-            # Perform the callback, including the screenshot and additional data
-            await upload_file(callback_url, os.path.basename(screenshot), screenshot, document)
-        else:
-            # Handle cases where no screenshot is generated
-            message = additional_data.get('error')
-            await notify_failure(callback_url, document, message)
-    except Exception as e:
-        logging.error(f"Error processing query: {e}")
-        await notify_failure(callback_url, document, str(e))
+    success, additional_data = await ai(username=username, query=query, openai_token=openai_token, upload_dir=upload_dir)
+    
+    if success:
+        document.update(additional_data)  # Merge additional data into the payload
 
-async def perform_callback(url, document):
-    # logic to perform a callback
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.post(url, json=document)
-            logging.info(f"Callback response: {response.status_code}")
-        except Exception as e:
-            logging.error(f"Error performing callback: {e}")
-
+        # Perform the callback, including the screenshot and additional data
+        await upload_file(callback_url, document)
+    else:
+        # Handle cases where no screenshot is generated
+        message = f"{additional_data.get('error')}: {additional_data.get('reason')}"
+        await notify_failure(callback_url, document, message)
+    
 
 async def notify_failure(callback_url, document, message=None):
     logging.info(f"Notifying failure: {message}")
@@ -106,7 +76,7 @@ async def notify_failure(callback_url, document, message=None):
         document["aigrub_error"] = message
     
     # Generate a 13-character long string consisting of lowercase letters and digits
-    random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=13))
+    random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=13)) 
     json_filename = f"json_data_{random_string}.json"
 
     # Dump to file    
@@ -123,31 +93,49 @@ async def notify_failure(callback_url, document, message=None):
     os.remove(json_filename)
 
 
-async def upload_file(callback_url, output_file, output_file_path, document):
-    logging.info(f"Uploading file: {output_file}")
-
+async def upload_file(callback_url, document):
+    """
+    Uploads files specified in the document to the callback URL.
+    Expects 'filename' and optionally 'image_from_page' in the document.
+    """
+    logging.info("in upload_file")
+    files_to_upload = []
     # Prepare JSON data
-    json_data = json.dumps(document).encode('utf-8')  # Ensure user_document is properly encoded
-
-    # Guess MIME type
-    mime_type, _ = mimetypes.guess_type(output_file_path)
-    mime_type = mime_type or 'application/octet-stream'
-
+    json_data = json.dumps(document).encode('utf-8')  # Encode document to JSON
+    
+    # Add JSON data to the files to upload
+    files_to_upload.append(('json_data', ('json_data.json', json_data, 'application/json')))
+    
+    # Check and add 'filename' if it exists in document
+    if 'filename' in document:
+        file_path = document['filename']
+        output_file = os.path.basename(file_path)
+        mime_type, _ = mimetypes.guess_type(file_path)
+        mime_type = mime_type or 'application/octet-stream'
+        files_to_upload.append(('file', (output_file, open(file_path, 'rb'), mime_type)))
+    
+    # Check and add 'image_from_page' if it exists in document
+    if 'image_from_page' in document:
+        image_path = document['image_from_page']
+        image_file = os.path.basename(image_path)
+        mime_type, _ = mimetypes.guess_type(image_path)
+        mime_type = mime_type or 'application/octet-stream'
+        files_to_upload.append(('image', (image_file, open(image_path, 'rb'), mime_type)))
+    
+    # Perform the upload
     async with httpx.AsyncClient() as client:
-        with open(output_file_path, 'rb') as f:
-            files = {
-                'file': (output_file, f, mime_type),
-                'json_data': ('json_data.json', json_data, 'application/json')
-            }
-            response = await client.post(callback_url, files=files)
-
+        response = await client.post(callback_url, files=files_to_upload)
+    
+    # Log the response and clean up
     if response.status_code == 200:
-        logging.info("File uploaded successfully.")
+        logging.info("Files uploaded successfully.")
     else:
-        logging.error(f"Failed to upload file: {response.text}")
-
-    # remove the screenshot after upload
-    os.remove(output_file_path)
+        logging.error(f"Failed to upload files: {response.text}")
+    
+    # Close and remove files
+    for _, file_tuple in files_to_upload:
+        if file_tuple[0] != 'json_data':  # Skip json_data as it's not a file needing closing
+            os.remove(file_tuple[1].name)  # Remove the file from the filesystem
 
 
 # Endpoint to download screenshots
