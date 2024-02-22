@@ -142,10 +142,12 @@ async def upload_file(callback_url, document):
     else:
         logging.error(f"Failed to upload files: {response.text}")
     
-    # Close and remove files
-    for _, file_tuple in files_to_upload:
-        if file_tuple[0] != 'json_data':  # Skip json_data as it's not a file needing closing
-            os.remove(file_tuple[1].name)  # Remove the file from the filesystem
+    for _, file_info in files_to_upload:
+        # file_info is a tuple where the second element is another tuple containing the file name, file object, and MIME type
+        if file_info[0] != 'json_data':  # 'json_data' does not refer to a file needing closing or removal
+            file_path = file_info[1][1].name  # Get the file name from the file object
+            file_info[1][1].close()  # Close the file object
+            os.remove(file_path)  # Remove the file from the filesystem
 
 
 # Endpoint to download screenshots
