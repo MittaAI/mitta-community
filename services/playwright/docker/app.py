@@ -36,6 +36,9 @@ async def grub():
         return jsonify({'result': 'failed', 'reason': 'Invalid or missing token'}), 401
     document.pop('grub_token')
 
+    # show the document in the logs
+    logging.info(document)
+
     # Extract necessary data
     username = document.get('username')
     query = document.get('query')
