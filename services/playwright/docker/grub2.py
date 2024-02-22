@@ -113,22 +113,13 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     links = []
     image_from_page = ""
 
-    logging.info("moving to playwright")
     async with async_playwright() as p:
-        logging.info("moving to playwright")
-    
         browser = await p.webkit.launch()
-        logging.info("moving to playwright 2")
-    
         page = await browser.new_page()
-        logging.info("moving to playwright 3")
     
         await page.goto(url)
-
-        logging.info("moving to playwright 4")
     
         if click_button and button_with_text:
-            logging.info(button_with_text)
             # Find a button by its accessible name and click it
             await page.get_by_role('button', name=button_with_text).click()
             await page.wait_for_timeout(1000)  # Additional waiting time after click action
@@ -157,7 +148,6 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
 
         await browser.close()
 
-    logging.info("out of playwright")
     result = {
         "filename": filename,
         "success": True
@@ -205,12 +195,8 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
     ]
     
     # get the function and parameters to call
-    logging.info(openai_token)
-    logging.info(tools)
     chat_response = await chat_completion_request_async(messages=messages, openai_token=openai_token, tools=tools)
 
-    logging.info("back from openai")
-    logging.info(chat_response)
     # Assume function_name and arguments are extracted from chat_response
     try:
         function_name = chat_response.choices[0].message.tool_calls[0].function.name
@@ -239,7 +225,6 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
                 screenshot_filename = f"{username}_{random_string}.png"
                 arguments['filename'] = os.path.join(user_dir, screenshot_filename)
 
-            logging.info("calling dynamic function")
             json_results_str = await execute_function_by_name(function_name, **arguments)
             results = json.loads(json_results_str) if not isinstance(json_results_str, dict) else json_results_str
 

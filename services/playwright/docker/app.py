@@ -61,8 +61,6 @@ async def process_query_background(username, query, openai_token, upload_dir, ca
         document.update(additional_data)  # Merge additional data into the payload
 
         # Perform the callback, including the screenshot and additional data
-        logging.info("calling upload file")
-        logging.info(document)
         await upload_file(callback_url, document)
     else:
         # Handle cases where no screenshot is generated
@@ -100,7 +98,6 @@ async def upload_file(callback_url, document):
     Uploads files specified in the document to the callback URL.
     Expects 'filename' and optionally 'image_from_page' in the document.
     """
-    logging.info("in upload_file")
     files_to_upload = []
     # Prepare JSON data
     json_data = json.dumps(document).encode('utf-8')  # Encode document to JSON
@@ -124,7 +121,6 @@ async def upload_file(callback_url, document):
         mime_type = mime_type or 'application/octet-stream'
         files_to_upload.append(('image', (image_file, open(image_path, 'rb'), mime_type)))
     
-    logging.info("trying to upload")
     # Perform the upload
     async with httpx.AsyncClient() as client:
         response = await client.post(callback_url, files=files_to_upload)
