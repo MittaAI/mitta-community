@@ -52,7 +52,7 @@ async def grub():
 
     # one worker only
     query = document.get('query')
-    if isinstance(queries, list):
+    if isinstance(query, list):
         query = query[0] # only processes the first query
 
     # by doing this, we will end up calling openai and playwright asyncronously
