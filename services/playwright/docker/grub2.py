@@ -196,7 +196,7 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
     
     # get the function and parameters to call
     chat_response = await chat_completion_request_async(messages=messages, openai_token=openai_token, tools=tools)
-
+    console.log(chat_response)
     # Assume function_name and arguments are extracted from chat_response
     try:
         function_name = chat_response.choices[0].message.tool_calls[0].function.name

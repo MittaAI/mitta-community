@@ -41,7 +41,6 @@ async def grub():
 
     # Extract necessary data
     username = document.get('username')
-    query = document.get('query')
     callback_url = document.get('callback_url')
     openai_token = document.get('openai_token')
 
@@ -51,9 +50,15 @@ async def grub():
     if not callback_url or not openai_token:
         return jsonify({'result': 'failed', 'reason': 'Missing callback URL or OpenAI token'}), 400
 
-    # Respond immediately to the client
-    asyncio.create_task(process_query_background(username, query, openai_token, UPLOAD_DIR, callback_url, document))
-    
+    # thread off workers
+    queries = document.get('query')
+    if not isinstance(queries, list):
+        queries = [queries]  # Make it a list if it isn't already
+
+    for query in queries:
+        asyncio.create_task(process_query_background(username, query, openai_token, UPLOAD_DIR, callback_url, document))
+
+    # Respond immediately to the client    
     return jsonify({'status': 'success', 'message': 'Query is being processed', 'callback_url': callback_url}), 202
 
 
