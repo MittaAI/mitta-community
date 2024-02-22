@@ -112,6 +112,8 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     # Function implementation goes here
     links = []
     image_from_page = ""
+
+    logging.info("moving to playwright")
     async with async_playwright() as p:
         browser = await p.webkit.launch()
         page = await browser.new_page()
@@ -147,6 +149,7 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
 
         await browser.close()
 
+    logging.info("out of playwright")
     result = {
         "filename": filename,
         "success": True
@@ -228,6 +231,7 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
                 screenshot_filename = f"{username}_{random_string}.png"
                 arguments['filename'] = os.path.join(user_dir, screenshot_filename)
 
+            logging.info("calling dynamic function")
             json_results_str = await execute_function_by_name(function_name, **arguments)
             results = json.loads(json_results_str) if not isinstance(json_results_str, dict) else json_results_str
 
