@@ -50,13 +50,14 @@ async def grub():
     if not callback_url or not openai_token:
         return jsonify({'result': 'failed', 'reason': 'Missing callback URL or OpenAI token'}), 400
 
-    # thread off workers
-    queries = document.get('query')
-    if not isinstance(queries, list):
-        queries = [queries]  # Make it a list if it isn't already
+    # one worker only
+    query = document.get('query')
+    if isinstance(queries, list):
+        query = query[0] # only processes the first query
 
-    for query in queries:
-        asyncio.create_task(process_query_background(username, query, openai_token, UPLOAD_DIR, callback_url, document))
+    # by doing this, we will end up calling openai and playwright asyncronously
+    # on Google Cloud, this requires full use of CPU when the external query is not active
+    asyncio.create_task(process_query_background(username, query, openai_token, UPLOAD_DIR, callback_url, document))
 
     # Respond immediately to the client    
     return jsonify({'status': 'success', 'message': 'Query is being processed', 'callback_url': callback_url}), 202
