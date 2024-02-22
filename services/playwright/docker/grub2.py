@@ -115,10 +115,18 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
 
     logging.info("moving to playwright")
     async with async_playwright() as p:
+        logging.info("moving to playwright")
+    
         browser = await p.webkit.launch()
+        logging.info("moving to playwright 2")
+    
         page = await browser.new_page()
+        logging.info("moving to playwright 3")
+    
         await page.goto(url)
 
+        logging.info("moving to playwright 4")
+    
         if click_button and button_with_text:
             logging.info(button_with_text)
             # Find a button by its accessible name and click it
