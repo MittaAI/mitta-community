@@ -15,7 +15,7 @@ if not os.path.exists(config_file_path):
     config_data = {
         "grub_token": "f00bar",
         "username": "hilarious-quetzal-of-excitement",
-        "query": "crawl hackernews new posts",
+        "query": "crawl https://www.amazon.com/OVERTURE-Filament-Consumables-Dimensional-Accuracy/dp/B07PDV9RC8",
         "callback_url": f"https://kordless.ngrok.io/hilarious-quetzal-of-excitement/callback?token={mitta_callback_token}",
         "openai_token": openai_token
     }
