@@ -2,7 +2,7 @@ import asyncio
 import json
 import re
 import sys
-from playwright.async_api import async_playwright
+from playwright.async_api import sync_playwright
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 import openai
 import os
