@@ -114,6 +114,8 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     image_from_page = ""
 
     logging.info("moving to playwright")
+
+    """
     async with async_playwright() as p:
         browser = await p.webkit.launch()
         page = await browser.new_page()
@@ -148,6 +150,44 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
                 image_from_page = image_path
 
         await browser.close()
+    """
+    with sync_playwright() as p:
+        browser = p.webkit.launch()
+        page = browser.new_page()
+        page.goto(url)
+
+        if click_button and button_with_text:
+            logging.info(button_with_text)
+            # Find a button by its accessible name and click it
+            page.get_by_role('button', name=button_with_text).click()
+            page.wait_for_timeout(1000)  # Additional waiting time after click action
+
+        links = []
+        if extract_links:
+            links = page.evaluate(f'''() => {{
+                const elements = Array.from(document.querySelectorAll('{link_selector}'));
+                return elements.map(element => {{
+                    return {{
+                        href: element.href,
+                        text: element.textContent || element.innerText
+                    }};
+                }});
+            }}''')
+
+        page.screenshot(path=filename, full_page=full_screen)
+
+        image_from_page = None
+        if extract_image:
+            img_element = page.query_selector(img_isolate_selector)
+            if img_element:
+                # Generate the filename for the image to be saved
+                image_filename = "image_" + os.path.basename(filename)
+                image_path = os.path.join(os.path.dirname(filename), image_filename)
+                img_element.screenshot(path=image_path)
+                image_from_page = image_path
+
+        browser.close()
+    return links, image_from_page
 
     logging.info("out of playwright")
     result = {
