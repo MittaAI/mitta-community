@@ -125,8 +125,11 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
             await page.wait_for_timeout(1000)  # Additional waiting time after click action
 
         if extract_links:
+            # Preprocess link_selector to replace double quotes with single quotes
+            sanitized_link_selector = link_selector.replace('"', "'")
+            
             links = await page.evaluate(f'''() => {{
-                const elements = Array.from(document.querySelectorAll('{link_selector}'));
+                const elements = Array.from(document.querySelectorAll("{sanitized_link_selector}"));
                 return elements.map(element => {{
                     return {{
                         href: element.href,

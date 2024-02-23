@@ -103,7 +103,6 @@ async def download_file(url, directory):
 
 
 async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, username):
-    logging.info(callback_url)
     # Split the command string into arguments
     args = shlex.split(ffmpeg_command)
 
@@ -218,7 +217,7 @@ async def upload_file(callback_url, input_file_path, output_file, output_file_pa
         await notify_failure(callback_url, f"Failed to upload files due to HTTP error: {e.response.status_code}")
     except httpx.RequestError as e:
         # Catches exceptions for network-related issues, which are usually due to bad socket closes after upload completes
-        logging.error(f"Request error: {e.request.url} - {str(e)} - not sending notification to server.")
+        logging.error(f"Unobvious network error, but upload is probably complete.")
     except Exception as e:
         # Catch-all for any other exceptions
         logging.error(f"Unexpected error: {type(e).__name__} - {str(e)}")
