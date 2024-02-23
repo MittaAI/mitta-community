@@ -1,6 +1,7 @@
 # Define variables
 $imageName = "ffmpeg-service"
 $containerName = "ffmpeg-container"
+$envVar = "FFMPEG_TOKEN=f00bar"
 
 Write-Host "Starting management of ffmpeg-service..."
 
@@ -23,10 +24,10 @@ while ($true) {
         # Rebuild the Docker image
         docker build -t $imageName .
 
-        # Run the Docker container with a restart policy and port mapping
-        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 $imageName
+        # Run the Docker container with a restart policy, port mapping, and environment variable
+        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 -v "${PWD}:/app" -e $envVar $imageName
 
-        Write-Host "Container restarted with port 5000 exposed."
+        Write-Host "Container restarted with port 5000 exposed and FFMPEG_TOKEN set."
     }
 
     # Display the latest logs after checking the container status
