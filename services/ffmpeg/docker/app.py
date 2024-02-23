@@ -57,12 +57,12 @@ async def convert():
     document.pop('ffmpeg_token')
 
     # parameters
-    username = data.get('username')
-    file_url = data.get('mitta_uri')
-    callback_url = data.get('callback_url')
-    ffmpeg_command = data.get('ffmpeg_command')
-    input_file = data.get('input_file')
-    output_file = data.get('output_file')
+    username = document.get('username')
+    file_url = document.get('mitta_uri')
+    callback_url = document.get('callback_url')
+    ffmpeg_command = document.get('ffmpeg_command')
+    input_file = document.get('input_file')
+    output_file = document.get('output_file')
 
     # lightly check command for problems
     if ".." in ffmpeg_command or ".." in input_file:
