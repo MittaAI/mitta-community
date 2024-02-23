@@ -103,6 +103,7 @@ async def download_file(url, directory):
 
 
 async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, username):
+    logging.info(callback_url)
     # Split the command string into arguments
     args = shlex.split(ffmpeg_command)
 
@@ -121,9 +122,10 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
     # Update paths for input and output files within the command arguments
     for index, arg in enumerate(args):
         if arg == input_file:
+            input_file_path = os.path.join(user_directory, input_file)
             args[index] = os.path.join(user_directory, input_file)
         elif arg == output_file:
-            output_file_path = os.path.join(user_directory, output_file)  # Set the full path for output file
+            output_file_path = os.path.join(user_directory, output_file)
             args[index] = output_file_path
 
     # Prepend 'ffmpeg' to the command arguments
@@ -153,7 +155,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
     # At this point, FFmpeg has executed successfully
     # Check for the output file's existence before attempting to upload
     if os.path.exists(output_file_path):
-        await upload_file(callback_url, output_file, output_file_path)
+        await upload_file(callback_url, input_file_path, output_file, output_file_path)
     else:
         logging.error("Output file is missing.")
         await notify_failure(callback_url, "FFmpeg succeeded but the output file is missing.")
@@ -177,39 +179,69 @@ def prepare_json_data(message=None, output_file=None):
 
 async def notify_failure(callback_url, message=None):
     logging.info(f"Notifying failure: {message}")
-    json_filename = prepare_json_data(message)
+    json_filename_notify = prepare_json_data(message=message)
     
     async with httpx.AsyncClient() as client:
-        with open(json_filename, 'rb') as json_file:
+        with open(json_filename_notify, 'rb') as json_file:
             response = await client.post(callback_url, files={'json_data': ('json_data.json', json_file, 'application/json')})
         logging.info(f"Notification response: {response.text}")
 
-    os.remove(json_filename)
+    # Cleanup file after sending the notification
+    os.remove(json_filename_notify)
+
+    return json_filename_notify
 
 
-async def upload_file(callback_url, output_file, output_file_path):
+async def upload_file(callback_url, input_file_path, output_file, output_file_path):
     json_filename = prepare_json_data(output_file=output_file)
-
-    # Guess the MIME type of the file based on its extension
+    json_filename_notify = None  # Initialize to None to avoid UnboundLocalError
     mime_type, _ = mimetypes.guess_type(output_file_path)
     if mime_type is None:
         mime_type = 'application/octet-stream'  # Default MIME type if unknown
 
-    async with httpx.AsyncClient() as client:
-        logging.info("Uploading.")
-        with open(output_file_path, 'rb') as f, open(json_filename, 'rb') as json_f:
-            files = {
-                'file': (output_file, f, mime_type),
-                'json_data': ('json_data.json', json_f, 'application/json')
-            }
-            response = await client.post(callback_url, files=files)
+    try:
+        async with httpx.AsyncClient() as client:
+            logging.info("Uploading.")
+            with open(output_file_path, 'rb') as f, open(json_filename, 'rb') as json_f:
+                files = {
+                    'file': (output_file, f, mime_type),
+                    'json_data': ('json_data.json', json_f, 'application/json'),
+                }
+                response = await client.post(callback_url, files=files)
+                if response.status_code != 200:
+                    json_filename_notify = await notify_failure(callback_url, "Got an error back from the upload, after processing.")
+                    return  # Early return if upload failed
+    
+    except httpx.HTTPStatusError as e:
+        # Catches exceptions for response status codes indicating an HTTP error
+        logging.error(f"HTTP error occurred: {e.response.status_code} - {e.response.text}")
+        await notify_failure(callback_url, f"Failed to upload files due to HTTP error: {e.response.status_code}")
+    except httpx.RequestError as e:
+        # Catches exceptions for network-related issues, which are usually due to bad socket closes after upload completes
+        logging.error(f"Request error: {e.request.url} - {str(e)} - not sending notification to server.")
+    except Exception as e:
+        # Catch-all for any other exceptions
+        logging.error(f"Unexpected error: {type(e).__name__} - {str(e)}")
+        await notify_failure(callback_url, "Failed to upload files due to an unexpected error.")
 
-    if response.status_code != 200:
-        await notify_failure(callback_url, "Got an error back from the upload, after processing.")
+    finally:
+        # Cleanup: Remove the output file, temporary JSON file, and input file
+        for file_path in [input_file_path, output_file_path, json_filename]:
+            try:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                    logging.info(f"Removed file: {file_path}")
+            except Exception as e:
+                logging.error(f"Failed to remove file: {file_path}. Error: {e}")
 
-    # Cleanup: remove output file, temporary JSON file
-    os.remove(output_file_path)
-    os.remove(json_filename)
+        # Cleanup the notification JSON file if it was created
+        if json_filename_notify and os.path.exists(json_filename_notify):
+            try:
+                os.remove(json_filename_notify)
+                logging.info(f"Removed notification file: {json_filename_notify}")
+            except Exception as e:
+                logging.error(f"Failed to remove notification file: {json_filename_notify}. Error: {e}")
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
