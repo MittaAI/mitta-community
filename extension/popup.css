@@ -1,0 +1,13 @@
+body {
+    width: 200px;
+    padding: 10px;
+}
+
+#form {
+    display: flex;
+    flex-direction: column;
+}
+
+input, button {
+    margin-bottom: 10px;
+}

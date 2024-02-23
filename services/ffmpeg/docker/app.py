@@ -48,25 +48,16 @@ async def home_redirect():
 
 @app.route('/convert', methods=['POST'])
 async def convert():
-    logging.info(f"Current working directory: {os.getcwd()}")
-    logging.info(f"Base directory: {BASE_DIR}")
-    logging.info(f"Uploads directory: {UPLOAD_DIR}")
-
+    document = await request.get_json()
     ffmpeg_token = os.getenv('FFMPEG_TOKEN')
-    data = await request.get_json()
-    logging.info(f"/convert data: {data}")
-    
-    # token check
-    if not data.get('ffmpeg_token'):
-        return jsonify({'result': 'failed: must include token'})
-    else:
-        if data.get('ffmpeg_token') != ffmpeg_token:
-            return jsonify({'result': 'failed: bad token'})
-    
+
+    # Token check
+    if not document or document.get('ffmpeg_token') != ffmpeg_token:
+        return jsonify({'result': 'failed', 'reason': 'Invalid or missing token'}), 401
+    document.pop('ffmpeg_token')
+
     # parameters
-    user_id = data.get('user_id')
-    user_document = data.get('user_document', {})
-    logging.info(f"user_document: {user_document}")
+    username = data.get('username')
     file_url = data.get('mitta_uri')
     callback_url = data.get('callback_url')
     ffmpeg_command = data.get('ffmpeg_command')
@@ -78,20 +69,18 @@ async def convert():
         return jsonify({'result': 'failed: command stopped at security checkpoint. No callback will occur.'})
 
     # Creating user-specific directory\
-    user_dir = os.path.join(UPLOAD_DIR, user_id)
-    logging.info(f"User's directory: {user_dir}")
+    user_dir = os.path.join(UPLOAD_DIR, username)
     create_and_check_directory(user_dir)
 
     # Download the file
     local_file_path = await download_file(file_url, user_dir)
-    logging.info(f"local file path: {local_file_path}")
 
     # log the request
     logging.info(f"User request resulted in the command: {ffmpeg_command}")
     
     try:
         # Processing with FFmpeg
-        asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, input_file, output_file, user_id, user_document))
+        asyncio.create_task(run_ffmpeg(ffmpeg_command, user_dir, callback_url, input_file, output_file, username))
         return jsonify({'result': 'success'})
     except:
         return jsonify({'result': 'failed: task did not run'})
@@ -113,13 +102,7 @@ async def download_file(url, directory):
     return file_path
 
 
-async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, user_id, user_document):
-    logging.info(f"user_document: {user_document}")
-    logging.info(f"Current working directory: {os.getcwd()}")
-    logging.info(f"Uploads directory: {UPLOAD_DIR}")
-    logging.info(f"User directory: {user_directory}")
-    logging.info(f"Callback: {callback_url}")
-
+async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, output_file, username):
     # Split the command string into arguments
     args = shlex.split(ffmpeg_command)
 
@@ -131,7 +114,7 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
     # check both the input file and output file for ..
     # second step of security handling
     if any(s in output_file for s in ["/", ".."]) or any(s in input_file for s in ["/", ".."]):
-        await notify_failure(callback_url, user_document, 'failed: command stopped at security checkpoint')
+        await notify_failure(callback_url, 'failed: command stopped at security checkpoint')
 
     # Update paths for the input and output files within the command arguments
     if input_file in args:
@@ -145,18 +128,15 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
     # Add 'ffmpeg' back at the beginning of the command
     args = ['ffmpeg'] + args
 
+    # log for security tracking
     logging.info(f"Final command list: {args}")
-    logging.info(f"ffmpeg_command is: {ffmpeg_command}")
-
-    # change to logging
+    logging.info(f"FFmpeg_command is: {ffmpeg_command}")
     logging.info(f"Executing FFmpeg command in {user_directory}: {''.join(ffmpeg_command)}")
 
     try:
-        # Execute the FFmpeg command without changing the global working directory
-        # process = subprocess.run(' '.join(ffmpeg_command), cwd=user_directory, shell=True, capture_output=True, text=True)
-
+        # run FFmpeg
         process = subprocess.run(args, cwd=user_directory, capture_output=True, text=True)
-        logging.info("subprocess ran")
+
         # Handle FFmpeg execution result
         if process.returncode != 0:
             # FFmpeg command failed, manually raise an exception
@@ -165,13 +145,13 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
 
     except subprocess.CalledProcessError as e:
         # Handle FFmpeg failure
-        user_document['bad_ffmpeg_command'] = ffmpeg_command
-        await notify_failure(callback_url, user_document, f"FFmpeg command failed: {e.stderr}")
+        logging.info(e)
+        await notify_failure(callback_url, f"FFmpeg command failed: {ffmpeg_command}")
 
     except Exception as e:
         logging.info(e)
         # Catch-all for any other exceptions during the process
-        await notify_failure(callback_url, user_document, f"FFmpeg command failed: An unexpected error occurred.")
+        await notify_failure(callback_url, f"FFmpeg command failed: An unexpected error occurred.")
 
     try:
         # Success path: Check for the output file and proceed with upload
@@ -187,9 +167,8 @@ async def run_ffmpeg(ffmpeg_command, user_directory, callback_url, input_file, o
         await notify_failure(callback_url, user_document, f"FFmpeg ran successfully, but failed to upload the file.")
 
 
-def prepare_json_data(user_document, message=None, output_file=None):
+def prepare_json_data(message=None, output_file=None):
     json_data = {
-        'user_document': user_document
     }
     if message:
         json_data['ffmpeg_result'] = message
@@ -204,7 +183,7 @@ def prepare_json_data(user_document, message=None, output_file=None):
     return json_filename
 
 
-async def notify_failure(callback_url, user_document, message=None):
+async def notify_failure(callback_url, message=None):
     logging.info(f"Notifying failure: {message}")
     json_filename = prepare_json_data(user_document, message)
     
@@ -216,10 +195,10 @@ async def notify_failure(callback_url, user_document, message=None):
     os.remove(json_filename)
 
 
-async def upload_file(callback_url, output_file, output_file_path, user_document):
+async def upload_file(callback_url, output_file, output_file_path):
     logging.info(f"output_file: {output_file}")
 
-    json_filename = prepare_json_data(user_document, output_file=output_file)
+    json_filename = prepare_json_data(output_file=output_file)
     logging.info(f"JSON filename: {json_filename}")
 
     # Guess the MIME type of the file based on its extension
@@ -236,7 +215,7 @@ async def upload_file(callback_url, output_file, output_file_path, user_document
                 'json_data': ('json_data.json', json_f, 'application/json')
             }
             response = await client.post(callback_url, files=files)
-    logging.info(response.json())
+
     if response.status_code != 200:
         await notify_failure(callback_url, user_document, "Failed to upload the file after FFmpeg processing.")
 

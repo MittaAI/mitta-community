@@ -1,0 +1,32 @@
+{
+  "name": "MittaAI Screenshot Uploader",
+  "version": "0.2.1",
+  "description": "Capture and upload screenshots directly to MittaAI pipelines.",
+  "manifest_version": 3,
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "https://mitta.ai/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "/assets/icon-16.png",
+      "32": "/assets/icon-32.png",
+      "48": "/assets/icon-48.png",
+      "128": "/assets/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "/assets/icon-16.png",
+    "32": "/assets/icon-32.png",
+    "48": "/assets/icon-48.png",
+    "128": "/assets/icon-128.png"
+  }
+}
