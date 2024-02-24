@@ -1,6 +1,6 @@
 {
-    "imageName": "dreams-service",
-    "containerName": "dreams-container",
+    "imageName": "convert-service",
+    "containerName": "convert-container",
     "MITTA_TOKEN": "<mitta_token>",
     "MITTA_PIPELINE": "<mitta_pipeline_id>",
     "MITTA_DEV": "True"

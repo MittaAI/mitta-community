@@ -12,13 +12,13 @@
   <meta property="og:image" content="https://dreams.mitta.ai/static/card.png" />
   <meta property="og:description" content="Discover hidden treasures and navigate pirate lore through insights provided by island natives. Interactive exploration powered by MittaAI." />
   <meta property="og:url" content="https://dreams.mitta.ai" />
-  <meta property="og:title" content="MittaAI | Pirate Dreams" />
+  <meta property="og:title" content="MittaAI Pirate Dreams" />
   <meta property="article:published_time" content="{{current_date}}" />
   <meta name="author" content="MittaAI">
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@mittacorp" />
-  <meta name="twitter:title" content="Mitta AI | Dreams" />
+  <meta name="twitter:title" content="MittaAI Pirate Dreams" />
   <meta name="twitter:description" content="Discover hidden treasures and navigate pirate lore through insights provided by island natives. Experience powered by MittaAI." />
   <meta name="twitter:image" content="https://dreams.mitta.ai/static/card.png" />
 
@@ -36,7 +36,7 @@
 <div class="container-fluid dreams">
   <div class="row">
     <div class="col-lg-12">
-      <h1 id="mitta"><span class="greater-than">&gt;</span> AI Dreams</h1>
+      <h1 id="mitta"><span class="greater-than">&gt;</span> AI Pirate Dreams</h1>
       <p style="display: none;" id="comms"></p>
       <div style="display: none;" id="controls">
         <div class="mb-3 inputs">
@@ -52,15 +52,10 @@
         <button class="btn btn-outline-dark" id="clear-history-button">Clear History</button>
         <div id="button-container" class="mt-2"></div>
       </div>
-      <!-- Image holder for visual feedback -->
       <div class="rounded mt-4">
         <img id="image" src="/static/{{pirate_filename}}" alt="Dreams Image" style="border-radius: 15px; max-width: 100%; height: auto;">
       </div>
-
-      <!-- Comms from pirate -->
-      <div id="story">
-      </div>
-
+      <div id="story"></div>
     </div>
   </div>
 </div>
@@ -73,14 +68,13 @@ $(document).ready(function() {
 
   // Get the UUID
   var uuid = getCookie('uuid');
-  console.log(uuid);
 
   // default message
   var defaultMessage = "Discover hidden treasures and unravel pirate lore! You are a pirate who has just awakened on a desert island. Select a thought or write your own and then click <strong>dream</strong>.";
   setTimeout(function() {
-    $('#comms').html(defaultMessage).fadeIn(1500);
-    $('#controls').delay(4000).fadeIn(1500);
-  }, 3000);
+    $('#comms').html(defaultMessage).fadeIn(500);
+    $('#controls').delay(4000).fadeIn(1000);
+  }, 1500);
   
   // Function to set a cookie
   function setCookie(name, value, days) {
@@ -132,10 +126,6 @@ $(document).ready(function() {
     $('#instructionInput').val(savedInstructions[0]);
   }
 
-  var resetTimer;
-  resetTimer = setTimeout(function() {
-  }, 30000);
-
   function loadImage(access_uri) {
       var img = $('<img/>', {
           src: access_uri,
@@ -155,10 +145,10 @@ $(document).ready(function() {
     var instruction = $('#instructionInput').val();
 
     var formData = new FormData();
-    formData.append('instructions', instruction); // Ensure this matches your backend's expected key
+    formData.append('instructions', instruction);
 
     // Optionally append UUID if it exists
-    var uuid = getCookie('uuid'); // Assuming getCookie is correctly implemented
+    var uuid = getCookie('uuid');
     if (uuid) {
       formData.append('uuid', uuid);
     }
@@ -273,7 +263,7 @@ $(document).ready(function() {
         ws.send(JSON.stringify({uuid: uuid}));
       } else {
         // No cookie for UUID
-        console.log("sending empty payload");
+        console.log("Sending empty payload");
         ws.send(JSON.stringify({}));
       }
     };
@@ -398,8 +388,8 @@ $(document).ready(function() {
         $('#image').fadeOut('slow');
         $('#story').fadeOut('slow');
       }, 360000); // six minutes
-    
-    };
+  
+    }
   }
 
   // Websocket reconnect functions

@@ -3,8 +3,6 @@ This is the community repository for MittaAI and SlothAI users. All code or exam
 
 The SlothAI framework, which runs MittaAI, is located [here](https://github.com/MittaAI/SlothAI).
 
-There is a [Discord server](https://discord.gg/SxwcVGQ8j9) available for help with building or running pipelines.
-
 ## Getting Started Video
 Before you begin, we recommend watching the Getting Started video guide. This guide will help you become familiar with important concepts such as callbacks, storage, and how to use pipelines effectively.
 

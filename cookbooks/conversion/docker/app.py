@@ -1,7 +1,11 @@
 import os
 import json
+import base64
 import logging
 import datetime
+import random
+import asyncio
+from urllib.parse import urlparse, unquote
 
 from uuid import uuid4
 
@@ -10,12 +14,12 @@ from quart_cors import cors
 import httpx
 
 app = Quart(__name__, static_folder='static')
-app = cors(app, allow_origin=["https://logailytics.pizza", "https://ai.mitta.ai"])
+app = cors(app, allow_origin=["http://localhost:5000", "https://convert.mitta.ai"])
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-@app.route('/convert/static/<path:filename>')
+@app.route('/static/<path:filename>')
 async def custom_static(filename):
     static_folder_path = app.static_folder
     file_path = os.path.join(static_folder_path, filename)
@@ -23,11 +27,6 @@ async def custom_static(filename):
 
 
 @app.route('/', methods=['GET', 'POST'])
-async def home():
-    return redirect("https://mitta.ai")
-
-
-@app.route('/convert', methods=['GET', 'POST'])
 async def convert():
     # Initialize the default instructions
     instructions = [
@@ -55,6 +54,7 @@ async def convert():
         "Normalize audio in a video file"
     ]
 
+
     if request.method == 'POST':
         form_data = await request.form
         posted_instruction = form_data.get('instructions')
@@ -63,9 +63,12 @@ async def convert():
         if posted_instruction and posted_instruction not in instructions:
             instructions.insert(0, posted_instruction)
 
+    # encode instructions
+    encoded_instructions = base64.b64encode(json.dumps(instructions).encode('utf-8')).decode('utf-8')
+
     # Pass the (possibly updated) instructions list to the template
     current_date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00") # card publish
-    return await render_template('index.html', instructions=instructions, current_date=current_date)
+    return await render_template('index.html', instructions=encoded_instructions, current_date=current_date)
 
 
 @app.route('/upload', methods=['POST'])
@@ -75,22 +78,32 @@ async def upload():
         form_data = await request.form
         instructions = form_data.get('instructions', 'Convert to a 640 wide gif')
         uuid = form_data.get('uuid')
+        if isinstance(uuid, list):
+            uuid = uuid[0]
         
         # Log the received instructions for debugging
-        logging.info(f"Received instructions: {instructions}")
+        logging.info(f"Received instructions '{instructions}' from '{uuid}'")
+
+        # Define the endpoint and token
+        pipeline = os.getenv('MITTA_PIPELINE')
+        mitta_token = os.getenv('MITTA_TOKEN')
+
+        # App Callback to /callback below
+        if os.getenv('MITTA_DEV') == "True":
+            app_callback = f"https://mitta-convert.ngrok.io/callback?token={mitta_token}"
+        else:
+            app_callback = f"https://convert.mitta.ai/callback?token={mitta_token}"
 
         # Prepare the JSON payload and encode it into bytes
         # httpx recent versions may not like non-encoded payloads
         json_data = {
-            "user_document": {"uuid": uuid},
-            "ffmpeg_request": instructions
+            "uuid": uuid,
+            "ffmpeg_request": instructions,
+            "app_callback_uri": app_callback
         }
 
         with open(f'json_data_{uuid}.json', 'w') as json_file:
             json.dump(json_data, json_file)
-
-        # logging.info(f"Sending json_data: {json_data}")
-        # logging.info(f"File content_type is {file.content_type}")
 
         # Prepare the file to be uploaded to the external handler
         files = {
@@ -98,27 +111,26 @@ async def upload():
             'json_data': ('json_data.json', open(f'json_data_{uuid}.json', 'rb'), 'application/json')
         }
 
-        # Define the endpoint and token
-        pipeline = os.getenv('FFMPEG_PIPELINE')
-        mitta_token = os.getenv('MITTA_TOKEN')
+        # Mitta Pipeline URL
         url = f"https://mitta.ai/pipeline/{pipeline}/task?token={mitta_token}"
-        logging.info(url)
+
         # Send the file using httpx
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(url, files=files)
 
         # remove the file
         os.remove(f'json_data_{uuid}.json')
-        logging.info(response.status_code)
+
         # Check the response from the external handler
         if response.status_code == 200:
             print(f"JSON task response: {response.json()}")
             await broadcast({"status": "success", "message": "File uploaded successfully!"}, uuid)
             return jsonify({"status": "success", "message": "File uploaded successfully"}), 200
         else:
-            await broadcast({"status": "success", "message": "File upload failed, sorry."})
-            return jsonify({"status": "error", "message": "Failed to upload file"}), 401
+            await broadcast({"status": "success", "message": "File upload failed. Try again in a few seconds."}, uuid)
+            return jsonify({"status": "error", "message": "Failed to upload file"}), 500
 
+    await broadcast({"status": "error", "message": "No file received."}, uuid)
     return jsonify({"status": "error", "message": "No file received"}), 404
 
 
@@ -128,6 +140,18 @@ async def callback():
     logging.info("in callback")
     logging.info(data)
 
+    # Define the token
+    mitta_token = os.getenv('MITTA_TOKEN')
+
+    # Compare the provided token with the expected token
+    token = request.args.get('token', default=None)
+
+    # check the tokens match
+    if token != mitta_token:
+        logging.info("Authentication failed")
+        # If tokens do not match, return an error response
+        return jsonify({'status': 'error', 'message': "Authentication failed"}), 401
+
     # uuid and message
     message = "Processing."  # Default message
 
@@ -136,28 +160,28 @@ async def callback():
         if 'message' in key:
             message = value
 
-    # Other variables
-    convert_uris = data.get('convert_uri', [])
-    user_document = data.get('user_document', {})
+    # Other variables, all exepected to be lists
+    access_uris = data.get('access_uri', [])
+    uuid = data.get('uuid', [])
     filenames = data.get('filename', [])
+    ffmpeg_results = data.get('ffmpeg_result', [])
 
-    # Check if convert_uri is provided and download the file
-    if convert_uris:
-        logging.info("in if convert_uris")
+    # Check if access_uris is provided and download the file
+    if access_uris:
         # Ensure the download directory exists
         download_dir = 'download'
         os.makedirs(download_dir, exist_ok=True)
 
         # Download the first file in the list
-        convert_uri = convert_uris[0]
+        access_uri = access_uris[0]
         if filenames:
             # use the first file only
             filename = filenames[0]
             filepath = os.path.join(download_dir, filename)
 
             async with httpx.AsyncClient() as client:
-                mitta_token = os.getenv('MITTA_TOKEN')
-                mitta_url = f"{convert_uri}?token={mitta_token}"
+                mitta_url = f"{access_uri}?token={mitta_token}"
+                logging.info(mitta_url)
                 response = await client.get(mitta_url)
 
                 if response.status_code == 200:
@@ -165,30 +189,42 @@ async def callback():
                         f.write(response.content)
                     # logging.info(f"File downloaded successfully: {filepath}")
                 else:
-                    logging.error(f"Failed to download file from {convert_uri}")
-                    return jsonify({"status": "failed"}), 404
+                    logging.error(f"Failed to download file from {access_uri}")
+                    return jsonify({"status": "error"}), 404
 
-            convert_uri = f"https://ai.mitta.ai/download/{filename}"
-            logging.info(convert_uri)
+            if os.getenv('MITTA_DEV') == "True":
+                access_uri = f"https://mitta-convert.ngrok.io/download/{filename}"
+            else:
+                access_uri = f"https://convert.mitta.ai/download/{filename}"
+
+            message = "File is ready for download."
         else:
             filename = ''
-            convert_uri = ''
+            access_uri = ''
     else:
-        convert_uri = ''
+        access_uri = ''
         filename = ''
 
-    if isinstance(user_document, dict):
-        uuid = user_document.get('uuid', 'anonymous')
+    # grab errors
+    if ffmpeg_results:
+        ffmpeg_result = ffmpeg_results[0]
     else:
-        uuid = 'anonymous'
+        ffmpeg_result = ""
 
-    # logging.info(f"uuid: {uuid}")
+    if isinstance(uuid, list):
+        try:
+            uuid = uuid[0]
+        except:
+            uuid = "anonymous"
+    if not uuid:
+        uuid = "anonymous"
 
     await broadcast(
         {
             "status": "success", 
             "message": message, 
-            "convert_uri": convert_uri,
+            "access_uri": access_uri,
+            "ffmpeg_result": ffmpeg_result,
             "filename": filename
         }, 
         recipient_id=uuid
@@ -203,7 +239,7 @@ from quart import send_from_directory
 
 @app.route('/download/<filename>')
 async def download_file(filename):
-    download_dir = 'download'  # Same directory you used for saving the files
+    download_dir = 'download'  # Same directory we used for saving the files
     return await send_from_directory(download_dir, filename, as_attachment=True)
 
 
@@ -224,8 +260,9 @@ async def ws():
 
 
 async def broadcast(message, recipient_id=None):
+    # TODO - needs to be rewritten to use pub/sub
+    # Otherwise, if the callback comes into another container, it will fail
     if recipient_id:
-        # If a recipient ID is provided, only send to that WebSocket
         ws = connected_websockets.get(recipient_id)
         if ws:
             await ws.send_json(message)

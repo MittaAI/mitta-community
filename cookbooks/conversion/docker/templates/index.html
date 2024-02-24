@@ -4,31 +4,31 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
  
-  <title>MittaAI | FFmpeg</title>
+  <title>MittaAI | Convert</title>
 
   <meta name="description" content="Converts images and media files to a new file using plain text requests. AI pipeline powered by MittaAI." />
-  <meta name="image" content="https://ai.mitta.ai/convert/static/card.png">
+  <meta name="image" content="https://convert.mitta.ai/static/card.png">
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://ai.mitta.ai/convert/static/card.png" />
+  <meta property="og:image" content="https://convert.mitta.ai/static/card.png" />
   <meta property="og:description" content="Converts images and media files to a new file using plain text requests. AI pipeline powered by MittaAI." />
-  <meta property="og:url" content="https://ai.mitta.ai/convert" />
-  <meta property="og:title" content="MittaAI FFmpeg" />
+  <meta property="og:url" content="https://convert.mitta.ai" />
+  <meta property="og:title" content="MittaAI Conversion" />
   <meta property="article:published_time" content="{{current_date}}" />
   <meta name="author" content="MittaAI">
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@mittacorp" />
-  <meta name="twitter:title" content="Mitta AI FFmpeg" />
+  <meta name="twitter:title" content="MittaAI Conversion" />
   <meta name="twitter:description" content="Converts images and media files to a new file using plain text requests. AI pipeline powered by MittaAI." />
-  <meta name="twitter:image" content="https://ai.mitta.ai/convert/static/card.png" />
+  <meta name="twitter:image" content="https://convert.mitta.ai/static/card.png" />
 
-  <link rel="shortcut icon" href="/convert/static/favicon.ico">
+  <link rel="shortcut icon" href="/static/favicon.ico">
 
-  <link rel="stylesheet" href="/convert/static/bootstrap.min.css">
-  <link rel="stylesheet" href="/convert/static/style.css?version=1.6">
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/style.css?version=1.6">
 
-  <script src="/convert/static/popper.min.js"></script>
-  <script src="/convert/static/jquery.min.js"></script>
+  <script src="/static/popper.min.js"></script>
+  <script src="/static/jquery.min.js"></script>
 </head>
 
 <body>
@@ -36,22 +36,21 @@
 <div class="container-fluid convert">
   <div class="row">
     <div class="col-lg-12">
-      <h1 id="mitta"><span class="greater-than">&gt;</span> AI FFmpeg</h1>
-      <p id="comms">Converts images or media files to a new file using plain text requests. Select a conversion request from the list or enter your own, then click upload to choose a file.</p>
-      <div class="mb-3 inputs">
-        <div class="input-group">
-          <input type="text" class="form-control" id="instructionInput">
-          <div class="input-group-append">
-            <button class="btn btn-outline-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-            <div class="dropdown-menu">
-              {% for instruction in instructions %}
-              <a class="dropdown-item" href="#">{{ instruction }}</a>
-              {% endfor %}
+      <h1 id="mitta"><span class="greater-than">&gt;</span> AI Convert</h1>
+      <p style="display: none;" id="comms"></p>
+      <div style="display: none;" id="controls">
+        <div class="mb-3 inputs">
+          <div class="input-group">
+            <input type="text" class="form-control" id="instructionInput">
+            <div class="input-group-append">
+              <button class="btn btn-outline-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+              <div class="dropdown-menu"></div>
             </div>
           </div>
         </div>
+        <button class="btn btn-primary" id="embark-button">Upload & Process</button>
+        <button class="btn btn-outline-dark" id="clear-history-button">Clear History</button>
       </div>
-      <button class="btn btn-primary" id="file-upload-button">Upload & Process</button>
     </div>
   </div>
   <input type="file" id="fileInput" style="display: none;">
@@ -59,18 +58,19 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  // doesn't work with local docker?
+  // WebSocket setup for server communication
   var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-  var hostname = window.location.protocol === 'https:' ? 'ai.mitta.ai' : 'localhost:5000';
+  var hostname = window.location.protocol === 'https:' ? 'convert.mitta.ai' : 'localhost:5000';
 
-  // assemble websocket
-  console.log(protocol, hostname);
-  var ws = new WebSocket(protocol + hostname + "/ws");
-  var uuid = '';
+  // Get the UUID
+  var uuid = getCookie('uuid');
 
-  ws.onopen = function() {
-    console.log("WebSocket connection established");
-  };
+  // default message
+  if (!uuid) {
+    var defaultMessage = "This tool converts images or media files to other formats using plain text requests. Select a conversion request from the pulldown or enter your own, then click <strong>'upload & process'</strong> to choose a file.";
+  } else {
+    var defaultMessage = "Welcome back! What can I convert for you?";
+  }
 
   // Function to set a cookie
   function setCookie(name, value, days) {
@@ -95,101 +95,99 @@ $(document).ready(function() {
       return null;
   }
 
-  // Load instructions from the cookie and prepend them to the dropdown
+  // take server instructions, merge with cookies and set the dropdown
+  var serverInstructions = "{{ instructions }}";
+  var decodedServerInstructions = atob(serverInstructions);
+  var serverInstructionsArray = JSON.parse(decodedServerInstructions);
   var savedInstructions = getCookie('instructions');
-  var serverInstructions = {{ instructions | tojson }};
 
   if (savedInstructions) {
     savedInstructions = JSON.parse(savedInstructions);
-
     savedInstructions.forEach(function(instruction) {
       $('.dropdown-menu').prepend('<a class="dropdown-item" href="#">' + instruction + '</a>');
-      // Remove this instruction from serverInstructions if it exists
-      var index = serverInstructions.indexOf(instruction);
+      var index = serverInstructionsArray.indexOf(instruction);
       if (index > -1) {
-        serverInstructions.splice(index, 1);
+        serverInstructionsArray.splice(index, 1);
       }
     });
   }
 
-  // Append remaining server instructions to the dropdown
-  serverInstructions.forEach(function(instruction) {
+  serverInstructionsArray.forEach(function(instruction) {
     $('.dropdown-menu').append('<a class="dropdown-item" href="#">' + instruction + '</a>');
   });
 
-  var resetTimer;
-  resetTimer = setTimeout(function() {
-    $('#comms').text(comms);
-  }, 30000);
-
-  var comms = $('#comms').text();
-
-  ws.onmessage = function(event) {
-    console.log("Received a message")
-    var data = JSON.parse(event.data);
-
-    // look for the UUID
-    if (data.uuid) {
-      uuid = data.uuid;
-      if (uuid == 'anonymous') {
-        // reload page to get new socket
-        window.location.reload();
-      }
-    }
-
-    // update comms messages
-    if (data.message) {
-      $('#comms').fadeOut('slow', function() {
-        $(this).text(data.message).fadeIn('slow');
-      });
-    }
-
-    clearTimeout(resetTimer);
-    resetTimer = setTimeout(function() {
-      $('#comms').text(comms);
-    }, 30000);
-
-    // show file
-    if (data.convert_uri && data.convert_uri != '') {
-      console.log("Downloading " + data.filename + " from " + data.convert_uri);
-      downloadFile(data.convert_uri, data.filename);
-    } else {
-      console.log(data);
-    }
+  if (serverInstructionsArray.length > 0) {
+    $('#instructionInput').val(serverInstructionsArray[0]);
+  } else if (savedInstructions && savedInstructions.length > 0) {
+    $('#instructionInput').val(savedInstructions[0]);
   }
 
-  ws.onclose = function() {
-    console.log("WebSocket connection closed");
-    window.location.reload();
-  };
 
-  function downloadFile(url, filename) {
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    console.log("Download initiated for: " + filename);
-  }
+  // Click handlers
+  // --------------
 
-  // default instructions
-  $('#instructionInput').val("{{instructions[0]}}");
+  // User clicked upload or hit enter
+  $('#embark-button').on('click', function() {
+    $('#comms').fadeOut('slow');
 
-  // click handlers
+    // Retrieve the instruction and create FormData
+    var instruction = $('#instructionInput').val();
+
+    var formData = new FormData();
+    formData.append('instructions', instruction);
+
+    // Optionally append UUID if it exists
+    var uuid = getCookie('uuid');
+    if (uuid) {
+      formData.append('uuid', uuid);
+    }
+
+    // Update or create 'instructions' cookie
+    var savedInstructions = getCookie('instructions') ? JSON.parse(getCookie('instructions')) : [];
+    if (!savedInstructions.includes(instruction)) {
+      savedInstructions.push(instruction);
+      setCookie('instructions', JSON.stringify(savedInstructions), 7); // Save for 7 days
+    }
+
+    // Trigger the file input
+    $('#fileInput').trigger('click');
+  });
+
+  // File input trigger
+  $('#fileInput').on('change', function() {
+      handleFileChange();
+  });
+
   $(document).on('click', function(event) {
     if (!$(event.target).closest('#instructionInput, .dropdown-menu, .dropdown-menu a, #mitta, #file-upload-button, #fileInput, .dropdown-toggle').length) {
       $('.dropdown-menu').hide();
     }
   });
 
-  $('.dropdown-menu a').click(function() {
-    $('#instructionInput').val($(this).text());
-    $('.dropdown-menu').hide();
+  // Clear the 'instructions' cookie by setting its expiration date to the past
+  $('#clear-history-button').on('click', function() {
+    console.log("Clearing history.");
+    document.cookie = 'instructions=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    window.location.reload();
   });
 
+  $('#instructionInput').keydown(function(event) {
+    if (event.which == 13) { // 13 is the key code for Enter
+        event.preventDefault(); // Prevent the default action to stop submitting the form in a traditional way
+        $('#embark-button').click(); // Trigger the click event on the submit button
+    }
+  });
+
+  // Advertising
   $('#mitta').on('click', function() {
-    window.location = "https://mitta.ai"
+    window.location = "https://mitta.ai";
+  });
+
+  // Dropdown handlers
+  $('.dropdown-menu a').click(function() {
+    event.preventDefault();
+    $('#instructionInput').val($(this).text());
+    $('.dropdown-menu').hide();
   });
 
   $('#instructionInput').on('click', function() {
@@ -200,19 +198,15 @@ $(document).ready(function() {
     $('.dropdown-menu').hide();
   });
 
-  $('#file-upload-button').on('click', function() {
-      $('#fileInput').trigger('click');
-  });
-
-  $('#fileInput').on('change', function() {
-      handleFileChange();
-  });
-
   $('.dropdown-toggle').on('click', function() {
     $('.dropdown-menu').toggle();
   });
 
-  // file change handler and upload
+
+  // Functions
+  // --------------
+
+  // Upload handler
   function handleFileChange() {
     var fileInput = $('#fileInput')[0];
     if (fileInput.files && fileInput.files[0]) {
@@ -258,6 +252,108 @@ $(document).ready(function() {
       });
     }
   }
+
+  // Websockets
+  function connectWebSocket() {
+    // Create websocket
+    ws = new WebSocket(protocol + hostname + "/ws");
+    
+    // Open Websocket
+    ws.onopen = function() {
+      console.log("WebSocket connection established");
+      retryCount = 0;
+      if (uuid) {
+        ws.send(JSON.stringify({uuid: uuid}));
+      } else {
+        // No cookie for UUID
+        console.log("Sending empty payload");
+        ws.send(JSON.stringify({}));
+      }
+    };
+
+    // Closed websocket
+    ws.onclose = function() {
+      console.log("WebSocket connection closed");
+      $('#comms').html(defaultMessage).fadeIn(1500);
+      attemptReconnect();
+    };
+
+    // Message websocket
+    ws.onmessage = function(event) {
+      var data = JSON.parse(event.data);
+      // log data
+      console.log(data);
+
+      // look for the UUID
+      if (data.uuid && data.uuid !== uuid) {
+          uuid = data.uuid;
+          setCookie('uuid', uuid, 7); // Store the UUID in a cookie for 7 days
+          console.log("Logged in with UUID: " + uuid);
+          $('#comms').html("Standby, I'm establishing a connection with the server.").fadeIn(500);
+          setTimeout(function() {
+            $('#comms').html(defaultMessage).delay(2000).fadeIn(1000);
+            $('#controls').fadeIn(250);
+          }, 1500);
+      }
+
+      if (data.message) {
+        $('#comms').html(data.message).fadeIn(500);
+      }
+
+      if (data.access_uri && data.filename) {
+        downloadFile(data.access_uri, data.filename)
+      }
+
+      if (data.ffmpeg_result) {
+        $('#comms').html("Something went wrong with the conversion. Try again in a minute.").fadeIn(500);
+        setTimeout(function() {
+          defaultMessage = "What else can I try to convert for you?";
+          $('#comms').html(defaultMessage).fadeIn(1000);
+        }, 1500);
+      }
+    }
+  }
+
+  function downloadFile(url, filename) {
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // Update the '#comms' element to indicate that the download has started
+    $('#comms').html("Downloading " + filename + ".").fadeIn(500);
+
+    // Set a timeout to clear the message and replace it with 'defaultMessage' after 4 seconds
+    setTimeout(function() {
+      // Assuming 'defaultMessage' is defined elsewhere and accessible here
+      defaultMessage = "What can I convert for you?";
+      $('#comms').html(defaultMessage).fadeIn(500);    
+    }, 6000);
+  }
+
+  // Websocket reconnect functions
+  function attemptReconnect() {
+      var delay = calculateBackoff(retryCount);
+      setTimeout(function() {
+          console.log(`Attempting to reconnect. Try #${retryCount + 1}`);
+          retryCount++;
+          connectWebSocket();
+      }, delay);
+  }
+
+  function calculateBackoff(retryCount) {
+      // Exponential backoff formula
+      var maxDelay = 30000; // Maximum delay of 30 seconds
+      var baseDelay = 1000; // Initial delay of 1 second
+      var delay = Math.min(baseDelay * Math.pow(2, retryCount), maxDelay);
+      return delay;
+  }
+
+  // Fire up the sockets
+  connectWebSocket();
+
 });
 
 </script>

@@ -109,6 +109,7 @@ input {
 #comms {
   color: #f4e8c1;
 }
+
 #comms, #story {
   max-width: 480px;
   min-width: 480px;

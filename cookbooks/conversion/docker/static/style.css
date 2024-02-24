@@ -1,13 +1,13 @@
 @font-face {
   font-family: 'Orbitron Regular';
-  src: url('/convert/static/Orbitron-Regular.ttf') format('truetype');
+  src: url('/static/Orbitron-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Silka Regular';
-  src: url('/convert/static/silka-regular-webfont.ttf') format('truetype');
+  src: url('/static/silka-regular-webfont.ttf') format('truetype');
 }
 
 body {
@@ -53,6 +53,7 @@ input {
   align-items: center;
   color: #f4f4f4;
   padding: 20px;
+  transition:  all 0.5s ease;
 }
 
 .inputs {
@@ -64,8 +65,16 @@ input {
 }
 
 .dropdown-menu {
-  max-height: 200px; /* Adjust the height as needed */
-  overflow-y: auto;  /* Enable vertical scrolling */
+  max-width: 480px; /* Adjust this value based on your design requirements */
+  max-height: 320px; /* Adjust the height as needed */
+  overflow-y: auto; /* Enable vertical scrolling for overflow content */
+  overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+.dropdown-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds an ellipsis (...) at the end of the text if it overflows */
 }
 
 .input-group-text {
@@ -82,8 +91,16 @@ input {
   flex-shrink: 0;
 }
 
+#controls {
+  min-width: 480px;
+}
+
 #mitta {
   cursor: pointer;
+}
+
+#comms {
+  color: #f4e8c1;
 }
 
 #comms {
@@ -99,12 +116,26 @@ input {
 }
 
 @media only screen and (max-width: 480px) {
-  #comms {
+  #comms, #image, #story {
     max-width: 320px;
     min-width: 320px;
   }
-  .dropdown-menu {
-    max-width: 320px;
+  
+  .convert {
+    align-items: stretch;
   }
+  
+  #controls {
+    min-width: 320px;
+    max-width: 320px;
+    overflow: hidden; /* Ensures content does not overflow the dropdown menu */
+  }
+
+  .dropdown-item {
+    min-width: 240px;
+    max-width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds an ellipsis (...) for overflowing text */
   }
 }

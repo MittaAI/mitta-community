@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2023 and Kord Campbell
+Copyright (c) 2023 Kord Campbell
 
 Instructions for Using the PDF Splitter:
 
