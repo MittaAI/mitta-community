@@ -10,7 +10,7 @@ from quart_cors import cors
 import httpx
 
 app = Quart(__name__, static_folder='static')
-app = cors(app, allow_origin=["https://72f3-173-174-35-128.ngrok-free.app", "https://news.mitta.ai"])
+app = cors(app, allow_origin=["https://localhost:5000", "https://news.mitta.ai"])
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -23,11 +23,6 @@ async def custom_static(filename):
 
 
 @app.route('/', methods=['GET', 'POST'])
-async def home():
-    return redirect("https://mitta.ai")
-
-
-@app.route('/news', methods=['GET', 'POST'])
 async def crawl():
     # Initialize the default instructions
     instructions = [
