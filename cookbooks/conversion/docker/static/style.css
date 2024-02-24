@@ -128,14 +128,12 @@ input {
   #controls {
     min-width: 320px;
     max-width: 320px;
-    overflow: hidden; /* Ensures content does not overflow the dropdown menu */
   }
 
   .dropdown-item {
     min-width: 240px;
     max-width: 320px;
     white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis; /* Adds an ellipsis (...) for overflowing text */
   }
 }
