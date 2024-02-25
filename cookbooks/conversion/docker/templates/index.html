@@ -122,6 +122,11 @@ $(document).ready(function() {
     $('#instructionInput').val(savedInstructions[0]);
   }
 
+  function calculateNewHeight() {
+    var dropdownHeight = $('.dropdown-menu').outerHeight();
+    var additionalSpacing = 20; // Extra spacing for aesthetic purposes
+    return dropdownHeight + additionalSpacing;
+  }
 
   // Click handlers
   // --------------
@@ -213,6 +218,10 @@ $(document).ready(function() {
   // Functions
   // --------------
 
+  // set timout variables
+  var messageTimeout;
+  var shortTimeout;
+
   // Upload handler
   function handleFileChange() {
     var fileInput = $('#fileInput')[0];
@@ -249,7 +258,29 @@ $(document).ready(function() {
         success: function(response) {
           console.log("File uploaded successfully");
           $('#comms').val("File uploaded.");
-          $('#fileInput').val('');;
+          $('#fileInput').val('');
+          
+          // clear any existing timeouts
+          clearTimeout(messageTimeout);
+          clearTimeout(shortTimeout);
+
+          // Start a new 30-second timer
+          if (!messageTimeout) {
+            messageTimeout = setTimeout(function() {
+              // This function runs after 30 seconds if not cleared
+              $('#comms').html("I'm sorry, but your request has timed out. Try again with a different request in a few seconds.").fadeIn(500);
+            }, 45000); // 45 seconds
+          }
+
+          // Additionally, set a 15-second notification
+          if (!shortTimeout) {
+            shortTimeout = setTimeout(function() {
+              // Check if the messageTimeout hasn't been cleared yet
+              if (messageTimeout) {
+                $('#comms').html("Still working on it...30 seconds remaining before timeout.").fadeIn(500);
+              }
+            }, 15000); // 15 seconds
+          }
         },
         error: function(xhr, status, error) {
           console.log("Error in file upload:", status, error);
@@ -303,12 +334,26 @@ $(document).ready(function() {
           }, 1500);
       }
 
-      if (data.message) {
-        $('#comms').html(data.message).fadeIn(500);
+      if (data.ffmpeg_result) {
+        $('#comms').html("The file conversion processs failed. More information is in the console log, if you are familar with that sort of thing. Try using a different file or request.");
+        return;
       }
 
+      if (data.message) {
+        $('#comms').html(data.message).fadeIn(500);
+
+        // Clear any existing timeout to avoid multiple timers running
+        clearTimeout(messageTimeout);
+        clearTimeout(shortTimeout);
+      }
+
+      // When an access_uri and filename are received
       if (data.access_uri && data.filename) {
-        downloadFile(data.access_uri, data.filename)
+        downloadFile(data.access_uri, data.filename);
+        
+        // Clear the timeout as we've received the file
+        clearTimeout(messageTimeout);
+        clearTimeout(shortTimeout);
       }
 
       if (data.ffmpeg_result) {
@@ -316,7 +361,7 @@ $(document).ready(function() {
         setTimeout(function() {
           defaultMessage = "What else can I try to convert for you?";
           $('#comms').html(defaultMessage).fadeIn(1000);
-        }, 1500);
+        }, 4000);
       }
     }
   }

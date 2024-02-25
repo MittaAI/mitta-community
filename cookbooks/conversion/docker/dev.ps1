@@ -4,6 +4,7 @@ $containerName = $null
 $env:MITTA_TOKEN = $null
 $env:MITTA_PIPELINE = $null
 $env:MITTA_DEV = "True"
+$env:MITTA_PROJECT = "sloth-ai"
 
 $configFilePath = ".\config.json"
 
@@ -56,7 +57,7 @@ while ($true) {
 
         # Run the Docker container with a restart policy and port mapping
         # Run the Docker container with environment variables, a restart policy, and port mapping
-        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 -e MITTA_TOKEN=$env:MITTA_TOKEN -e MITTA_PIPELINE=$env:MITTA_PIPELINE -e MITTA_DEV=$env:MITTA_DEV $imageName
+        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 -e MITTA_TOKEN=$env:MITTA_TOKEN -e MITTA_PIPELINE=$env:MITTA_PIPELINE -e MITTA_DEV=$env:MITTA_DEV -e MITTA_PROJECT=$env:MITTA_PROJECT -e GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/application_default_credentials.json -e GOOGLE_CLOUD_PROJECT=$env:MITTA_PROJECT -v ${env:APPDATA}\gcloud:/app/credentials $imageName
 
         Write-Host "Container rebuilt and restarted with port 5000 exposed."
     }
