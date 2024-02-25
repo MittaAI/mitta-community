@@ -103,13 +103,9 @@ $(document).ready(function() {
 
   if (savedInstructions) {
     savedInstructions = JSON.parse(savedInstructions);
-    savedInstructions.forEach(function(instruction, index) {
+    savedInstructions.forEach(function(instruction) {
       var newInstructionElement = $('<a class="dropdown-item" href="#">' + instruction + '</a>');
-      if ($('.dropdown-menu .dropdown-item').length > 0) {
-        $('.dropdown-menu .dropdown-item').eq(index - 1).after(newInstructionElement);
-      } else {
-        $('.dropdown-menu').prepend(newInstructionElement);
-      }
+      $('.dropdown-menu').append(newInstructionElement); // Append the new instruction to the dropdown menu
       
       // Remove the instruction from serverInstructionsArray if it exists there
       var serverIndex = serverInstructionsArray.indexOf(instruction);
