@@ -103,11 +103,18 @@ $(document).ready(function() {
 
   if (savedInstructions) {
     savedInstructions = JSON.parse(savedInstructions);
-    savedInstructions.forEach(function(instruction) {
-      $('.dropdown-menu').prepend('<a class="dropdown-item" href="#">' + instruction + '</a>');
-      var index = serverInstructionsArray.indexOf(instruction);
-      if (index > -1) {
-        serverInstructionsArray.splice(index, 1);
+    savedInstructions.forEach(function(instruction, index) {
+      var newInstructionElement = $('<a class="dropdown-item" href="#">' + instruction + '</a>');
+      if ($('.dropdown-menu .dropdown-item').length > 0) {
+        $('.dropdown-menu .dropdown-item').eq(index - 1).after(newInstructionElement);
+      } else {
+        $('.dropdown-menu').prepend(newInstructionElement);
+      }
+      
+      // Remove the instruction from serverInstructionsArray if it exists there
+      var serverIndex = serverInstructionsArray.indexOf(instruction);
+      if (serverIndex > -1) {
+        serverInstructionsArray.splice(serverIndex, 1);
       }
     });
   }
