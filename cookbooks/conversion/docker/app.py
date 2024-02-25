@@ -230,7 +230,7 @@ async def convert():
         # If a new instruction is posted, add it to the top of the list
         if posted_instruction and posted_instruction not in instructions:
             instructions.insert(0, posted_instruction)
-
+        logging.info(instructions)
     # encode instructions
     encoded_instructions = base64.b64encode(json.dumps(instructions).encode('utf-8')).decode('utf-8')
 
