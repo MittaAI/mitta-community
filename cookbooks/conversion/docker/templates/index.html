@@ -104,13 +104,15 @@ $(document).ready(function() {
   if (savedInstructions) {
     savedInstructions = JSON.parse(savedInstructions);
     savedInstructions.forEach(function(instruction) {
-      var newInstructionElement = $('<a class="dropdown-item" href="#">' + instruction + '</a>');
-      $('.dropdown-menu').append(newInstructionElement); // Append the new instruction to the dropdown menu
-      
-      // Remove the instruction from serverInstructionsArray if it exists there
-      var serverIndex = serverInstructionsArray.indexOf(instruction);
-      if (serverIndex > -1) {
-        serverInstructionsArray.splice(serverIndex, 1);
+      // Check if the instruction is already in the dropdown
+      var isInstructionInDropdown = $('.dropdown-menu .dropdown-item').filter(function() {
+        return $(this).text() === instruction;
+      }).length > 0;
+
+      // If the instruction is not in the dropdown, append it
+      if (!isInstructionInDropdown) {
+        var newInstructionElement = $('<a class="dropdown-item" href="#">' + instruction + '</a>');
+        $('.dropdown-menu').append(newInstructionElement);
       }
     });
   }
