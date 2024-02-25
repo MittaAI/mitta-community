@@ -107,47 +107,50 @@ async def process_pubsub_messages():
     
     while True:
         message = await message_queue.get()
+        data = json.loads(message.data.decode("utf-8"))
+        logging.info(f"Processed message: {data}")
+        client_uuid = data.get('uuid', None)
+
         try:
-            data = json.loads(message.data.decode("utf-8"))
-            logging.info(f"Processed message: {data}")
-            client_uuid = data.get('uuid', None)
+            # Check if client_uuid is connected before processing
+            if client_uuid in connected_websockets:
+                # Check for 'access_uri' in the message for file download process
+                if "access_uri" in data and data.get('access_uri'):
+                    download_dir = 'download'
+                    os.makedirs(download_dir, exist_ok=True)
+                    filename = data["filename"]
+                    filepath = os.path.join(download_dir, filename)
+                    access_uri = f"{data.get('access_uri')}?token={mitta_token}"
+                    logging.info(f"Downloading file from: {access_uri}")
 
-            # Check for 'access_uri' in the message for file download process
-            if "access_uri" in data and data.get('access_uri') and client_uuid:
-                download_dir = 'download'
-                os.makedirs(download_dir, exist_ok=True)
-                filename = data["filename"]
-                filepath = os.path.join(download_dir, filename)
-                access_uri = f"{data.get('access_uri')}?token={mitta_token}"
-                logging.info(access_uri)
+                    async with httpx.AsyncClient() as client:
+                        response = await client.get(access_uri)
 
-                async with httpx.AsyncClient() as client:
-                    response = await client.get(access_uri)
+                        if response.status_code == 200:
+                            async with aiofiles.open(filepath, 'wb') as f:
+                                await f.write(response.content)
+                            logging.info(f"File downloaded successfully: {filepath}")
 
-                    if response.status_code == 200:
-                        async with aiofiles.open(filepath, 'wb') as f:
-                            await f.write(response.content)
-                        logging.info(f"File downloaded successfully: {filepath}")
+                            # Update access_uri to point to the service's download handler
+                            new_access_uri = f"https://mitta-convert.ngrok.io/download/{filename}" if os.getenv('MITTA_DEV') == "True" else f"https://convert.mitta.ai/download/{filename}"
+                            data["access_uri"] = new_access_uri
 
-                        # Update access_uri to point to the service's download handler
-                        if os.getenv('MITTA_DEV') == "True":
-                            new_access_uri = f"https://mitta-convert.ngrok.io/download/{filename}"
-                        else:
-                            new_access_uri = f"https://convert.mitta.ai/download/{filename}"
+                    # Broadcast the message with updated access_uri
+                    await broadcast(data, client_uuid)
+                else:
+                    # If no access_uri, simply broadcast the data as it is
+                    await broadcast(data, client_uuid)
 
-                        # overload the Mitta URL (which contained a token we don't want to expose)
-                        data["access_uri"] = new_access_uri
-
-                # Proceed to inform the client with updated access_uri
-                await broadcast(data, client_uuid)
-            elif client_uuid:
-                # Broadcast message as is if no access_uri present
-                await broadcast(data, client_uuid)
-
+                # Acknowledge and mark the message handling as done
+                message.ack()
+            else:
+                logging.info(f"UUID {client_uuid} not connected. Message not broadcasted.")
+                
         except Exception as e:
-            logging.error(f"Error processing message: {e}")
+            logging.error(f"Error processing message for UUID {client_uuid}: {e}")
+        
         finally:
-            message.ack()
+            # Ensure task_done is called to maintain the queue's task count
             message_queue.task_done()
 
 def start_pubsub_listener():
