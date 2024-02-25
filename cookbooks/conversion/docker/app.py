@@ -226,9 +226,10 @@ async def convert():
         form_data = await request.form
         posted_instruction = form_data.get('instructions')
 
+        logging.info(posted_instruction)
         # If a new instruction is posted, add it to the top of the list
         if posted_instruction and posted_instruction not in instructions:
-            posted_instruction.insert(0, posted_instruction)
+            instructions.insert(0, posted_instruction)
 
     # encode instructions
     encoded_instructions = base64.b64encode(json.dumps(instructions).encode('utf-8')).decode('utf-8')
