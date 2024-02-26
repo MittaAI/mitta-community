@@ -2,6 +2,7 @@
 $imageName = $null
 $containerName = $null
 $env:MITTA_TOKEN = $null
+$env:MITTA_REDIS_PASSWORD = $null
 $env:MITTA_PIPELINE = $null
 $env:MITTA_DEV = "True"
 $env:MITTA_PROJECT = "sloth-ai"
@@ -19,6 +20,7 @@ if (Test-Path -Path $configFilePath) {
     $imageName = $configContent.imageName
     $containerName = $configContent.containerName
     $env:MITTA_TOKEN = $configContent.MITTA_TOKEN
+    $env:MITTA_REDIS_PASSWORD = $configContent.MITTA_REDIS_PASSWORD
     $env:MITTA_PIPELINE = $configContent.MITTA_PIPELINE
     $env:MITTA_DEV = $configContent.MITTA_DEV
 }

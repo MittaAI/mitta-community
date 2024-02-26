@@ -1,191 +1,35 @@
 """
-This Python file is part of the MittaAI platform, developed by Kord Campbell and copyrighted by MittaAI. 
-It is released under the BSD license, promoting both open-source usage and distribution while allowing for 
-commercial use. The application serves as a reference service for processing various media conversion tasks, 
-leveraging a combination of asynchronous web frameworks and Google Cloud Pub/Sub for efficient, distributed 
-communication and task management.
-
-Description:
-The application, built on Quart, provides an asynchronous web server that handles media conversion requests 
-via websockets and HTTP endpoints. Users can submit files for conversion, specifying instructions through 
-a web interface. The application then processes these files using a MittaAI pipeline, offloading tasks to 
-external services or infrastructure. Utilizing Google Cloud Pub/Sub, the system can communicate across 
-distributed instances, ensuring that callbacks and responses are routed to the correct client session, 
-even in complex, load-balanced deployments.
-
-Usage:
-- Clients connect to the service, submitting media files along with conversion instructions.
-- The service queues these requests for processing, and invokes MittaAI API pipeline calls.
-- Upon completion, results are communicated back to the client through websockets or direct HTTP responses, 
-  facilitated by a Pub/Sub mechanism that ensures messages reach the correct instance handling the client's session.
-
-This architecture allows for scalable, efficient processing of media files, catering to a broad range of conversion 
-tasks while maintaining high availability and responsiveness. This code is meant to illustrate how to build async
-pipeline use with MittaAI.
+This is a reference web server for handling non-blocking clients.
 
 https://mitta.ai
 
 Copyright:
 - MittaAI, Kord Campbell, 2024
 - BSD License
-
 """
 
 import os
 import json
 import base64
 import logging
-import datetime
 import random
 import asyncio
 import aiofiles
-import queue
-
-from urllib.parse import urlparse, unquote
-
-from uuid import uuid4
-
-from google.cloud import pubsub_v1
-
-from quart import Quart, websocket, render_template, request, redirect, jsonify
-from quart import send_from_directory
-from quart_cors import cors
 import httpx
 
+from uuid import uuid4
+from datetime import datetime, timedelta
+
+from quart import Quart, render_template, request, redirect, jsonify, Response, stream_with_context
+from quart import send_from_directory
+from quart_cors import cors
+
+# App definition
 app = Quart(__name__, static_folder='static')
 app = cors(app, allow_origin=["http://localhost:5000", "https://convert.mitta.ai"])
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Thread-safe queue for inter-thread communication
-inter_thread_queue = queue.Queue()
-
-# Asyncio queue for processing messages
-message_queue = asyncio.Queue()
-
-# Connected websockets; managed by UUID
-connected_websockets = {}
-
-# Ensure these environment variables are set in your environment
-project_id = os.getenv('MITTA_PROJECT')
-topic_id = "convert-notice"
-subscription_id = "convert-notice-sub"
-
-# Initialize Publisher and Subscriber clients
-publisher = pubsub_v1.PublisherClient()
-subscriber = pubsub_v1.SubscriberClient()
-
-# Define Pub/Sub topic and subscription paths
-topic_path = publisher.topic_path(project_id, topic_id)
-subscription_path = subscriber.subscription_path(project_id, subscription_id)
-
-async def publish_message_async(topic_path, message_data):
-    # Ensure this operation does not block by running it in the background
-    loop = asyncio.get_running_loop()
-    try:
-        # Use a thread pool executor to perform the blocking publish operation
-        result = await loop.run_in_executor(None, lambda: publisher.publish(topic_path, message_data).result())
-        logging.info(f"Message published with ID: {result}")
-    except Exception as e:
-        logging.error(f"Failed to publish message: {e}")
-
-def pub_sub_callback(message):
-    inter_thread_queue.put(message)
-
-async def transfer_messages_to_async_queue():
-    while True:
-        if not inter_thread_queue.empty():
-            message = inter_thread_queue.get()
-            await message_queue.put(message)
-        else:
-            await asyncio.sleep(0.5)  # Adjust sleep time as needed
-
-async def process_pubsub_messages():
-    # Define the token
-    mitta_token = os.getenv('MITTA_TOKEN')
-    
-    while True:
-        message = await message_queue.get()
-        data = json.loads(message.data.decode("utf-8"))
-        logging.info(f"Processed message: {data}")
-        client_uuid = data.get('uuid', None)
-
-        try:
-            # Check if client_uuid is connected before processing
-            if client_uuid in connected_websockets:
-                # Check for 'access_uri' in the message for file download process
-                if "access_uri" in data and data.get('access_uri'):
-                    download_dir = 'download'
-                    os.makedirs(download_dir, exist_ok=True)
-                    filename = data["filename"]
-                    filepath = os.path.join(download_dir, filename)
-                    access_uri = f"{data.get('access_uri')}?token={mitta_token}"
-                    logging.info(f"Downloading file from: {access_uri}")
-
-                    async with httpx.AsyncClient() as client:
-                        response = await client.get(access_uri)
-
-                        if response.status_code == 200:
-                            async with aiofiles.open(filepath, 'wb') as f:
-                                await f.write(response.content)
-                            logging.info(f"File downloaded successfully: {filepath}")
-
-                            # Update access_uri to point to the service's download handler
-                            new_access_uri = f"https://mitta-convert.ngrok.io/download/{filename}" if os.getenv('MITTA_DEV') == "True" else f"https://convert.mitta.ai/download/{filename}"
-                            data["access_uri"] = new_access_uri
-
-                    # Broadcast the message with updated access_uri
-                    await broadcast(data, client_uuid)
-                else:
-                    # If no access_uri, simply broadcast the data as it is
-                    await broadcast(data, client_uuid)
-
-                # Acknowledge and mark the message handling as done
-                message.ack()
-            else:
-                logging.info(f"UUID {client_uuid} not connected. Message not broadcasted.")
-                
-        except Exception as e:
-            logging.error(f"Error processing message for UUID {client_uuid}: {e}")
-        
-        finally:
-            # Ensure task_done is called to maintain the queue's task count
-            message_queue.task_done()
-
-def start_pubsub_listener():
-    subscriber.subscribe(subscription_path, callback=pub_sub_callback)
-
-# Adjusted Broadcast messages to connected clients based on UUID
-async def broadcast(message, recipient_id=None):
-    if recipient_id:
-        ws = connected_websockets.get(recipient_id)
-        if ws:
-            await ws.send_json(message)
-
-# Initialize app with the queue
-@app.before_serving
-async def startup():
-    asyncio.get_running_loop().create_task(transfer_messages_to_async_queue())
-    asyncio.get_running_loop().create_task(process_pubsub_messages())
-    start_pubsub_listener()
-
-# Websocket handling
-@app.websocket('/ws')
-async def ws():
-    unique_id = str(uuid4())  # Generate a unique ID for the session
-    ws_obj = websocket._get_current_object()
-    connected_websockets[unique_id] = ws_obj  # Store the WebSocket object with the unique ID
-
-    try:
-        await ws_obj.send_json({'uuid': unique_id})
-        while True:
-            # Awaiting any message from the client, could be used for further communication
-            await websocket.receive()
-    except Exception as e:
-        logging.error(f"WebSocket error: {e}")
-    finally:
-        connected_websockets.pop(unique_id, None)  # Remove the WebSocket from the dictionary on disconnect
 
 
 # Static files
@@ -194,6 +38,16 @@ async def custom_static(filename):
     static_folder_path = app.static_folder
     file_path = os.path.join(static_folder_path, filename)
     return await send_from_directory(static_folder_path, filename)
+
+async def my_generator_function():
+    yield "data: Hello\n\n"
+
+@app.route('/stream')
+async def stream_data():
+    async def generator_wrapper():
+        async for item in my_generator_function():
+            yield item
+    return Response(generator_wrapper(), content_type='text/event-stream')
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -238,7 +92,7 @@ async def convert():
     encoded_instructions = base64.b64encode(json.dumps(instructions).encode('utf-8')).decode('utf-8')
 
     # Pass the (possibly updated) instructions list to the template
-    current_date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00") # card publish
+    current_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00") # card publish
     return await render_template('index.html', instructions=encoded_instructions, current_date=current_date)
 
 
@@ -294,13 +148,10 @@ async def upload():
 
         # Check the response from the external handler
         if response.status_code == 200:
-            await broadcast({"status": "success", "message": "File uploaded successfully!"}, uuid)
             return jsonify({"status": "success", "message": "File uploaded successfully"}), 200
         else:
-            await broadcast({"status": "success", "message": "File upload failed. Try again in a few seconds."}, uuid)
             return jsonify({"status": "error", "message": "Failed to upload file"}), 500
 
-    await broadcast({"status": "error", "message": "No file received."}, uuid)
     return jsonify({"status": "error", "message": "No file received"}), 404
 
 
@@ -356,10 +207,9 @@ async def callback():
         "ffmpeg_result": ffmpeg_result,
         "filename": filename,
         "uuid": uuid 
-    }).encode("utf-8")
+    })
 
-    # Publish the message
-    await publish_message_async(topic_path, message_data)
+    logging.info(message_data)
 
     # Return
     return jsonify({"status": "success"}), 200

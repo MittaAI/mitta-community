@@ -37,8 +37,8 @@
   <div class="row">
     <div class="col-lg-12">
       <h1 id="mitta"><span class="greater-than">&gt;</span> AI Convert</h1>
-      <p style="display: none;" id="comms"></p>
-      <div style="display: none;" id="controls">
+      <p id="comms"></p>
+      <div id="controls">
         <div class="mb-3 inputs">
           <div class="input-group">
             <input type="text" class="form-control" id="instructionInput">
@@ -58,9 +58,11 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  // WebSocket setup for server communication
-  var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-  var hostname = window.location.protocol === 'https:' ? 'convert.mitta.ai' : 'localhost:5000';
+  const eventSource = new EventSource('/stream');
+  eventSource.onmessage = function(event) {
+      console.log('New message:', event.data);
+      // Update your application state or UI here
+  };
 
   // Get the UUID
   var uuid = getCookie('uuid');
@@ -231,13 +233,12 @@ $(document).ready(function() {
   function handleFileChange() {
     var fileInput = $('#fileInput')[0];
     if (fileInput.files && fileInput.files[0]) {
-      var file = fileInput.files[0];
+      var file = fileInput.files[0];      
+      var instruction = $('#instructionInput').val();
+
       var formData = new FormData();
       formData.append('file', file);
-
-      var instruction = $('#instructionInput').val();
       formData.append('instructions', instruction);
-
       formData.append('uuid', uuid);
 
       // Retrieve existing instructions from the cookie
@@ -264,28 +265,6 @@ $(document).ready(function() {
           console.log("File uploaded successfully");
           $('#comms').val("File uploaded.");
           $('#fileInput').val('');
-          
-          // clear any existing timeouts
-          clearTimeout(messageTimeout);
-          clearTimeout(shortTimeout);
-
-          // Start a new 30-second timer
-          if (!messageTimeout) {
-            messageTimeout = setTimeout(function() {
-              // This function runs after 30 seconds if not cleared
-              $('#comms').html("I'm sorry, but your request has timed out. Try again with a different request in a few seconds.").fadeIn(500);
-            }, 45000); // 45 seconds
-          }
-
-          // Additionally, set a 15-second notification
-          if (!shortTimeout) {
-            shortTimeout = setTimeout(function() {
-              // Check if the messageTimeout hasn't been cleared yet
-              if (messageTimeout) {
-                $('#comms').html("Still working on it...30 seconds remaining before timeout.").fadeIn(500);
-              }
-            }, 15000); // 15 seconds
-          }
         },
         error: function(xhr, status, error) {
           console.log("Error in file upload:", status, error);
@@ -293,81 +272,6 @@ $(document).ready(function() {
           $('#fileInput').val('');
         }
       });
-    }
-  }
-
-  // Websockets
-  function connectWebSocket() {
-    // Create websocket
-    ws = new WebSocket(protocol + hostname + "/ws");
-    
-    // Open Websocket
-    ws.onopen = function() {
-      console.log("WebSocket connection established");
-      retryCount = 0;
-      if (uuid) {
-        ws.send(JSON.stringify({uuid: uuid}));
-      } else {
-        // No cookie for UUID
-        console.log("Sending empty payload");
-        ws.send(JSON.stringify({}));
-      }
-    };
-
-    // Closed websocket
-    ws.onclose = function() {
-      console.log("WebSocket connection closed");
-      $('#comms').html(defaultMessage).fadeIn(1500);
-      attemptReconnect();
-    };
-
-    // Message websocket
-    ws.onmessage = function(event) {
-      var data = JSON.parse(event.data);
-      // log data
-      console.log(data);
-
-      // look for the UUID
-      if (data.uuid && data.uuid !== uuid) {
-          uuid = data.uuid;
-          setCookie('uuid', uuid, 7); // Store the UUID in a cookie for 7 days
-          console.log("Logged in with UUID: " + uuid);
-          $('#comms').html("Standby, I'm establishing a connection with the server.").fadeIn(500);
-          setTimeout(function() {
-            $('#comms').html(defaultMessage).delay(2000).fadeIn(1000);
-            $('#controls').fadeIn(250);
-          }, 1500);
-      }
-
-      if (data.ffmpeg_result) {
-        $('#comms').html("The file conversion processs failed. More information is in the console log, if you are familar with that sort of thing. Try using a different file or request.");
-        return;
-      }
-
-      if (data.message) {
-        $('#comms').html(data.message).fadeIn(500);
-
-        // Clear any existing timeout to avoid multiple timers running
-        clearTimeout(messageTimeout);
-        clearTimeout(shortTimeout);
-      }
-
-      // When an access_uri and filename are received
-      if (data.access_uri && data.filename) {
-        downloadFile(data.access_uri, data.filename);
-        
-        // Clear the timeout as we've received the file
-        clearTimeout(messageTimeout);
-        clearTimeout(shortTimeout);
-      }
-
-      if (data.ffmpeg_result) {
-        $('#comms').html("Something went wrong with the conversion. Try again in a minute.").fadeIn(500);
-        setTimeout(function() {
-          defaultMessage = "What else can I try to convert for you?";
-          $('#comms').html(defaultMessage).fadeIn(1000);
-        }, 4000);
-      }
     }
   }
 
@@ -389,27 +293,6 @@ $(document).ready(function() {
       $('#comms').html(defaultMessage).fadeIn(500);    
     }, 6000);
   }
-
-  // Websocket reconnect functions
-  function attemptReconnect() {
-      var delay = calculateBackoff(retryCount);
-      setTimeout(function() {
-          console.log(`Attempting to reconnect. Try #${retryCount + 1}`);
-          retryCount++;
-          connectWebSocket();
-      }, delay);
-  }
-
-  function calculateBackoff(retryCount) {
-      // Exponential backoff formula
-      var maxDelay = 30000; // Maximum delay of 30 seconds
-      var baseDelay = 1000; // Initial delay of 1 second
-      var delay = Math.min(baseDelay * Math.pow(2, retryCount), maxDelay);
-      return delay;
-  }
-
-  // Fire up the sockets
-  connectWebSocket();
 
 });
 

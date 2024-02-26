@@ -5,7 +5,6 @@ FROM python:3.10-slim
 RUN pip install quart hypercorn
 RUN pip install httpx
 RUN pip install quart-cors
-RUN pip install google-cloud-pubsub
 
 # Set the working directory in the container
 WORKDIR /app
