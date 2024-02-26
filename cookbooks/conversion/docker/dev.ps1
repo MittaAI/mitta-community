@@ -2,10 +2,12 @@
 $imageName = $null
 $containerName = $null
 $env:MITTA_TOKEN = $null
-$env:MITTA_REDIS_PASSWORD = $null
 $env:MITTA_PIPELINE = $null
-$env:MITTA_DEV = "True"
 $env:MITTA_PROJECT = "sloth-ai"
+$env:MITTA_BUCKET = $null
+$env:MITTA_SECRET = $null
+$env:MITTA_DEV = "True"
+
 
 $configFilePath = ".\config.json"
 
@@ -20,8 +22,10 @@ if (Test-Path -Path $configFilePath) {
     $imageName = $configContent.imageName
     $containerName = $configContent.containerName
     $env:MITTA_TOKEN = $configContent.MITTA_TOKEN
-    $env:MITTA_REDIS_PASSWORD = $configContent.MITTA_REDIS_PASSWORD
     $env:MITTA_PIPELINE = $configContent.MITTA_PIPELINE
+    $env:MITTA_PROJECT = $configContent.MITTA_PROJECT
+    $env:MITTA_BUCKET = $configContent.MITTA_BUCKET
+    $env:MITTA_SECRET = $configContent.MITTA_SECRET
     $env:MITTA_DEV = $configContent.MITTA_DEV
 }
 else {
@@ -59,7 +63,7 @@ while ($true) {
 
         # Run the Docker container with a restart policy and port mapping
         # Run the Docker container with environment variables, a restart policy, and port mapping
-        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 -e MITTA_TOKEN=$env:MITTA_TOKEN -e MITTA_PIPELINE=$env:MITTA_PIPELINE -e MITTA_DEV=$env:MITTA_DEV -e MITTA_PROJECT=$env:MITTA_PROJECT -e GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/application_default_credentials.json -e GOOGLE_CLOUD_PROJECT=$env:MITTA_PROJECT -v ${env:APPDATA}\gcloud:/app/credentials $imageName
+        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 -e MITTA_TOKEN=$env:MITTA_TOKEN -e MITTA_PIPELINE=$env:MITTA_PIPELINE -e MITTA_PROJECT=$env:MITTA_PROJECT -e MITTA_BUCKET=$env:MITTA_BUCKET -e MITTA_DEV=$env:MITTA_DEV -e GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/application_default_credentials.json -e GOOGLE_CLOUD_PROJECT=$env:MITTA_PROJECT -v ${env:APPDATA}\gcloud:/app/credentials $imageName
 
         Write-Host "Container rebuilt and restarted with port 5000 exposed."
     }
