@@ -164,6 +164,7 @@ $(document).ready(function() {
       console.error("EventSource failed:", event);
       updateMessage("I love converting things!");
       eventSource.close(); // Close the current connection
+      checkUUIDAndConnect();
     };
   }
 

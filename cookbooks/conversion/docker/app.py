@@ -338,6 +338,11 @@ async def callback():
         access_uri = await download_and_upload(access_uri, uuid, filename)
         message = "Downloading the file. Look at the bottom if you are on an iPhone, the top if you are in a browser."
 
+    # Hot wire the ffmpeg_result to messages
+    # We only get this when there is an error
+    if ffmpeg_result:
+        message = ffmpeg_result
+
     # Use the new_access_uri in the message_data
     message_data = {
         "status": "success", 
