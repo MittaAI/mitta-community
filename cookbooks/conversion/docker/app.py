@@ -95,7 +95,7 @@ async def upload_data_json_to_storage(uuid, data):
 async def generate_uuid_and_upload_data_json():
     user_uuid = str(uuid4())
     session['uuid'] = user_uuid
-    data = {"uuid": user_uuid, "message": "Connection established."}
+    data = {"uuid": user_uuid}
     await upload_data_json_to_storage(user_uuid, data)
     return user_uuid
 
