@@ -46,7 +46,7 @@ If you have issues configuring the pipeline, pop into [Slack](https://join.slack
 
 ## Docker Instance Integration
 
-The Docker instance is seamlessly integrated with the conversion pipeline, allowing for the use of MittaAI directly by uploading files to it. This integration facilitates a streamlined workflow, enhancing the utility and accessibility of MittaAI for various conversion tasks.
+The Docker instance is seamlessly integrated with the conversion pipeline, allowing for the use of MittaAI directly by uploading files to it. A [demo](https://convert.mitta.ai) of this is available. This integration facilitates a streamlined workflow, enhancing the utility and accessibility of MittaAI for various conversion tasks.
 
 ### Launching the Docker Container
 
