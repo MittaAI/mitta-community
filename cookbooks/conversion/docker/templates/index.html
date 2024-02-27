@@ -116,6 +116,19 @@ $(document).ready(function() {
       };
   }
 
+  function ackMessage(uuid) {
+    // Attempt to acknowledge the download message
+    $.ajax({
+      url: "/ack",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ uuid: uuid }),
+      error: function(xhr, status, error) {
+        console.error("Error:", status, error);
+      }
+    });
+  }
+
   // Fire up the connection
   connect();
 
@@ -330,6 +343,10 @@ $(document).ready(function() {
 
       // Update the '#comms' element to indicate that the download has started
       updateMessage("Downloading " + filename + ".");
+
+      // tell the server to wipe the last message from storage
+      // this prevents a reconnect to a different server from downloading the file again
+      ackMessage();
 
       // Set a timeout to clear the message and replace it with 'defaultMessage' after 4 seconds
       setTimeout(function() {

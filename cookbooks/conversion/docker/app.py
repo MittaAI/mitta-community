@@ -220,6 +220,25 @@ async def events():
         return '', 400
 
 
+@app.route('/ack', methods=['GET', 'POST'])
+async def ack():
+    # Try to grab the UUID from the cookie
+    uuid = request.cookies.get('uuid', None)
+
+    # Check if the UUID is valid
+    if uuid is None or not is_valid_uuid(uuid):
+        # If not, redirect to the login page
+        return redirect(url_for('login'))
+
+    # Check if the UUID is in a session
+    uuid_in_session = session.get('uuid')
+    if uuid != uuid_in_session:
+        return redirect(url_for('login'))
+
+    await upload_data_json_to_storage(uuid, {})    
+    return jsonify({"status": "success", "message": "Download event removed from storage."}), 200
+
+
 @app.route('/', methods=['GET', 'POST'])
 async def convert():
     # Try to grab the UUID from the cookie
@@ -236,7 +255,7 @@ async def convert():
         return redirect(url_for('login'))
 
     # ensure we have a file for this uuid
-    await upload_data_json_to_storage(uuid, {"message": "Welcome back."})
+    await upload_data_json_to_storage(uuid, {})
     
     # Set the instruction list
     instructions = [
@@ -392,14 +411,18 @@ async def callback():
     if access_uri:
         access_uri = await move_to_storage(access_uri, uuid, filename)
 
+    # Get any valid access_uris
+    messages = data.get('message', [])
+    
+    if messages:
+        message = messages[0]
+    else:
+        message = 'I 👩🏽‍❤‍👩🏾 converting things.'
+
     # Hot wire the ffmpeg_result to message
     # We only get this when there is an error
     if ffmpeg_result:
         message = ffmpeg_result
-
-    # Get any valid access_uris
-    messages = data.get('message', [])
-    message = messages[0] if messages and not messages else 'I 👩🏽‍❤‍👩🏾 converting things.'
 
     # Use the new_access_uri in the message_data
     message_data = {
