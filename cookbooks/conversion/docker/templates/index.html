@@ -101,6 +101,7 @@ $(document).ready(function() {
         console.log(data);
         // Check and process the message if present
         if (data.message) {
+
           updateMessage(data.message); // Display or process the message
         }
         // Check for file download information and process if present
@@ -187,7 +188,7 @@ $(document).ready(function() {
     updateMessage("Uploading file.");
     setTimeout(function() {
       updateMessage("I 👩🏽‍❤‍👩🏾 converting things.");
-    }, 5000);
+    }, 7000);
 
     // Retrieve the instruction and create FormData
     var instruction = $('#instructionInput').val();

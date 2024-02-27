@@ -9,27 +9,10 @@
         "alt": "Convert"
       },
       "title": "FFMpeg Convert",
-      "description": "Use this pipeline to convert media files with conversational language using FFmpeg. Uploads are limited in size to 32MB.",
+      "description": "Use this pipeline to convert media files with conversational language using FFmpeg. Uploads are limited in size to 25MB.",
       "links": {
         "install": {
           "href": "pipeline_ffmpeg.json",
-          "text": "Install"
-        },
-        "github": {
-          "href": "https://github.com/MittaAI/mitta-community/tree/main/cookbooks/conversion"
-        }
-      }
-    },
-    {
-      "image": {
-        "src": "images/callback.png",
-        "alt": "FFMpeg Callback"
-      },
-      "title": "FFMpeg Callback",
-      "description": "Use this pipeline to catch the callback from the `aiffmpeg` processor. Displays the output from the first pipeline in the logs tab.",
-      "links": {
-        "install": {
-          "href": "pipeline_ffupload.json",
           "text": "Install"
         },
         "github": {
