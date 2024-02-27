@@ -37,7 +37,7 @@
   <div class="row">
     <div class="col-lg-12">
       <h1 id="mitta"><span class="greater-than">&gt;</span> AI Convert</h1>
-      <p id="comms">Use the pulldown or write your own request to convert one file format to another. Use terms like 'rotate', 'resize', and 'crop'.</p>
+      <p id="comms"></p>
       <div id="controls">
         <div class="mb-3 inputs">
           <div class="input-group">
@@ -101,15 +101,12 @@ $(document).ready(function() {
     });
   }
 
-  var defaultMessage = "hello";
-  var uuid;
-
   // Function to check UUID and connect using jQuery
   async function checkUUIDAndConnect() {
     uuid = getCookie('uuid');
 
     // Use jQuery to update the innerHTML of #defaultMessage
-    $('#defaultMessage').html(defaultMessage);
+    updateMessage("Reconnecting.");
 
     if (!uuid) {
       // Request UUID using jQuery
@@ -117,52 +114,63 @@ $(document).ready(function() {
       setCookie('uuid', String(uuid), 7);
     }
 
+    updateMessage("Use the pulldown or write your own request to convert one file format to another. Use terms like 'rotate', 'resize', and 'crop'.");
+
     // Connect to SSE stream with the UUID
     connectToStream(uuid);
   }
 
-  function connectToStream(uuid) {
-    let lastMessage = null; // Store the last message for comparison
+  let lastMessageReceived = null; 
 
+  function ackMessageAndConnect(uuid) {
+    // Attempt to acknowledge the message
+    $.ajax({
+      url: "http://localhost:5000/ack",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ uuid: uuid }),
+      success: function() {
+        console.log("Acknowledgement successful.");
+        // Connect to stream upon successful acknowledgement
+        connectToStream(uuid);
+      },
+      error: function(xhr, status, error) {
+        console.error("Error:", status, error);
+      }
+    });
+  }
+
+  function connectToStream(uuid) {
     const eventSource = new EventSource(`/stream?uuid=${uuid}`);
 
     eventSource.onmessage = function(event) {
-      // Assuming the server sends JSON data, you might need to parse the event data
-      const data = JSON.parse(event.data); // parse the JSON data
+      const data = JSON.parse(event.data); // Assuming JSON data
 
-      // Check if the message is different from the last message
-      if (JSON.stringify(data) !== JSON.stringify(lastMessage) && Object.keys(data).length > 1) {
-        // Update the lastMessage
-        lastMessage = data;
-
-        // Call the /ack endpoint if the message is different and contains more than just "uuid"
-        $.ajax({
-          url: `/ack?uuid=${uuid}`,
-          method: 'POST',
-          success: function(response) {
-            console.log('Acknowledgement sent:', response);
-            // Optionally handle response
-          },
-          error: function(error) {
-            console.error('Error sending acknowledgement:', error);
-          }
-        });
-      }
-
-      // Display message and potentially trigger download
-      if (data.message) {
-        updateMessage(data.message);
-      }
-
-      if (data.access_uri && data.filename) {
-        downloadFile(data.access_uri, data.filename);
+      // Check if the message has changed from the last one received
+      if (lastMessageReceived !== event.data) {
+        lastMessageReceived = event.data; // Update the last message received
+        
+        // Process the message only if it's new
+        if (data.message) {
+          updateMessage(data.message);
+        }
+        if (data.access_uri && data.filename) {
+          downloadFile(data.access_uri, data.filename);
+        }
+        ackMessageAndConnect(uuid);
       }
     };
 
     eventSource.onerror = function(event) {
-      // Handle the error state
       console.error("EventSource failed:", event);
-      checkUUIDAndConnect();
+      updateMessage("Connection failed, so reload if necessary.");
+      eventSource.close(); // Close the existing connection
+      setTimeout(function() {
+        console.log("Retrying to connect and ack...");
+        updateMessage("I 👩🏽‍❤‍👩🏾 converting things.")
+        checkUUIDAndConnect();  
+      }, 3000); // 3 seconds delay
+
     };
   }
 
@@ -352,24 +360,45 @@ $(document).ready(function() {
     }
   }
 
+
   function downloadFile(url, filename) {
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+      // Check if the user is on Chrome Mobile
+      var isChromeMobile = /chrome/i.test(navigator.userAgent) && /mobile/i.test(navigator.userAgent);
 
-    // Update the '#comms' element to indicate that the download has started
-    updateMessage("Downloading " + filename + ".");
+      if (!isChromeMobile) {
+          // Original method for non-Chrome Mobile browsers
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+      } else {
+          // For Chrome Mobile, create a new button for the user to manually trigger the download
+          var $buttonContainer = $('#button-container');
+          var $downloadButton = $('<button/>', {
+              text: 'Download ' + filename,
+              class: 'btn btn-primary mt-2', // Assuming you have Bootstrap or similar for styling
+              click: function () {
+                  window.location.href = url;
+              }
+          });
 
-    // Set a timeout to clear the message and replace it with 'defaultMessage' after 4 seconds
-    setTimeout(function() {
-      // Assuming 'defaultMessage' is defined elsewhere and accessible here
-      defaultMessage = "What can I convert for you?";
-      updateMessage(defaultMessage);    
-    }, 6000);
+          // Clear existing content and append the new button
+          $buttonContainer.empty().append($downloadButton);
+      }
+
+      // Update the '#comms' element to indicate that the download has started
+      updateMessage("Downloading " + filename + ".");
+
+      // Set a timeout to clear the message and replace it with 'defaultMessage' after 4 seconds
+      setTimeout(function() {
+          // Assuming 'defaultMessage' is defined elsewhere and accessible here
+          defaultMessage = "What can I convert for you?";
+          updateMessage(defaultMessage);    
+      }, 6000);
   }
+
 
 });
 
