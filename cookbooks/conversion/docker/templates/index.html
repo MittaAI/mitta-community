@@ -185,6 +185,9 @@ $(document).ready(function() {
   // User clicked upload or hit enter
   $('#embark-button').on('click', function() {
     updateMessage("Uploading file.");
+    setTimeout(function() {
+      updateMessage("I 👩🏽‍❤‍👩🏾 converting things.");
+    }, 5000);
 
     // Retrieve the instruction and create FormData
     var instruction = $('#instructionInput').val();
