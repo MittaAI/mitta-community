@@ -27,7 +27,7 @@ import time
 from google.cloud import storage
 from google.api_core.exceptions import Forbidden
 
-from quart import Quart, render_template, request, redirect, jsonify, Response, stream_with_context, session, send_from_directory, send_file
+from quart import Quart, render_template, request, redirect, jsonify, url_for, Response, stream_with_context, session, send_from_directory, send_file
 from quart_cors import cors
 
 # App definition
@@ -38,6 +38,11 @@ app.secret_key = os.getenv('MITTA_SECRET', 'f00bar22222')
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+
+#################
+# Storage methods
+#################
 
 # File storage handling
 async def upload_to_storage(uuid, filename=None, content=None, content_type=None):
@@ -55,7 +60,8 @@ async def upload_to_storage(uuid, filename=None, content=None, content_type=None
     return f"gs://{bucket.name}/{blob.name}"
 
 
-async def download_and_upload(access_uri, uuid, filename):
+# File download and upload to storage
+async def move_to_storage(access_uri, uuid, filename):
     async with httpx.AsyncClient() as client:
         mitta_url = f"{access_uri}?token={os.getenv('MITTA_TOKEN')}"
         logging.info(mitta_url)
@@ -63,7 +69,7 @@ async def download_and_upload(access_uri, uuid, filename):
 
         if response.status_code == 200:
             content_type = response.headers.get('Content-Type', 'application/octet-stream')
-            new_access_uri = await upload_to_storage(
+            bucket = await upload_to_storage(
                 uuid=uuid,
                 filename=filename,
                 content=response.content,
@@ -72,189 +78,167 @@ async def download_and_upload(access_uri, uuid, filename):
 
             # Construct the new access URI based on the MITTA_DEV environment variable
             base_url = "https://mitta-convert.ngrok.io" if os.getenv('MITTA_DEV') == "True" else "https://convert.mitta.ai"
-            new_access_uri = f"{base_url}/download/{uuid}/{filename}"
+            access_uri = f"{base_url}/download/{uuid}/{filename}"
             
-            logging.info(f"File uploaded successfully to GCS: {new_access_uri}")
-            return new_access_uri
+            logging.info(f"File uploaded successfully to GCS: {access_uri}")
+            return access_uri
         else:
-            logging.error(f"Failed to download file from {access_uri}")
+            logging.error(f"Failed to download file from {bucket}")
             return None
 
-# Global dictionary to track read backoff for each UUID
-read_backoff_info = {}
 
-async def fetch_data_json_content(uuid):
-    global read_backoff_info
-    min_backoff_seconds = 1  # Minimum backoff time in seconds
-    max_backoff_seconds = 60  # Maximum backoff time in seconds
-
-    current_time = time.time()
-
-    # Initialize backoff info for the UUID if not already present
-    if uuid not in read_backoff_info:
-        read_backoff_info[uuid] = {"last_read_time": 0, "backoff_counter": 0, "last_content": None}
-
-    # Calculate backoff time
-    backoff_time = min_backoff_seconds * (2 ** read_backoff_info[uuid]["backoff_counter"])
-    backoff_time = min(backoff_time, max_backoff_seconds)  # Cap the backoff time at the maximum
-
-    # Check if we should proceed with the read based on backoff time
-    if current_time - read_backoff_info[uuid]["last_read_time"] < backoff_time:
-        logging.info(f"Read skipped for UUID {uuid} due to backoff policy.")
-        return None
+# Read JSON data from storage
+async def fetch_data_json_from_storage(uuid):
+    client = storage.Client()
+    bucket = client.bucket(os.getenv('MITTA_BUCKET'))
+    blob = bucket.blob(f"{uuid}/data.json")
+    
+    if not blob.exists():  # Check if the blob exists
+        logging.info(f"data.json for UUID {uuid} does not exist. Initializing storage.")
+        # Initialize the storage with a default message
+        await upload_data_json_to_storage(uuid, {"message": "Initialized storage."})
+        return None  # Return None or the default message as per your logic
 
     try:
-        client = storage.Client()
-        bucket = client.bucket(os.getenv('MITTA_BUCKET'))
-        blob = bucket.blob(f"{uuid}/data.json")
         content = blob.download_as_text()
-
-        # Check if the content has changed from the last read
-        if content == read_backoff_info[uuid]["last_content"]:
-            # If the content is the same, increase the backoff counter
-            read_backoff_info[uuid]["backoff_counter"] += 1
-        else:
-            # If the content has changed, reset the backoff counter
-            read_backoff_info[uuid]["backoff_counter"] = 0
-
-        # Update the last read time and last content
-        read_backoff_info[uuid]["last_read_time"] = current_time
-        read_backoff_info[uuid]["last_content"] = content
-
         return content
     except Exception as ex:
         logging.error(f"Error fetching data.json for UUID {uuid}: {ex}")
-        read_backoff_info[uuid]["last_read_time"] = current_time  # Ensure to update last read time even on failure
         return None
 
-async def upload_data_json_to_storage(uuid, data):
+
+# Write JSON data to storage
+async def upload_data_json_to_storage(uuid, message):
+    if 'message_id' not in message:
+        message['message_id'] = str(uuid4())  # Assign a unique message_id
+    if 'uuid' not in message:
+        message['uuid'] = uuid
+
     loop = asyncio.get_running_loop()
     gcs = storage.Client()
     bucket = gcs.bucket(os.getenv('MITTA_BUCKET'))
     blob_name = f"{uuid}/data.json"
     blob = bucket.blob(blob_name)
-    # Ensure data is a string for upload_from_string
-    data_str = json.dumps(data) if not isinstance(data, str) else data
+    data_str = json.dumps(message)  # Serialize the message
 
-    # Clear backoff
-    if uuid in read_backoff_info:
-        del read_backoff_info[uuid]
-        logging.info(f"Upload backoff cleared for UUID {uuid}")
-        
     # Pass content_type as part of args in run_in_executor
     await loop.run_in_executor(None, blob.upload_from_string, data_str, 'application/json')
 
 
-async def generate_uuid_and_upload_data_json():
-    user_uuid = str(uuid4())
-    session['uuid'] = user_uuid
-    logging.info("generate uuid")
-    data = {"uuid": user_uuid}
-    await upload_data_json_to_storage(user_uuid, data)
-    return user_uuid
+################################
+#Auth create UUID and data store
+################################
 
-async def ensure_data_json_uploaded(uuid):
-    loop = asyncio.get_running_loop()
-    client = storage.Client()
-    bucket = client.bucket(os.getenv('MITTA_BUCKET'))
-    blob = bucket.blob(f"{uuid}/data.json")
-
-    # Check if the blob exists to prevent overwriting
-    exists = await loop.run_in_executor(None, blob.exists)
-    if not exists:
-        data = {"uuid": uuid, "message": "Setting up secure connection."}
-        await upload_data_json_to_storage(uuid, data)
-
-"""
-# Ack and login routes
-@app.route('/ack', methods=['POST'])
-async def ack():
-    # Use the session's UUID instead of one provided by the client
-
-
-    uuid = session['uuid']
-    
-    # Prepare the data to reset or update the file contents
+async def gen_uuid_write_json_data():
+    uuid = str(uuid4())
+    session['uuid'] = uuid
+    logging.info(f"generated uuid: {uuid}")
     data = {"uuid": uuid}
-    logging.info(data)
-    
-    # Call the function to upload data.json to the storage
     await upload_data_json_to_storage(uuid, data)
-    
-    return jsonify({"message": "Acknowledgement received", "uuid": uuid})
-"""
+    return uuid
+
 
 @app.route('/login', methods=['GET'])
 async def login():
-    user_uuid = await generate_uuid_and_upload_data_json()
-    return jsonify({"uuid": user_uuid})
+    user_uuid = await gen_uuid_write_json_data()
+    # Now, instead of returning JSON, render the login.html template with the UUID
+    return await render_template('login.html', uuid=user_uuid)
 
 
-async def my_generator_function(uuid=None):
-    while True:
-        content = await fetch_data_json_content(uuid)
+########################
+# Event stream managment
+########################
+
+connections = {}
+historic_queue = []
+
+# Client payload pickup and transfer
+async def notify_clients():
+    for uuid, queue in connections.items():
+        content = await fetch_data_json_from_storage(uuid)
         if content:
-            yield f"data: {content}\n\n"
-        await asyncio.sleep(3)
+            try:
+                message = json.loads(content)
+                message_id = message.get('message_id')
+                if message_id and message_id not in historic_queue:
+                    await queue.put(content)  # Send the entire message as a JSON string without altering it
+                    historic_queue.append(message_id)  # Mark message_id as processed globally
+            except json.JSONDecodeError as e:
+                logging.error(f"Error decoding JSON for UUID {uuid}: {e}")
+    await asyncio.sleep(2)
 
 
-def is_valid_uuid(uuid_to_test, version=4):
+# Start and stop the queue fetch process
+@app.before_serving
+async def start_background_tasks():
+    async def broadcast():
+        while True:
+            await asyncio.sleep(2)
+            await notify_clients()
+    asyncio.create_task(broadcast())
+
+# Event stream
+async def event_stream(uuid):
+    queue = asyncio.Queue()
+    connections[uuid] = queue  # Associate the queue with the UUID
     try:
-        uuid_obj = UUID(uuid_to_test, version=version)
-        return str(uuid_obj) == uuid_to_test
+        while True:
+            data = await queue.get()
+            # Ensure data is a JSON string
+            try:
+                data_json = json.dumps(data) if not isinstance(data, str) else data
+            except TypeError:
+                logging.error(f"Error serializing message to JSON for {uuid}")
+                continue
+            # Format the message for SSE with correct data field and JSON payload
+            yield f"id: {uuid}\nevent: message\ndata: {data_json}\n\n"
+            await asyncio.sleep(3)  # Sleep the loop
+    except GeneratorExit:
+        logging.info(f"Client disconnect {uuid}")
+        connections.pop(uuid, None)  # Remove the queue on disconnect
+        raise
+
+
+# Check for valid UUID
+def is_valid_uuid(uuid, version=4):
+    try:
+        uuid_obj = UUID(uuid, version=version)
+        return str(uuid_obj) == uuid
     except ValueError:
         return False
 
 
-@app.route('/ack', methods=['POST'])
-async def ack():
-    request_data = await request.get_json()
-    logging.info(request_data)
-    
-    # Check if 'uuid' is present in the session and log it
-    if 'uuid' in session:
-        logging.info(f"Current session UUID: {session['uuid']}")
-    else:
-        logging.info("No UUID in current session.")
-    
-    client_uuid = request_data.get('uuid', '') if request_data else ''
-    
-    if is_valid_uuid(client_uuid):
-        # Store the valid UUID in the session
-        session['uuid'] = client_uuid
-        # Prepare the data to reset or update the file contents
-        data = {"uuid": client_uuid}
-        logging.info(data)
-        # Call the function to upload data.json to the storage
-        await upload_data_json_to_storage(client_uuid, data)
-        return jsonify({"message": "Acknowledgement received", "uuid": client_uuid})
-    else:
-        # Log an empty data object if the UUID is invalid
-        logging.info({})
-        return jsonify({"error": "Invalid UUID provided"}), 400
-
-async def uuid_in_session(uuid):
-    return session.get('uuid') == uuid
-
-
-# Main Quart routes
-@app.route('/stream')
-async def stream_data():
+# Your updated /events route
+@app.route('/events')
+async def events():
     uuid = request.args.get('uuid', None)
     if uuid and is_valid_uuid(uuid):
-        logging.info(uuid)
-        async def generator_wrapper():
-            async for item in my_generator_function(uuid):
-                yield item
-        return Response(generator_wrapper(), content_type='text/event-stream')
+        logging.info(f"Establishing event stream for {uuid}")
+        return Response(event_stream(uuid), content_type='text/event-stream')
     else:
-        logging.info(await uuid_in_session(uuid));
-        return Response("event: error\ndata: Invalid or missing UUID.\n\n", content_type='text/event-stream')
+        logging.error("Invalid or missing UUID")
+        return '', 400
 
 
 @app.route('/', methods=['GET', 'POST'])
 async def convert():
-    # Initialize the default instructions
+    # Try to grab the UUID from the cookie
+    uuid = request.cookies.get('uuid', None)
+
+    # Check if the UUID is valid
+    if uuid is None or not is_valid_uuid(uuid):
+        # If not, redirect to the login page
+        return redirect(url_for('login'))
+
+    # Check if the UUID is in a session
+    uuid_in_session = session.get('uuid')
+    if uuid != uuid_in_session:
+        return redirect(url_for('login'))
+
+    # ensure we have a file for this uuid
+    await upload_data_json_to_storage(uuid, {"message": "Welcome back."})
+    
+    # Set the instruction list
     instructions = [
         "Rotate image by 90 degrees",
         "Flip image horizontally",
@@ -280,17 +264,13 @@ async def convert():
         "Normalize audio in a video file"
     ]
 
-
     if request.method == 'POST':
         form_data = await request.form
         posted_instruction = form_data.get('instructions')
 
-        logging.info(posted_instruction)
         # If a new instruction is posted, add it to the top of the list
         if posted_instruction and posted_instruction not in instructions:
             instructions.insert(0, posted_instruction)
-        
-        logging.info(instructions)
 
     # encode instructions
     encoded_instructions = base64.b64encode(json.dumps(instructions).encode('utf-8')).decode('utf-8')
@@ -302,9 +282,23 @@ async def convert():
 
 @app.route('/upload', methods=['POST'])
 async def upload():
-    form_data = await request.form
-    uuid = form_data.get('uuid')
-    
+    # Try to grab the UUID from the cookie
+    uuid = request.cookies.get('uuid', None)
+
+    # Check if the UUID is valid
+    if uuid is None or not is_valid_uuid(uuid):
+        # If not, redirect to the login page
+        return redirect(url_for('login'))
+
+    # Check if the UUID is in a session
+    uuid_in_session = session.get('uuid')
+    if uuid != uuid_in_session:
+        return redirect(url_for('login'))
+
+    await upload_data_json_to_storage(uuid, {"message": "Received upload request."})
+
+    # Get the calling info from the client
+    form_data = await request.form    
     files = await request.files
     file = files.get('file')
 
@@ -360,8 +354,14 @@ async def upload():
 @app.route('/callback', methods=['POST'])
 async def callback():
     data = await request.get_json()
-    logging.info("in callback")
-    logging.info(data)
+
+    # Grab the UUID
+    uuid = data.get('uuid', [])
+    if isinstance(uuid, list):
+        try:
+            uuid = uuid[0]
+        except:
+            return jsonify({"status": "error", "message": "Can't access the UUID."})
 
     # Define the token
     mitta_token = os.getenv('MITTA_TOKEN')
@@ -375,21 +375,6 @@ async def callback():
         # If tokens do not match, return an error response
         return jsonify({'status': 'error', 'message': "Authentication failed"}), 401
 
-    # uuid and message
-    message = "Processing."  # Default message
-
-    # Iterate through the keys in the data dictionary
-    for key, value in data.items():
-        if 'message' in key:
-            message = value
-
-    # Grab the UUID
-    uuid = data.get('uuid', [])
-    if isinstance(uuid, list):
-        try:
-            uuid = uuid[0]
-        except:
-            return jsonify({"status": "error", "message": "Can't access the UUID."})
 
     # Other variables, all expected to be lists
     access_uris = data.get('access_uri', [])
@@ -405,12 +390,16 @@ async def callback():
 
     # Attempt to download and upload the file, receiving a new access URI if successful
     if access_uri:
-        access_uri = await download_and_upload(access_uri, uuid, filename)
+        access_uri = await move_to_storage(access_uri, uuid, filename)
 
-    # Hot wire the ffmpeg_result to messages
+    # Hot wire the ffmpeg_result to message
     # We only get this when there is an error
     if ffmpeg_result:
         message = ffmpeg_result
+
+    # Get any valid access_uris
+    messages = data.get('message', [])
+    message = messages[0] if messages and not messages else 'I 👩🏽‍❤‍👩🏾 converting things.'
 
     # Use the new_access_uri in the message_data
     message_data = {
@@ -432,6 +421,20 @@ async def callback():
 # Static files
 @app.route('/static/<path:filename>')
 async def custom_static(filename):
+
+    # Try to grab the UUID from the cookie
+    uuid = request.cookies.get('uuid', None)
+
+    # Check if the UUID is valid
+    if uuid is None or not is_valid_uuid(uuid):
+        # If not, redirect to the login page
+        return redirect(url_for('login'))
+
+    # Check if the UUID is in a session
+    uuid_in_session = session.get('uuid')
+    if uuid != uuid_in_session:
+        return redirect(url_for('login'))
+
     static_folder_path = app.static_folder
     file_path = os.path.join(static_folder_path, filename)
     return await send_from_directory(static_folder_path, filename)
@@ -442,6 +445,7 @@ DOWNLOAD_DIR = 'downloads'
 
 @app.route('/download/<path:filename>')
 async def download_file(filename):
+    # no need to check session as the filenames are randomized
     bucket_name = os.getenv('MITTA_BUCKET')
     client = storage.Client()
     bucket = client.bucket(bucket_name)

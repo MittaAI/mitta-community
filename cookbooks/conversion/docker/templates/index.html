@@ -37,7 +37,7 @@
   <div class="row">
     <div class="col-lg-12">
       <h1 id="mitta"><span class="greater-than">&gt;</span> AI Convert</h1>
-      <p id="comms"></p>
+      <p id="comms">Use the pulldown or write your own request to convert one file format to another. Use terms like 'rotate', 'resize', and 'crop'.</p>
       <div id="controls">
         <div class="mb-3 inputs">
           <div class="input-group">
@@ -58,6 +58,8 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
+
+  // Cookies
   function setCookie(name, value, days) {
     var expires = "";
     if (days) {
@@ -79,6 +81,7 @@ $(document).ready(function() {
     return null;
   }
 
+  // Update messages
   function updateMessage(newMessage) {
     var currentMessage = $('#comms').html(); // Get the current content of the element
     if (newMessage !== currentMessage) { // Check if the new message is different
@@ -86,97 +89,35 @@ $(document).ready(function() {
     }
   }
 
-  function requestUUID() {
-    // Return the Promise directly to the caller
-    return $.ajax({
-      url: '/login',
-      method: 'GET'
-    }).then(function(data) {
-      // Use .then() to handle success and directly return the UUID
-      return data.uuid;
-    }, function(jqXHR, textStatus, errorThrown) {
-      // Handle failure
-      console.error('Failed to fetch UUID from /login:', textStatus, errorThrown);
-      return null;
-    });
-  }
+  // SSE handling
+  let evtSource;
+  const uuid = getCookie('uuid'); // Ensure you have a function to get the 'uuid' cookie
 
-  // Function to check UUID and connect using jQuery
-  async function checkUUIDAndConnect() {
-    uuid = getCookie('uuid');
-
-    // Use jQuery to update the innerHTML of #defaultMessage
-    updateMessage("Reconnecting.");
-
-    if (!uuid) {
-      // Request UUID using jQuery
-      uuid = await requestUUID();
-      setCookie('uuid', String(uuid), 7);
-    }
-
-    updateMessage("Use the pulldown or write your own request to convert one file format to another. Use terms like 'rotate', 'resize', and 'crop'.");
-
-    // Connect to SSE stream with the UUID
-    connectToStream(uuid);
-  }
-
-  let lastMessageReceived = null; 
-
-  function ackMessageAndConnect(uuid) {
-    // Attempt to acknowledge the message
-    $.ajax({
-      url: "http://localhost:5000/ack",
-      type: "POST",
-      contentType: "application/json",
-      data: JSON.stringify({ uuid: uuid }),
-      success: function() {
-        console.log("Acknowledgement successful.");
-        // Connect to stream upon successful acknowledgement
-        connectToStream(uuid);
-      },
-      error: function(xhr, status, error) {
-        console.error("Error:", status, error);
-      }
-    });
-  }
-
-  function connectToStream(uuid) {
-    const eventSource = new EventSource(`/stream?uuid=${uuid}`);
-
-    eventSource.onmessage = function(event) {
-      const data = JSON.parse(event.data); // Assuming JSON data
-
-      // Check if the message has changed from the last one received
-      if (lastMessageReceived !== event.data) {
-        lastMessageReceived = event.data; // Update the last message received
-        
-        // Process the message only if it's new
+  function connect() {
+      evtSource = new EventSource(`/events?uuid=${uuid}`);
+      
+      evtSource.onmessage = function(event) {
+        const data = JSON.parse(event.data); // Parse the JSON string to an object
+        console.log(data);
+        // Check and process the message if present
         if (data.message) {
-          updateMessage(data.message);
+          updateMessage(data.message); // Display or process the message
         }
+        // Check for file download information and process if present
         if (data.access_uri && data.filename) {
-          downloadFile(data.access_uri, data.filename);
+          downloadFile(data.access_uri, data.filename); // Function to handle file download
         }
-        ackMessageAndConnect(uuid);
-      }
-    };
+      };
 
-    eventSource.onerror = function(event) {
-      console.error("EventSource failed:", event);
-      updateMessage("Connection failed, so reload if necessary.");
-      eventSource.close(); // Close the existing connection
-      setTimeout(function() {
-        console.log("Retrying to connect and ack...");
-        updateMessage("I 👩🏽‍❤‍👩🏾 converting things.")
-        checkUUIDAndConnect();  
-      }, 3000); // 3 seconds delay
-
-    };
+      evtSource.onerror = function(event) {
+          console.error("EventSource encountered an error, attempting to reconnect...");
+          evtSource.close(); // Close the current EventSource connection
+          setTimeout(connect, 2000); // Try to reconnect after 2 seconds
+      };
   }
 
-
-  // Initiate the process
-  checkUUIDAndConnect();
+  // Fire up the connection
+  connect();
 
   // take server instructions, merge with cookies and set the dropdown
   var serverInstructions = "{{ instructions }}";
@@ -198,6 +139,8 @@ $(document).ready(function() {
         $('.dropdown-menu').append(newInstructionElement);
       }
     });
+  } else {
+    updateMessage("Use the pulldown or write your own request to convert one file format to another. Use terms like 'rotate', 'resize', and 'crop'.");
   }
 
   serverInstructionsArray.forEach(function(instruction) {
@@ -303,14 +246,11 @@ $(document).ready(function() {
   });
 
 
-  // Functions
-  // --------------
-
   // set timout variables
   var messageTimeout;
   var shortTimeout;
 
-  // Upload handler
+  // Upload handling
   function handleFileChange() {
     var fileInput = $('#fileInput')[0];
     if (fileInput.files && fileInput.files[0]) {

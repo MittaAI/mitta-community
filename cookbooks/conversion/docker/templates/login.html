@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Setting Session</title>
+    <script>
+        // Function to set a cookie
+        function setCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+
+        // Immediately set the UUID cookie and redirect to root
+        (function() {
+            const uuid = "{{ uuid }}";
+            setCookie("uuid", uuid, 7); // Set the uuid cookie to expire in 7 days
+            window.location.href = "/"; // Redirect to the root page
+        })();
+    </script>
+</head>
+<body>
+    <!-- No visible content needed, as the page will redirect immediately -->
+</body>
+</html>
