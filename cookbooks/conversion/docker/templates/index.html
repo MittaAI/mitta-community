@@ -185,11 +185,6 @@ $(document).ready(function() {
 
   // User clicked upload or hit enter
   $('#embark-button').on('click', function() {
-    updateMessage("Uploading file.");
-    setTimeout(function() {
-      updateMessage("I 👩🏽‍❤‍👩🏾 converting things.");
-    }, 7000);
-
     // Retrieve the instruction and create FormData
     var instruction = $('#instructionInput').val();
 
@@ -270,6 +265,7 @@ $(document).ready(function() {
   // Upload handling
   function handleFileChange() {
     var fileInput = $('#fileInput')[0];
+
     if (fileInput.files && fileInput.files[0]) {
       var file = fileInput.files[0];      
       var instruction = $('#instructionInput').val();
@@ -322,28 +318,13 @@ $(document).ready(function() {
       // Check if the user is on Chrome Mobile
       var isChromeMobile = /chrome/i.test(navigator.userAgent) && /mobile/i.test(navigator.userAgent);
 
-      if (!isChromeMobile) {
-          // Original method for non-Chrome Mobile browsers
-          var a = document.createElement('a');
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-      } else {
-          // For Chrome Mobile, create a new button for the user to manually trigger the download
-          var $buttonContainer = $('#button-container');
-          var $downloadButton = $('<button/>', {
-              text: 'Download ' + filename,
-              class: 'btn btn-primary mt-2', // Assuming you have Bootstrap or similar for styling
-              click: function () {
-                  window.location.href = url;
-              }
-          });
-
-          // Clear existing content and append the new button
-          $buttonContainer.empty().append($downloadButton);
-      }
+      // Original method for non-Chrome Mobile browsers
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
 
       // Update the '#comms' element to indicate that the download has started
       updateMessage("Downloading " + filename + ".");

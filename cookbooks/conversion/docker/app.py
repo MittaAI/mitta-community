@@ -417,7 +417,7 @@ async def callback():
     if messages:
         message = messages[0]
     else:
-        message = 'f'
+        message = 'What can I convert for you?'
 
     # Hot wire the ffmpeg_result to message
     # We only get this when there is an error
