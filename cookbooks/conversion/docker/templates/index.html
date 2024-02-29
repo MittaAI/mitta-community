@@ -94,27 +94,26 @@ $(document).ready(function() {
   const uuid = getCookie('uuid'); // Ensure you have a function to get the 'uuid' cookie
 
   function connect() {
-      evtSource = new EventSource(`/events?uuid=${uuid}`);
-      
-      evtSource.onmessage = function(event) {
-        const data = JSON.parse(event.data); // Parse the JSON string to an object
-        console.log(data);
-        // Check and process the message if present
-        if (data.message) {
+    console.log("Connecting to server...")
+    evtSource = new EventSource(`/events?uuid=${uuid}`);
+    
+    evtSource.onmessage = function(event) {
+      const data = JSON.parse(event.data); // Parse the JSON string to an object
+      // Check and process the message if present
+      if (data.message) {
+        updateMessage(data.message); // Display or process the message
+      }
+      // Check for file download information and process if present
+      if (data.access_uri && data.filename) {
+        downloadFile(data.access_uri, data.filename); // Function to handle file download
+      }
+    };
 
-          updateMessage(data.message); // Display or process the message
-        }
-        // Check for file download information and process if present
-        if (data.access_uri && data.filename) {
-          downloadFile(data.access_uri, data.filename); // Function to handle file download
-        }
-      };
-
-      evtSource.onerror = function(event) {
-          console.error("EventSource encountered an error, attempting to reconnect...");
-          evtSource.close(); // Close the current EventSource connection
-          setTimeout(connect, 2000); // Try to reconnect after 2 seconds
-      };
+    evtSource.onerror = function(event) {
+      console.error("EventSource encountered an error, attempting to reconnect...");
+      evtSource.close(); // Close the current EventSource connection
+      setTimeout(connect, 2000); // Try to reconnect after 2 seconds
+    };
   }
 
   function ackMessage(uuid) {
@@ -183,7 +182,7 @@ $(document).ready(function() {
     }, 10);
   });
 
-  // User clicked upload or hit enter
+  // User embarks on a new experience
   $('#embark-button').on('click', function() {
     // Retrieve the instruction and create FormData
     var instruction = $('#instructionInput').val();
@@ -289,6 +288,7 @@ $(document).ready(function() {
         setCookie('instructions', JSON.stringify(savedInstructions), 7);
       }
 
+      updateMessage("Uploading file.")
       $.ajax({
         url: '/upload',
         type: 'POST',
@@ -296,7 +296,6 @@ $(document).ready(function() {
         processData: false,
         contentType: false,
         success: function(response) {
-          console.log(response);
           updateMessage(response.message);
           $('#comms').fadeIn('slow');
           $('#fileInput').val('');

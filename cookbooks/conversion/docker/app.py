@@ -154,17 +154,32 @@ historic_queue = []
 
 # Client payload pickup and transfer
 async def notify_clients():
-    for uuid, queue in connections.items():
+    current_time = datetime.now()
+    for uuid, (queue, last_active) in list(connections.items()):
         content = await fetch_data_json_from_storage(uuid)
+        message_id = None  # Initialize message_id outside the try-except block
+
+        # Attempt to decode the JSON content and extract the message_id
         if content:
             try:
                 message = json.loads(content)
                 message_id = message.get('message_id')
-                if message_id and message_id not in historic_queue:
-                    await queue.put(content)  # Send the entire message as a JSON string without altering it
-                    historic_queue.append(message_id)  # Mark message_id as processed globally
             except json.JSONDecodeError as e:
                 logging.error(f"Error decoding JSON for UUID {uuid}: {e}")
+                content = None  # Invalidate content if there's a JSON error
+
+        # Remove the connection if it's inactive, and also clean up related historic_queue entries
+        if current_time - last_active > timedelta(minutes=5):
+            logging.info(f"Removing inactive connection {uuid}")
+            connections.pop(uuid)  # Remove the inactive connection
+            if message_id and message_id in historic_queue:
+                historic_queue.remove(message_id)  # Remove message_id from historic_queue if present
+            continue  # Skip further processing for this UUID
+
+        # Process and send the message if it's valid and not already in historic_queue
+        if content and message_id and message_id not in historic_queue:
+            await queue.put(content)
+            historic_queue.append(message_id)
     await asyncio.sleep(2)
 
 
@@ -177,25 +192,22 @@ async def start_background_tasks():
             await notify_clients()
     asyncio.create_task(broadcast())
 
+
 # Event stream
 async def event_stream(uuid):
     queue = asyncio.Queue()
-    connections[uuid] = queue  # Associate the queue with the UUID
+    connections[uuid] = (queue, datetime.now())  # Store queue with current timestamp
     try:
         while True:
             data = await queue.get()
-            # Ensure data is a JSON string
-            try:
-                data_json = json.dumps(data) if not isinstance(data, str) else data
-            except TypeError:
-                logging.error(f"Error serializing message to JSON for {uuid}")
-                continue
-            # Format the message for SSE with correct data field and JSON payload
+            # Refresh the timestamp each time data is sent
+            connections[uuid] = (queue, datetime.now())
+            data_json = json.dumps(data) if not isinstance(data, str) else data
             yield f"id: {uuid}\nevent: message\ndata: {data_json}\n\n"
-            await asyncio.sleep(3)  # Sleep the loop
+            await asyncio.sleep(3)
     except GeneratorExit:
         logging.info(f"Client disconnect {uuid}")
-        connections.pop(uuid, None)  # Remove the queue on disconnect
+        connections.pop(uuid, None)
         raise
 
 
