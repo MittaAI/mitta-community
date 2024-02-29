@@ -82,10 +82,12 @@ $(document).ready(function() {
   }
 
   // Update messages
+  var currentMessage;
   function updateMessage(newMessage) {
-    var currentMessage = $('#comms').html(); // Get the current content of the element
     if (newMessage !== currentMessage) { // Check if the new message is different
       $('#comms').html(newMessage).fadeIn('slow'); // Update the content and apply the fade effect
+    } else {
+      currentMessage = newMessage;
     }
   }
 
