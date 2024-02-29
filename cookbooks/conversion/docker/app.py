@@ -140,9 +140,47 @@ async def gen_uuid_write_json_data():
 
 @app.route('/login', methods=['GET'])
 async def login():
+    # Log all request headers
+    for header, value in request.headers.items():
+        logging.info(f"{header}: {value}")
+
+    # Attempt to get the client's IP address from the X-Forwarded-For header
+    x_forwarded_for = request.headers.get('X-Forwarded-For')
+    client_ip = x_forwarded_for.split(',')[0] if x_forwarded_for else request.remote_addr
+    logging.info(f"Client IP: {client_ip}")
+
+    # Render the login.html template
+    # Note: UUID generation is moved to the POST handler
+    return await render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+async def process_login():
+    # Extract JSON data from the request
+    data = await request.get_json()
+
+    # Log the received data
+    logging.info(f"Received data: {data}")
+
+    # Generate user_uuid here for use in response
     user_uuid = await gen_uuid_write_json_data()
-    # Now, instead of returning JSON, render the login.html template with the UUID
-    return await render_template('login.html', uuid=user_uuid)
+
+    # Log the generated user_uuid
+    logging.info(f"Generated user UUID: {user_uuid}")
+
+    # Respond with JSON including the UUID and indicating the client should redirect
+    response = {
+        "success": True, 
+        "cookieValue": user_uuid,  # Assuming this will be used as a cookie value on the client-side
+        "redirectUrl": "/"  # The URL to redirect the client to
+    }
+    return jsonify(response)
+
+# Ensure logging is configured to see output
+logging.basicConfig(level=logging.INFO)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 
 
 ########################
