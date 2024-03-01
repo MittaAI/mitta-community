@@ -46,7 +46,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 
 # File storage handling
 async def upload_to_storage(uuid, filename=None, content=None, content_type=None):
-    logging.info("upload_to_storage")
     gcs = storage.Client()
     bucket = gcs.bucket(os.getenv('MITTA_BUCKET'))
     blob_name = f"{uuid}/{filename}"
@@ -64,7 +63,6 @@ async def upload_to_storage(uuid, filename=None, content=None, content_type=None
 async def move_to_storage(access_uri, uuid, filename):
     async with httpx.AsyncClient() as client:
         mitta_url = f"{access_uri}?token={os.getenv('MITTA_TOKEN')}"
-        logging.info(mitta_url)
         response = await client.get(mitta_url)
 
         if response.status_code == 200:
@@ -79,8 +77,6 @@ async def move_to_storage(access_uri, uuid, filename):
             # Construct the new access URI based on the MITTA_DEV environment variable
             base_url = "https://mitta-convert.ngrok.io" if os.getenv('MITTA_DEV') == "True" else "https://convert.mitta.ai"
             access_uri = f"{base_url}/download/{uuid}/{filename}"
-            
-            logging.info(f"File uploaded successfully to GCS: {access_uri}")
             return access_uri
         else:
             logging.error(f"Failed to download file from {bucket}")
@@ -133,7 +129,6 @@ async def upload_data_json_to_storage(uuid, message):
 async def gen_uuid_write_json_data():
     uuid = str(uuid4())
     session['uuid'] = uuid
-    logging.info(f"generated uuid: {uuid}")
     data = {"uuid": uuid}
     await upload_data_json_to_storage(uuid, data)
     return uuid
@@ -440,7 +435,7 @@ async def callback():
 
     # Check the tokens match
     if token != mitta_token:
-        logging.info("Authentication failed")
+        logging.info("Authentication failed to callback.")
         # If tokens do not match, return an error response
         return jsonify({'status': 'error', 'message': "Authentication failed"}), 401
 
