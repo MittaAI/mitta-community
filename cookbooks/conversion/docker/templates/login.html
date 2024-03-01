@@ -14,28 +14,6 @@
             document.cookie = name + "=" + (value || "") + expires + "; path=/";
         }
 
-        function getBrowserDebugInfo() {
-            try {
-                return {
-                    userAgent: navigator.userAgent,
-                    language: navigator.language,
-                    platform: navigator.platform,
-                    screenWidth: window.screen.width,
-                    screenHeight: window.screen.height,
-                    colorDepth: window.screen.colorDepth,
-                    pixelDepth: window.screen.pixelDepth,
-                    timezoneOffset: new Date().getTimezoneOffset(),
-                    currentTime: new Date().toString(),
-                    cookiesEnabled: navigator.cookieEnabled,
-                    javaEnabled: navigator.javaEnabled ? navigator.javaEnabled() : 'Not available'
-                };
-            } catch (error) {
-                console.error("Failed to get browser debug info:", error);
-                // Return a fallback or partial object in case of an error
-                return {};
-            }
-        }
-
         function postData(url = '', data = {}) {
             return fetch(url, {
                 method: 'POST',
@@ -51,33 +29,20 @@
             }).then(response => response.json()); // Expecting a JSON response
         }
 
+        // likely gets rid of pesky crawlers, because if they did POSTs they'd be screwed
         function collectAndSendData() {
-            fetch('https://api.ipify.org?format=json')
-                .then(results => results.json())
-                .catch(() => {
-                    console.error("Failed to fetch IP address, proceeding without it.");
-                    return { ip: "Unavailable" }; // Fallback or partial content
+            postData('/login', {})
+                .then(response => {
+                    if (response.success && response.cookieValue && response.redirectUrl) {
+                        // Set cookie as instructed by the server
+                        setCookie("uuid", response.cookieValue, 7); // Example: Set for 7 days
+                        // Redirect to the URL provided by the server
+                        window.location.href = response.redirectUrl;
+                    } else {
+                        console.error("Failed to process data on the server.");
+                    }
                 })
-                .then(ipData => {
-                    const debugInfo = getBrowserDebugInfo();
-                    const dataToSend = {
-                        ...debugInfo,
-                        publicIP: ipData.ip
-                    };
-
-                    postData('/login', dataToSend)
-                        .then(response => {
-                            if (response.success && response.cookieValue && response.redirectUrl) {
-                                // Set cookie as instructed by the server
-                                setCookie("uuid", response.cookieValue, 7); // Example: Set for 7 days
-                                // Redirect to the URL provided by the server
-                                window.location.href = response.redirectUrl;
-                            } else {
-                                console.error("Failed to process data on the server.");
-                            }
-                        })
-                        .catch(error => console.error("Error sending data:", error));
-                });
+                .catch(error => console.error("Error sending data:", error));
         }
 
         window.onload = collectAndSendData;

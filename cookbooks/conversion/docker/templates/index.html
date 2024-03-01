@@ -95,10 +95,22 @@ $(document).ready(function() {
   let evtSource;
   const uuid = getCookie('uuid'); // Ensure you have a function to get the 'uuid' cookie
 
+  var retryCount = 0;
+  const maxRetries = 5; // Maximum number of retries
+  var reconnectScheduled = false;
+  
+  // Connect to SSE called twice here, and once in the #embark handler below
   function connect() {
-    console.log("Connecting to server...")
-    evtSource = new EventSource(`/events?uuid=${uuid}`);
-    
+    console.log("Connecting to server...");
+    if (retryCount > maxRetries) {
+        console.error("Maximum reconnect attempts reached. Stopping reconnection attempts.");
+        return; // Stop trying to reconnect
+    } else {
+      reconnectScheduled = false;
+      // version the event request so we can upgrade clients later by forcing reload
+      evtSource = new EventSource(`/events?uuid=${uuid}&v=1`);
+    }
+       
     evtSource.onmessage = function(event) {
       const data = JSON.parse(event.data); // Parse the JSON string to an object
       // Check and process the message if present
@@ -109,12 +121,24 @@ $(document).ready(function() {
       if (data.access_uri && data.filename) {
         downloadFile(data.access_uri, data.filename); // Function to handle file download
       }
+      // Check for reload event, to update page
+      if (data.reload) {
+        window.location.href = '/login';
+      }
     };
 
     evtSource.onerror = function(event) {
       console.error("EventSource encountered an error, attempting to reconnect...");
+      retryCount++;
       evtSource.close(); // Close the current EventSource connection
-      setTimeout(connect, 2000); // Try to reconnect after 2 seconds
+      if (!reconnectScheduled) {
+        console.log("Scheduling reconnection attempt...");
+        reconnectScheduled = true;
+        retryCount++;
+        setTimeout(function() {
+            connect(); // Try to reconnect after 2 seconds
+        }, 2000);
+      }
     };
   }
 
@@ -131,8 +155,8 @@ $(document).ready(function() {
     });
   }
 
-  // Fire up the connection
-  connect();
+  // don't need this now
+  // connect();
 
   // take server instructions, merge with cookies and set the dropdown
   var serverInstructions = "{{ instructions }}";
@@ -186,6 +210,12 @@ $(document).ready(function() {
 
   // User embarks on a new experience
   $('#embark-button').on('click', function() {
+    // Reset the retry count each time the user initiates the process
+    retryCount = 0;
+    
+    // Connect to the server-side event stream
+    connect();
+
     // Retrieve the instruction and create FormData
     var instruction = $('#instructionInput').val();
 
