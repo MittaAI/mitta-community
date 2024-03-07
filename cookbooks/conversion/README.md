@@ -1,6 +1,12 @@
 
 # AI Powered Media Conversion Pipeline
+You can demo this pipeline here: [AI Convert](https://convert.mitta.ai)
 
+## Development Notes
+The pipeline has gotten a bit fussy since OpenAI GPT models have apparently been nerfed, or degraded. Not sure what is going on, but the work is ongoing to continue to improve the success rate of the conversions. Notes will appear here as this process occurs.
+
+- 3/4/24 - Swapped the ffmpeg node over to using 'gpt-4-turbo-preview'. The `aiffmpeg` node uses a subset of the `aidict` functionality, and this would really be better served using `aistruct` which leverages function calls with OpenAI. I've also updated the template slightly to insist the AI returns an ffmpeg_command in the result. Work is also underway to vectorize the results of errors to let the system learn what works and what doesn't.
+  
 This pipeline is designed to convert and process media files using an `aiffmpeg` processor, transforming them via AI-generated conversion code. It enables users to automate the transformation of various media formats and integrate advanced AI capabilities into their media processing workflows.
 
 It can be used with file generation pipelines to resize/reformat images or audio files.
