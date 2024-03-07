@@ -116,6 +116,7 @@ SCRIPT=$(cat <<EOF
 #!/bin/bash
 if [ -d "/opt/$REPO_NAME/" ]; then
   echo "starting controller"
+  cd /opt/mitta-community/services/gpu/controller
   bash start-controller.sh
 else
   sudo su -

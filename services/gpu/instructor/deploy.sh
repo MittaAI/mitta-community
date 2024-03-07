@@ -65,7 +65,6 @@ if [[ $(git status --porcelain) ]]; then
   exit 1
 else
   echo "Git repository is up to date."
-  # Add your deployment script commands here
 fi
 
 # Get the current remote URL for 'origin'
@@ -113,7 +112,7 @@ SCRIPT=$(cat <<EOF
 #!/bin/bash
 if [ -d "/opt/$REPO_NAME/" ]; then
   echo "Starting Instructor services..."
-  /opt/deeplearning/install-driver.sh
+  # /opt/deeplearning/install-driver.sh
   cd /opt/mitta-community/services/gpu/instructor/
   bash start-instructor.sh
 
@@ -130,9 +129,6 @@ else
   apt-get install python3-pip -y
   apt-get install git -y
   apt-get install gcc -y
- 
-  # cuda drivers
-  /opt/deeplearning/install-driver.sh
   
   # download code
   cd /opt/
@@ -153,6 +149,9 @@ else
   # requirements
   cd /opt/$REPO_NAME/services/gpu/instructor/
   pip install -r requirements.txt
+
+  # cuda drivers
+  /opt/deeplearning/install-driver.sh
 
   # restart ngninx
   systemctl restart nginx.service
@@ -183,7 +182,7 @@ $PREEMPTIBLE \
 --labels=type=instructor \
 --tags instructor,token-$TOKEN \
 --reservation-affinity=any \
---metadata startup-script="$SCRIPT"
+--metadata startup-script="$SCRIPT",enable-oslogin=FALSE
 sleep 15
 
 # add data
