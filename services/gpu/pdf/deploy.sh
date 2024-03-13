@@ -144,12 +144,15 @@ else
   cp bid_token.py /root/
   cp nginx.conf.pdf /etc/nginx/nginx.conf
 
-  # grab the tokens and write to nginx htpasswrd and env
-  cd /root
-  python3 bid_token.py pdf
 
   # requirements
   # pip install "python-doctr[torch]"
+  pip install easyocr
+  python pdf.py
+  
+  # grab the tokens and write to nginx htpasswrd and env
+  cd /root
+  python3 bid_token.py pdf
 
   # restart ngninx
   systemctl restart nginx.service
