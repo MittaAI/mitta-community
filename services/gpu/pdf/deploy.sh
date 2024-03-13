@@ -112,23 +112,29 @@ esac
 SCRIPT=$(cat <<EOF
 #!/bin/bash
 if [ -d "/opt/$REPO_NAME/" ]; then
-  echo "Starting PDF services..."
-  /opt/deeplearning/install-driver.sh
-  cd /opt/mitta-community/services/gpu/pdf/
-  bash start-pdf.sh
+  echo "Starting Instructor services..."
+  # /opt/deeplearning/install-driver.sh
+  cd /opt/mitta-community/services/gpu/instructor/
+  bash start-instructor.sh
 
 else
   sudo su -
   date >> /opt/start.time
 
-  # apt-get
   apt-get update -y
+
+  apt-get install apache2-utils -y
+  apt-get install nginx -y
+  apt-get install build-essential -y
+  apt-get install unzip -y
   apt-get install python3-pip -y
   apt-get install git -y
- 
-  # cuda drivers
-  /opt/deeplearning/install-driver.sh
+  apt-get install gcc -y
   
+  # copy files
+  cp bid_token.py /root/
+  cp nginx.conf.pdf /etc/nginx/nginx.conf
+
   # download code
   cd /opt/
   git clone $REPO_URL
@@ -143,13 +149,13 @@ else
   python3 bid_token.py pdf
 
   # requirements
-  pip install "python-doctr[torch]"
+  # pip install "python-doctr[torch]"
 
   # restart ngninx
   systemctl restart nginx.service
 
   # start instructor service
-  bash start-pdf.sh &
+  # bash start-pdf.sh &
 
   date >> /opt/done.time
 
@@ -175,6 +181,26 @@ $PREEMPTIBLE \
 --tags pdf,token-$TOKEN \
 --reservation-affinity=any \
 --metadata startup-script="$SCRIPT"
+sleep 15
+
+gcloud compute instances create $NAME-$NEW_UUID \
+--project=$GC_PROJECT \
+--zone=$ZONE \
+--machine-type=$TYPE \
+--network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
+--no-restart-on-failure \
+$PREEMPTIBLE \
+--service-account=$SERVICE_ACCOUNT \
+--scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
+--accelerator=count=1,type=nvidia-l4 \
+--create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/ml-images/global/images/c0-deeplearning-common-gpu-v20231209-debian-11-py310,mode=rw,size=200,type=projects/$GC_PROJECT/zones/$ZONE/diskTypes/pd-ssd \
+--no-shielded-secure-boot \
+--shielded-vtpm \
+--shielded-integrity-monitoring \
+--labels=type=instructor \
+--tags instructor,token-$TOKEN \
+--reservation-affinity=any \
+--metadata startup-script="$SCRIPT",enable-oslogin=FALSE
 sleep 15
 
 # add data
