@@ -144,11 +144,13 @@ else
   cp nginx.conf.ocr /etc/nginx/nginx.conf
 
   # requirements
+  conda create -n ocr python=3.10 -y
+  conda activate ocr
   pip install -r requirements.txt
 
   # grab the tokens and write to nginx htpasswrd and env
   cd /root
-  python3 bid_token.py ocr
+  python bid_token.py ocr
 
   # restart ngninx
   systemctl restart nginx.service
