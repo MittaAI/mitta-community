@@ -123,9 +123,14 @@ else
 
   # apt-get
   apt-get update -y
+  apt-get install apache2-utils -y
+  apt-get install nginx -y
+  apt-get install build-essential -y
+  apt-get install unzip -y
   apt-get install python3-pip -y
   apt-get install git -y
- 
+  apt-get install gcc -y
+
   # cuda drivers
   /opt/deeplearning/install-driver.sh
   
