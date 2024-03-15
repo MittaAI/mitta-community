@@ -112,7 +112,7 @@ SCRIPT=$(cat <<EOF
 #!/bin/bash
 if [ -d "/opt/$REPO_NAME/" ]; then
   echo "Starting Instructor services..."
-  # /opt/deeplearning/install-driver.sh
+  /opt/deeplearning/install-driver.sh
   cd /opt/mitta-community/services/gpu/instructor/
   bash start-instructor.sh
 

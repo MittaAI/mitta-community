@@ -138,12 +138,15 @@ else
   cp bid_token.py /root/
   cp nginx.conf.ocr /etc/nginx/nginx.conf
 
+  # requirements
+  pip install easyocr
+
+  # prime the pump
+  python model.py
+  
   # grab the tokens and write to nginx htpasswrd and env
   cd /root
   python3 bid_token.py ocr
-
-  # requirements
-  pip install easyocr
 
   # restart ngninx
   systemctl restart nginx.service
