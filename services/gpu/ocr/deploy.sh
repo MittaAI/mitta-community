@@ -143,7 +143,7 @@ else
 
   # prime the pump
   python model.py
-  
+
   # grab the tokens and write to nginx htpasswrd and env
   cd /root
   python3 bid_token.py ocr
@@ -152,6 +152,7 @@ else
   systemctl restart nginx.service
 
   # start instructor service
+  cd /opt/$REPO_NAME/services/gpu/ocr/
   bash start-ocr.sh &
 
   date >> /opt/done.time
