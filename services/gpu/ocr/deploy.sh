@@ -139,7 +139,7 @@ else
   cp nginx.conf.ocr /etc/nginx/nginx.conf
 
   # requirements
-  pip install easyocr
+  pip install -r requirements.txt
 
   # prime the pump
   python model.py
