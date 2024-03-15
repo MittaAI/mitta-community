@@ -143,6 +143,11 @@ else
   cp bid_token.py /root/
   cp nginx.conf.ocr /etc/nginx/nginx.conf
 
+  # install conda
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda
+  export PATH="/opt/conda/bin:$PATH"
+
   # requirements
   conda create -n ocr python=3.10 -y
   conda activate ocr
