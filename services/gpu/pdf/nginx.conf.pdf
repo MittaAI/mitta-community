@@ -6,15 +6,15 @@ events {
         # multi_accept on;
 }
 http {
-        upstream instructor {
+        upstream pdf {
                 server localhost:8989;
         }
         server {
                 listen  9898;
                 location / {
-                        auth_basic "instructor";
+                        auth_basic "pdf";
                         auth_basic_user_file /etc/nginx/htpasswd;
-                        proxy_pass http://instructor/;
+                        proxy_pass http://pdf/;
                 }
         }
 }
