@@ -147,7 +147,7 @@ else
   pip install -r requirements.txt
 
   # prime the pump
-  python model.py
+  python3 model.py
 
   # grab the tokens and write to nginx htpasswrd and env
   cd /root
