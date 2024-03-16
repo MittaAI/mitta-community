@@ -8,7 +8,7 @@ from PIL import Image
 import httpx
 from io import BytesIO
 
-logging.basicConfig(filename='instructor.log', level=logging.DEBUG,
+logging.basicConfig(filename='ocr.log', level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Quart(__name__)
