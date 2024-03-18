@@ -115,7 +115,8 @@ if [ -d "/opt/$REPO_NAME/" ]; then
   echo "Starting OCR services..."
   /opt/deeplearning/install-driver.sh
   cd /opt/mitta-community/services/gpu/ocr/
-  bash start-ocr.sh
+  conda activate ocr
+  bash start-ocr.sh &
 
 else
   sudo su -
