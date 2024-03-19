@@ -152,7 +152,7 @@ else
   # requirements
   conda create -n ocr python=3.10 -y
   conda activate ocr
-  pip install -r requirements.txt
+  sudo pip install -r requirements.txt
 
   # grab the tokens and write to nginx htpasswrd and env
   cd /root
