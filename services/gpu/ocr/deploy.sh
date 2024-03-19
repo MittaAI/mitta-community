@@ -115,6 +115,7 @@ if [ -d "/opt/$REPO_NAME/" ]; then
   echo "Starting OCR services..."
   /opt/deeplearning/install-driver.sh
   cd /opt/mitta-community/services/gpu/ocr/
+  conda init
   conda activate ocr
   bash start-ocr.sh &
 
@@ -150,6 +151,7 @@ else
   export PATH="/opt/conda/bin:$PATH"
 
   # requirements
+  conda init
   conda create -n ocr python=3.10 -y
   conda activate ocr
   sudo pip install -r requirements.txt
