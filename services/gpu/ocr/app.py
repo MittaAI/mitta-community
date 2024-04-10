@@ -49,6 +49,9 @@ async def read():
             result = reader.readtext(image_bytes, paragraph=True, height_ths=5, width_ths=0.8, detail=1)
             app.logger.info(result)
 
+            # delete the reader to help manage cuda memory
+            del reader
+
             # Sort the recognized text based on the vertical position (top to bottom)
             sorted_result = sorted(result, key=lambda x: x[0][0][1])
 
