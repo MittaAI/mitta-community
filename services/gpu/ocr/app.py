@@ -19,23 +19,23 @@ async def read():
     if request.method == 'POST':
         data = await request.get_json()  # Assuming the data is sent as JSON in the request body
         mitta_uris = data.get('mitta_uri')
-        page_numbers = data.get('page_numbers')
+        page_nums = data.get('page_nums')
 
-        if not mitta_uris or not page_numbers:
-            return jsonify({"status": "failed", "error": "Both `mitta_uri` and `page_numbers` are required."}), 400
+        if not mitta_uris or not page_nums:
+            return jsonify({"status": "failed", "error": "Both `mitta_uri` and `page_nums` are required."}), 400
 
-        if not isinstance(mitta_uris, list) or not isinstance(page_numbers, list):
-            return jsonify({"status": "failed", "error": "`mitta_uri` and `page_numbers` must be lists."}), 400
+        if not isinstance(mitta_uris, list) or not isinstance(page_nums, list):
+            return jsonify({"status": "failed", "error": "`mitta_uri` and `page_nums` must be lists."}), 400
 
-        if len(mitta_uris) != len(page_numbers):
-            return jsonify({"status": "failed", "error": "The number of `mitta_uri` and `page_numbers` must be the same."}), 400
+        if len(mitta_uris) != len(page_nums):
+            return jsonify({"status": "failed", "error": "The number of `mitta_uri` and `page_nums` must be the same."}), 400
 
         all_recognized_text = []
         all_coordinates = []
-        all_page_numbers = []
+        all_page_nums = []
 
-        for mitta_uri, page_number in zip(mitta_uris, page_numbers):
-            log_line = f"Received POST request to /read with: '{mitta_uri}', page number: {page_number}. Responding with texts."
+        for mitta_uri, page_num in zip(mitta_uris, page_nums):
+            log_line = f"Received POST request to /read with: '{mitta_uri}', page number: {page_num}. Responding with texts."
             app.logger.info(log_line)
 
             # Download the image from the provided URL using HTTPX
@@ -62,9 +62,9 @@ async def read():
 
             all_recognized_text.append(recognized_text)
             all_coordinates.append(coordinates)
-            all_page_numbers.append(page_number)
+            all_page_nums.append(page_num)
 
-        return jsonify({"texts": all_recognized_text, "coords": all_coordinates, "page_numbers": all_page_numbers}), 200
+        return jsonify({"texts": all_recognized_text, "coords": all_coordinates, "page_nums": all_page_nums}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
