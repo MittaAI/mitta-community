@@ -7,6 +7,7 @@ import re
 import logging
 import httpx
 from io import BytesIO
+import torch
 
 logging.basicConfig(filename='ocr.log', level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -45,9 +46,15 @@ async def read():
             # Initialize the EasyOCR reader
             reader = easyocr.Reader(['en'], gpu=True, verbose=True)
 
-            with easyocr.Reader(['en'], gpu=True, verbose=True) as reader:
+            try:
                 # Perform text recognition
                 result = reader.readtext(image_bytes, paragraph=True, height_ths=5, width_ths=0.8, detail=1)
+            finally:
+                # Delete the reader object
+                del reader
+
+            # Release the GPU memory
+            torch.cuda.empty_cache()
 
             # Sort the recognized text based on the vertical position (top to bottom)
             sorted_result = sorted(result, key=lambda x: x[0][0][1])
