@@ -1,11 +1,11 @@
 # powered by easyocr
-
 import easyocr
 from quart import Quart, request, jsonify
 import random
 import re
 import logging
 import httpx
+from httpx import TimeoutException
 from io import BytesIO
 import torch
 
@@ -38,10 +38,14 @@ async def read():
             log_line = f"Received POST request to /read with: '{mitta_uri}', page number: {page_num}. Responding with texts."
             app.logger.info(log_line)
 
-            # Download the image from the provided URL using HTTPX
-            async with httpx.AsyncClient() as client:
-                response = await client.get(mitta_uri)
-                image_bytes = response.read()
+            try:
+                # Download the image from the provided URL using HTTPX with a timeout of 60 seconds
+                async with httpx.AsyncClient(timeout=60.0) as client:
+                    response = await client.get(mitta_uri)
+                    image_bytes = response.read()
+            except TimeoutException:
+                app.logger.error(f"Timeout occurred while downloading image from '{mitta_uri}'")
+                return jsonify({"status": "failed", "error": f"Timeout occurred while downloading image from '{mitta_uri}'"}), 500
 
             # Initialize the EasyOCR reader
             reader = easyocr.Reader(['en'], gpu=True, verbose=True)
