@@ -21,14 +21,11 @@ async def read():
         mitta_uris = data.get('mitta_uri')
         page_numbers = data.get('page_numbers')
 
-        if not mitta_uris:
-            return jsonify({"status": "failed", "error": "Requires `mitta_uri`."}), 400
+        if not mitta_uris or not page_numbers:
+            return jsonify({"status": "failed", "error": "Both `mitta_uri` and `page_numbers` are required."}), 400
 
-        if isinstance(mitta_uris, str):
-            mitta_uris = [mitta_uris]  # Convert single URL string to a list
-
-        if not page_numbers:
-            page_numbers = [1] * len(mitta_uris)  # Default page number to 1 if not provided
+        if not isinstance(mitta_uris, list) or not isinstance(page_numbers, list):
+            return jsonify({"status": "failed", "error": "`mitta_uri` and `page_numbers` must be lists."}), 400
 
         if len(mitta_uris) != len(page_numbers):
             return jsonify({"status": "failed", "error": "The number of `mitta_uri` and `page_numbers` must be the same."}), 400
@@ -65,7 +62,7 @@ async def read():
 
             all_recognized_text.append(recognized_text)
             all_coordinates.append(coordinates)
-            all_page_numbers.append([page_number] * len(recognized_text))
+            all_page_numbers.append(page_number)
 
         return jsonify({"texts": all_recognized_text, "coords": all_coordinates, "page_numbers": all_page_numbers}), 200
 
