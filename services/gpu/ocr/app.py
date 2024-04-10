@@ -5,7 +5,6 @@ from quart import Quart, request, jsonify
 import random
 import re
 import logging
-from PIL import Image
 import httpx
 from io import BytesIO
 
@@ -43,14 +42,11 @@ async def read():
                 response = await client.get(mitta_uri)
                 image_bytes = response.read()
 
-            # Create a PIL Image object from the downloaded image bytes
-            image = Image.open(BytesIO(image_bytes))
-
             # Initialize the EasyOCR reader
             reader = easyocr.Reader(['en'], gpu=True, verbose=True)
 
             # Perform text recognition
-            result = reader.readtext(image, paragraph=True, height_ths=5, width_ths=0.8, detail=1)
+            result = reader.readtext(image_bytes, paragraph=True, height_ths=5, width_ths=0.8, detail=1)
             app.logger.info(result)
 
             # Sort the recognized text based on the vertical position (top to bottom)
