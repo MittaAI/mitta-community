@@ -1,4 +1,5 @@
 # powered by easyocr
+
 import easyocr
 from quart import Quart, request, jsonify
 import random
@@ -21,13 +22,16 @@ async def read():
         page_numbers = data.get('page_numbers')
 
         if not mitta_uris:
-            return jsonify({"status": "failed", "error": "Requires `mitta_uri`."})
+            return jsonify({"status": "failed", "error": "Requires `mitta_uri`."}), 400
 
         if isinstance(mitta_uris, str):
             mitta_uris = [mitta_uris]  # Convert single URL string to a list
 
         if not page_numbers:
             page_numbers = [1] * len(mitta_uris)  # Default page number to 1 if not provided
+
+        if len(mitta_uris) != len(page_numbers):
+            return jsonify({"status": "failed", "error": "The number of `mitta_uri` and `page_numbers` must be the same."}), 400
 
         all_recognized_text = []
         all_coordinates = []
@@ -63,7 +67,7 @@ async def read():
             all_coordinates.append(coordinates)
             all_page_numbers.append([page_number] * len(recognized_text))
 
-        return jsonify({"texts": all_recognized_text, "coords": all_coordinates, "page_numbers": all_page_numbers})
+        return jsonify({"texts": all_recognized_text, "coords": all_coordinates, "page_numbers": all_page_numbers}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
