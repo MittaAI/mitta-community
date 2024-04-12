@@ -28,12 +28,11 @@ if [ -z "$TOKEN" ] || [ -z "$SERVICE_ACCOUNT" ] || [ -z "$GC_PROJECT" ]; then
 fi
 
 # Setup boxes
-TYPE=n1-standard-8
+TYPE=g2-standard-8
 NAME=ocr
 NEW_UUID=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 4 ; echo)
 
 PREEMPTIBLE=" \
---maintenance-policy=TERMINATE \
 --provisioning-model=SPOT \
 --instance-termination-action=STOP \
 "
@@ -179,10 +178,11 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --machine-type=$TYPE \
 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
 --no-restart-on-failure \
+--maintenance-policy=TERMINATE \
 $PREEMPTIBLE \
 --service-account=$SERVICE_ACCOUNT \
 --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
---accelerator=count=2,type=nvidia-tesla-t4 \
+--accelerator=count=2,type=nvidia-l4 \
 --create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/ml-images/global/images/c0-deeplearning-common-gpu-v20231209-debian-11-py310,mode=rw,size=200,type=projects/$GC_PROJECT/zones/$ZONE/diskTypes/pd-ssd \
 --no-shielded-secure-boot \
 --shielded-vtpm \
