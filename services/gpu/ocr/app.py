@@ -66,6 +66,11 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
         try:
             # Perform text recognition
             result = reader.readtext(image_bytes, paragraph=True, height_ths=5, width_ths=0.8, detail=1)
+        except Exception as e:
+            app.logger.error(f"Error occurred during OCR processing: {e}")
+            if callback_url:
+                await notify_failure(callback_url, f"Error occurred during OCR processing: {e}")
+            continue
         finally:
             # Delete the reader object
             del reader
@@ -84,12 +89,16 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
         all_page_nums.append(page_num)
 
     if callback_url:
-        await send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums)
+        if all_recognized_text:
+            await send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums, status="success")
+        else:
+            await send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums, status="failed")
     else:
         return all_recognized_text, all_coordinates, all_page_nums
 
-async def send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums):
+async def send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums, status="success"):
     data = {
+        "status": status,
         "texts": all_recognized_text,
         "coords": all_coordinates,
         "page_nums": all_page_nums
