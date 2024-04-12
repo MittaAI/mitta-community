@@ -110,13 +110,18 @@ esac
 
 SCRIPT=$(cat <<EOF
 #!/bin/bash
-if [ -d "/opt/$REPO_NAME/" ]; then
-  echo "Starting OCR services..."
-  /opt/deeplearning/install-driver.sh
-  cd /opt/mitta-community/services/gpu/ocr/
-  conda init
-  conda activate ocr
-  bash start-ocr.sh &
+
+if [ -d "/opt/mitta-community/" ]; then
+    echo "Updating OCR services..."
+    cd /opt/mitta-community/
+    git pull
+
+    echo "Starting OCR services..."
+    /opt/deeplearning/install-driver.sh
+    cd /opt/mitta-community/services/gpu/ocr/
+    conda init
+    conda activate ocr
+    bash start-ocr.sh &
 
 else
   sudo su -
