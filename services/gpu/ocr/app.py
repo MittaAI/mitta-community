@@ -41,6 +41,14 @@ async def read():
             return jsonify({"texts": all_recognized_text, "coords": all_coordinates, "page_nums": all_page_nums}), 200
 
 async def process_ocr(mitta_uris, page_nums, callback_url=None):
+
+    # set the flag to indicate we're running to the shutdown script
+    process_id = str(uuid.uuid4())[:8]  # Generate a unique process ID
+    process_file = f"/path/to/PROCESS-{process_id}"
+
+    with open(process_file, "w") as file:
+        file.write("Processing")
+
     all_recognized_text = []
     all_coordinates = []
     all_page_nums = []
@@ -88,6 +96,8 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
         all_coordinates.append(coordinates)
         all_page_nums.append(page_num)
 
+    os.remove(process_file)  # Delete the PROCESS file for the thread
+    
     if callback_url:
         if all_recognized_text:
             await send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums, status="success")
