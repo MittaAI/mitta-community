@@ -10,6 +10,8 @@ from httpx import TimeoutException
 from io import BytesIO
 import torch
 import asyncio
+import os
+import uuid
 
 logging.basicConfig(filename='ocr.log', level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -97,7 +99,7 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
         all_page_nums.append(page_num)
 
     os.remove(process_file)  # Delete the PROCESS file for the thread
-    
+
     if callback_url:
         if all_recognized_text:
             await send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums, status="success")
