@@ -28,7 +28,7 @@ if [ -z "$TOKEN" ] || [ -z "$SERVICE_ACCOUNT" ] || [ -z "$GC_PROJECT" ]; then
 fi
 
 # Setup boxes
-TYPE=g2-standard-8
+TYPE=n1-standard-8
 NAME=ocr
 NEW_UUID=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 4 ; echo)
 
