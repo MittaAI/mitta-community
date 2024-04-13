@@ -46,7 +46,9 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
 
     # set the flag to indicate we're running to the shutdown script
     process_id = str(uuid.uuid4())[:8]  # Generate a unique process ID
-    process_file = f"/path/to/PROCESS-{process_id}"
+    
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    process_file = f"{current_path}/PROCESS-{process_id}"
 
     with open(process_file, "w") as file:
         file.write("Processing")
