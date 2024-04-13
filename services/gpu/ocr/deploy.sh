@@ -116,6 +116,9 @@ if [ -d "/opt/mitta-community/" ]; then
     cd /opt/mitta-community/
     git pull
 
+    echo "Setting conda path..."
+    export PATH="/opt/conda/bin:$PATH"
+
     echo "Starting OCR services..."
     /opt/deeplearning/install-driver.sh
     cd /opt/mitta-community/services/gpu/ocr/
