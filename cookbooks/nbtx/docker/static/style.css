@@ -1,0 +1,171 @@
+@font-face {
+  font-family: 'Orbitron Regular';
+  src: url('/static/Orbitron-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Silka Regular';
+  src: url('/static/silka-regular-webfont.ttf') format('truetype');
+}
+
+body {
+  font-family: 'Silka Regular';
+  background-color: #101010;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: left;
+  margin: 0;
+  caret-color: transparent;
+}
+
+button, a.btn {
+  -webkit-appearance: none;
+}
+
+a {
+  color: #96c9ff;
+  text-decoration: none;
+}
+
+h1 {
+  font-family: 'Orbitron Regular';
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+input {
+  caret-color: auto;
+}
+
+.greater-than {
+  color: #0adf1c;
+}
+
+.convert {
+  background: radial-gradient(circle at center center, rgba(128, 128, 128, 0.3) 0%, rgba(128, 128, 128, 0) 100%);
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f4f4f4;
+  padding: 20px;
+  transition:  all 0.5s ease;
+}
+
+.inputs {
+  width: 100%;
+}
+
+.input-group {
+  max-width: 100%;
+}
+
+.dropdown-menu {
+  max-width: 480px; /* Adjust this value based on your design requirements */
+  max-height: 320px; /* Adjust the height as needed */
+  overflow-y: auto; /* Enable vertical scrolling for overflow content */
+  overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+.dropdown-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds an ellipsis (...) at the end of the text if it overflows */
+}
+
+.input-group-text {
+  cursor: pointer;
+}
+
+.input-group {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.input-group .form-control {
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
+#controls {
+  min-width: 480px;
+}
+
+#mitta {
+  cursor: pointer;
+}
+
+#comms {
+  color: #f4e8c1;
+}
+
+#comms {
+  max-width: 480px;
+  min-width: 480px;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .input-group {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  #comms, #image, #story {
+    max-width: 320px;
+    min-width: 320px;
+  }
+  
+  .convert {
+    align-items: stretch;
+  }
+  
+  #controls {
+    min-width: 320px;
+    max-width: 320px;
+  }
+
+  .dropdown-item {
+    min-width: 240px;
+    max-width: 320px;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* Adds an ellipsis (...) for overflowing text */
+  }
+}
+
+
+
+.conversation-container {
+    margin-bottom: 20px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-y: auto;
+    max-height: 300px;  // Adjust height as needed
+}
+
+.exchange {
+    margin-bottom: 10px;
+}
+
+.user-message, .bot-reply {
+    margin: 5px 0;
+    padding: 8px;
+    background-color: #e7e7e7;
+    border-radius: 4px;
+}
+
+.user-message {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+.bot-reply {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}

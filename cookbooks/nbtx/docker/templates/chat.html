@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Braunfels AI</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Welcome to NBTX!</h1>
+        <div class="conversation-container">
+            <div class="exchange">
+                <p class="user-message"><strong>User:</strong> {{user_query}}</p>
+                <p class="bot-reply"><strong>Bot:</strong> {{bot_response}}.</p>
+            </div>
+        </div>
+        <div class="chat-box">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Ask me anything...">
+            <button id="sendButton" class="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#sendButton').on('click', function() {
+                var query = $('#chatInput').val();
+                // Add functionality to handle the chat interaction
+                console.log("Query sent: ", query);
+                // Example of appending the user's query and a simulated response
+                $('.conversation-container').append('<p class="user-message"><strong>User:</strong> ' + query + '</p>');
+                // Simulate a bot response for demonstration
+                $('.conversation-container').append('<p class="bot-reply"><strong>Bot:</strong> Thank you for asking. Here is the information you requested.</p>');
+                $('#chatInput').val(''); // Clear the input field
+            });
+
+            $('#chatInput').on('keypress', function(e) {
+                if (e.which === 13) {  // Enter key
+                    $('#sendButton').click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
