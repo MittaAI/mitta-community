@@ -32,7 +32,7 @@ from quart_cors import cors
 
 # App definition
 app = Quart(__name__, static_folder='static')
-app = cors(app, allow_origin=["http://localhost:5000", "https://convert.mitta.ai"])
+app = cors(app, allow_origin=["http://localhost:5000", "https://nbtx.ai"])
 app.config['SESSION_COOKIE_MAX_AGE'] = timedelta(seconds=30)
 app.secret_key = os.getenv('MITTA_SECRET', 'f00bar22222')
 
