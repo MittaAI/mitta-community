@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 import logging
 import requests
 import uuid
+import os
 
 logging.basicConfig(filename='instructor.log', level=logging.INFO)
 
@@ -65,6 +66,8 @@ def embed():
                     app.logger.error(f"Failed to send callback for batch {i // batch_size + 1}: {str(e)}")
                     # You can choose to handle this error differently, e.g., retry or continue to the next batch
 
+        os.remove(process_file)  # Delete the PROCESS file for the thread
+        
         return jsonify({"status": "success"}), 202
 
 if __name__ == '__main__':

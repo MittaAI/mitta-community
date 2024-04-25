@@ -155,8 +155,8 @@ else
 
   # requirements
   conda init
-  conda create -n ocr python=3.10 -y
-  conda activate ocr
+  conda create -n instructor python=3.10 -y
+  conda activate instructor
   cd /opt/$REPO_NAME/services/gpu/instructor/
   sudo pip install -r requirements.txt
 
