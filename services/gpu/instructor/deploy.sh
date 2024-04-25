@@ -109,11 +109,21 @@ esac
 
 SCRIPT=$(cat <<EOF
 #!/bin/bash
-if [ -d "/opt/$REPO_NAME/" ]; then
-  echo "Starting Instructor services..."
-  /opt/deeplearning/install-driver.sh
-  cd /opt/mitta-community/services/gpu/instructor/
-  bash start-instructor.sh
+
+if [ -d "/opt/mitta-community/" ]; then
+    echo "Updating Instructor services..."
+    cd /opt/mitta-community/
+    git pull
+
+    echo "Setting conda path..."
+    export PATH="/opt/conda/bin:$PATH"
+
+    echo "Starting Instructor services..."
+    /opt/deeplearning/install-driver.sh
+    cd /opt/mitta-community/services/gpu/instructor/
+    conda init
+    conda activate instructor
+    bash start-instructor.sh &
 
 else
   sudo su -
@@ -138,16 +148,24 @@ else
   cp bid_token.py /root/
   cp nginx.conf.instructor /etc/nginx/nginx.conf
 
+  # install conda
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda
+  export PATH="/opt/conda/bin:$PATH"
+
+  # requirements
+  conda init
+  conda create -n ocr python=3.10 -y
+  conda activate ocr
+  cd /opt/$REPO_NAME/services/gpu/instructor/
+  sudo pip install -r requirements.txt
+
   # grab the tokens and write to nginx htpasswrd and env
   cd /root
   python3 bid_token.py instructor
 
   # huggingface
   pip install --upgrade huggingface_hub
-
-  # requirements
-  cd /opt/$REPO_NAME/services/gpu/instructor/
-  pip install -r requirements.txt
 
   # cuda drivers
   /opt/deeplearning/install-driver.sh
