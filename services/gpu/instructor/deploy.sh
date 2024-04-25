@@ -35,7 +35,6 @@ NEW_UUID=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 4 ; echo)
 PREEMPTIBLE=" \
 --maintenance-policy=TERMINATE \
 --provisioning-model=SPOT \
---instance-termination-action=STOP \
 "
 
 # load arguments
@@ -171,6 +170,7 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --machine-type=$TYPE \
 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
 --no-restart-on-failure \
+--instance-termination-action=STOP \
 $PREEMPTIBLE \
 --service-account=$SERVICE_ACCOUNT \
 --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
