@@ -42,8 +42,8 @@ async def read():
             all_recognized_text, all_coordinates, all_page_nums = await process_ocr(mitta_uris, page_nums)
             return jsonify({"texts": all_recognized_text, "coords": all_coordinates, "page_nums": all_page_nums}), 200
 
-async def process_ocr(mitta_uris, page_nums, callback_url=None):
 
+async def process_ocr(mitta_uris, page_nums, callback_url=None):
     # set the flag to indicate we're running to the shutdown script
     process_id = str(uuid.uuid4())[:8]  # Generate a unique process ID
     
@@ -55,7 +55,6 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
 
     all_recognized_text = []
     all_coordinates = []
-    all_page_nums = []
 
     for mitta_uri, page_num in zip(mitta_uris, page_nums):
         log_line = f"Received POST request to /read with: '{mitta_uri}', page number: {page_num}. Responding with texts."
@@ -98,17 +97,17 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
 
         all_recognized_text.append(recognized_text)
         all_coordinates.append(coordinates)
-        all_page_nums.append(page_num)
 
     os.remove(process_file)  # Delete the PROCESS file for the thread
 
     if callback_url:
         if all_recognized_text:
-            await send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums, status="success")
+            await send_callback(callback_url, all_recognized_text, all_coordinates, page_nums, status="success")
         else:
-            await send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums, status="failed")
+            await send_callback(callback_url, all_recognized_text, all_coordinates, page_nums, status="failed")
     else:
-        return all_recognized_text, all_coordinates, all_page_nums
+        return all_recognized_text, all_coordinates, page_nums
+
 
 async def send_callback(callback_url, all_recognized_text, all_coordinates, all_page_nums, status="success"):
     data = {
