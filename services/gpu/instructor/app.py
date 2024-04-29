@@ -54,7 +54,7 @@ async def process_embedding(payload_data, model, callback_url, output_fields, ba
 
             # Prepare the response data for the current batch
             response_data = {
-                f"{field_name}_embeddings": embeddings,  # Store embeddings directly under the field name
+                f"{field_name}_embedding": embeddings,  # Store embeddings directly under the field name
                 "output_fields": output_fields,
                 "batch_index": i // batch_size,  # Include the batch index
                 "total_batches": (len(input_data) + batch_size - 1) // batch_size  # Include the total number of batches
