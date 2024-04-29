@@ -6,7 +6,7 @@ conda activate instructor
 
 # Function to start Hypercorn
 start_hypercorn() {
-    screen -dmS hypercorn_screen hypercorn -b 0.0.0.0:8989 app:app -w 2 --timeout 120
+    screen -dmS hypercorn_screen hypercorn -b 0.0.0.0:8989 app:app -w 2
 }
 
 # Function to check if Hypercorn is running
