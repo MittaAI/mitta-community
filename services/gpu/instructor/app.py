@@ -46,17 +46,15 @@ async def process_embedding(payload_data, model, callback_url, output_fields, ba
         for i in range(0, len(input_data), batch_size):
             batch = input_data[i:i + batch_size]
             embeddings = []
-
             if model == "instructor-xl":
                 batch_embeddings = xl.encode(batch).tolist()
             else:
                 batch_embeddings = large.encode(batch).tolist()
-
             embeddings.extend(batch_embeddings)
 
             # Prepare the response data for the current batch
             response_data = {
-                "embeddings": {field_name: embeddings},
+                f"{field_name}_embeddings": embeddings,  # Store embeddings directly under the field name
                 "output_fields": output_fields,
                 "batch_index": i // batch_size,  # Include the batch index
                 "total_batches": (len(input_data) + batch_size - 1) // batch_size  # Include the total number of batches
