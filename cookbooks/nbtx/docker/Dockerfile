@@ -9,6 +9,7 @@ RUN pip install quart-cors
 RUN pip install quart-session
 RUN pip install google-cloud-storage
 RUN pip install google-cloud-datastore
+RUN pip install google-cloud-ndb
 
 # Set the working directory in the container
 WORKDIR /app
