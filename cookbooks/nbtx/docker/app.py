@@ -26,6 +26,8 @@ import time
 
 from google.cloud import storage
 from google.api_core.exceptions import Forbidden
+from google.cloud import datastore
+from google.cloud import ndb
 
 from quart import Quart, render_template, request, redirect, jsonify, url_for, Response, stream_with_context, session, send_from_directory, send_file
 from quart_cors import cors
@@ -43,6 +45,42 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 #################
 # Storage methods
 #################
+
+# Initialize the NDB client
+client = datastore.Client()
+context = ndb.Context(client)
+context.set_cache_policy(False)
+context.set_memcache_policy(False)
+ndb.model._default_model_class = ndb.Model
+
+# Define the URLs class
+class URLs(ndb.Model):
+    url = ndb.StringProperty(required=True)
+    name = ndb.StringProperty(required=True)
+    crawl_type = ndb.StringProperty(required=True)
+    next_crawl_date = ndb.DateTimeProperty(required=True)
+
+# Function to store a URLs instance
+def store_url(url, name, crawl_type, next_crawl_date):
+    try:
+        # Create a new URLs instance
+        url_instance = URLs(
+            url=url,
+            name=name,
+            crawl_type=crawl_type,
+            next_crawl_date=next_crawl_date
+        )
+        
+        # Save the URLs instance to the Datastore
+        url_key = url_instance.put()
+        
+        print(f"URLs instance stored successfully. Key: {url_key}")
+        
+        return url_key
+    
+    except Exception as e:
+        print(f"Error storing URLs instance: {str(e)}")
+        return None
 
 # File storage handling
 async def upload_to_storage(uuid, filename=None, content=None, content_type=None):
@@ -417,6 +455,40 @@ async def upload():
             return jsonify({"status": "error", "message": "Failed to upload file."}), 500
 
     return jsonify({"status": "error", "message": "No file received."}), 404
+
+
+@app.route('/crawl', methods=['POST'])
+async def crawl():
+    # Try to grab the UUID from the cookie
+    uuid = request.cookies.get('uuid', None)
+
+    # Check if the UUID is valid
+    if uuid is None or not is_valid_uuid(uuid):
+        # If not, redirect to the login page
+        return redirect(url_for('login'))
+
+    # Check if the UUID is in a session
+    uuid_in_session = session.get('uuid')
+    if uuid != uuid_in_session:
+        return redirect(url_for('login'))
+
+    form_data = await request.form
+
+    url = form_data.get('url')
+    name = form_data.get('name')
+    crawl_type = form_data.get('crawl_type')
+    frequency_hours = int(form_data.get('frequency_hours'))
+
+    # Calculate the next crawl date based on the current time and frequency
+    next_crawl_date = datetime.now() + timedelta(hours=frequency_hours)
+
+    # Store the URLs instance
+    url_key = store_url(url, name, crawl_type, next_crawl_date)
+
+    if url_key:
+        return jsonify({"status": "success", "message": "URL stored successfully."}), 200
+    else:
+        return jsonify({"status": "error", "message": "Failed to store URL."}), 500
 
 
 @app.route('/callback', methods=['POST'])
