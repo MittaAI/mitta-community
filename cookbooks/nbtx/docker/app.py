@@ -244,8 +244,8 @@ async def notify_clients():
 
         # Process and send the message if it's valid and not already in historic_queue
         if content and message_id and message_id not in historic_queue:
-            print("content uploaded to queue")
-            print(content)
+            logging.info("content uploaded to queue")
+            logging.info(content)
             await queue.put(content)
             historic_queue.append(message_id)
     await asyncio.sleep(2)
@@ -457,27 +457,44 @@ async def upload():
     return jsonify({"status": "error", "message": "No file received."}), 404
 
 
-@app.route('/crawl', methods=['POST'])
-async def crawl():
-    # Try to grab the UUID from the cookie
-    uuid = request.cookies.get('uuid', None)
 
-    # Check if the UUID is valid
+@app.route('/crawl', methods=['GET', 'POST'])
+async def crawl():
+
+    if request.method == 'GET':
+        # Serve the HTML page when accessed via a GET request
+        logging.info("serving admin.html")
+        return await render_template('admin.html')
+
+    # The following code handles the POST request:
+    uuid = request.cookies.get('uuid', None)
     if uuid is None or not is_valid_uuid(uuid):
         # If not, redirect to the login page
         return redirect(url_for('login'))
 
-    # Check if the UUID is in a session
     uuid_in_session = session.get('uuid')
     if uuid != uuid_in_session:
         return redirect(url_for('login'))
 
-    form_data = await request.form
+    data = await request.get_json()
 
-    url = form_data.get('url')
-    name = form_data.get('name')
-    crawl_type = form_data.get('crawl_type')
-    frequency_hours = int(form_data.get('frequency_hours'))
+    logging.info(data)
+
+    url = data.get('url')
+    name = data.get('name')
+    crawl_type = data.get('crawl_type')
+    frequency_hours = data.get('frequency_hours')
+
+    logging.info(frequency_hours)
+    
+    if frequency_hours is None:
+        return jsonify({"status": "error", "message": "Frequency hours must be provided."}), 400
+
+    # Convert frequency_hours to an integer
+    try:
+        frequency_hours = int(frequency_hours)
+    except ValueError:
+        return jsonify({"status": "error", "message": "Frequency hours must be a valid integer."}), 400
 
     # Calculate the next crawl date based on the current time and frequency
     next_crawl_date = datetime.now() + timedelta(hours=frequency_hours)
