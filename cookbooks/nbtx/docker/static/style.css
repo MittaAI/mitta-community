@@ -172,6 +172,7 @@ input {
 /* Added styles for chat page */
 #chatHistory {
   overflow-y:  auto;
+  margin-top: 60px;
 }
 
 .header {

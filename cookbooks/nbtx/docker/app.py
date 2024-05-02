@@ -379,8 +379,10 @@ async def chat():
     elif request.method == 'POST':
         form_data = await request.form
         user_query = form_data.get('query', '')
+
         if not user_query:
             user_query = form_data.get('home_query', '')
+            logging.info(user_query)
             return await render_template('chat.html', query=user_query)
         
         bot_response = await process_user_query(user_query)

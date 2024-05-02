@@ -11,12 +11,11 @@
 <body>
     <header class="header fixed-top">
         <div class="container">
-            <h1 id="mitta" class="text-center">NBTX.AI Chat</h1>
+            <h1 id="mitta" class="text-center"><span class="greater-than">&gt;</span> I am NBTX!</h1>
         </div>
     </header>
     <div class="container mt-5 chat-container">
         <div id="chatHistory">
-            <!-- Chat history will be dynamically populated here -->
         </div>
     </div>
     <footer class="footer fixed-bottom">
@@ -47,24 +46,26 @@
                 }
             });
 
-            // Automatically click the Send button after loading the page
-            if ($('#userInput').val()) {
-                $('#sendButton').click();
+            // Automatically send the pre-populated user input after loading the page
+            var userInput = $('#userInput');
+            var query = userInput.val();
+            if (query) {
+                chatHistory.append('<p></p>');
+                sendMessage();
             }
 
             function sendMessage() {
                 var userInput = $('#userInput');
                 var query = userInput.val();
                 userInput.val('');
-                chatHistory.append('<p class="chat-message"><strong>User:</strong> ' + query + '</p>');
-                scrollChatToBottom();
 
                 $.ajax({
                     type: 'POST',
                     url: '/chat',
                     data: { query: query },
                     success: function(response) {
-                        // The bot's response will be received via SSE
+                        chatHistory.append('<p class="chat-message"><strong>User:</strong> ' + query + '</p>');
+                        scrollChatToBottom();
                     },
                     error: function() {
                         chatHistory.append('<p class="chat-message"><strong>Error:</strong> Failed to send message.</p>');
