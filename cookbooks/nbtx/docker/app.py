@@ -74,12 +74,12 @@ def store_url(url, name, crawl_type, next_crawl_date):
         # Save the URLs instance to the Datastore
         url_key = url_instance.put()
         
-        print(f"URLs instance stored successfully. Key: {url_key}")
+        logging.error(f"URLs instance stored successfully. Key: {url_key}")
         
         return url_key
     
     except Exception as e:
-        print(f"Error storing URLs instance: {str(e)}")
+        logging.error(f"Error storing URLs instance: {str(e)}")
         return None
 
 # File storage handling
@@ -486,7 +486,7 @@ async def crawl():
     frequency_hours = data.get('frequency_hours')
 
     logging.info(frequency_hours)
-    
+
     if frequency_hours is None:
         return jsonify({"status": "error", "message": "Frequency hours must be provided."}), 400
 
@@ -501,6 +501,7 @@ async def crawl():
 
     # Store the URLs instance
     url_key = store_url(url, name, crawl_type, next_crawl_date)
+
 
     if url_key:
         return jsonify({"status": "success", "message": "URL stored successfully."}), 200
