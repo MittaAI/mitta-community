@@ -11,7 +11,7 @@
 <body>
     <header class="header fixed-top">
         <div class="container">
-            <h1 class="text-center">NBTX.AI Chat</h1>
+            <h1 id="mitta" class="text-center">NBTX.AI Chat</h1>
         </div>
     </header>
     <div class="container mt-5 chat-container">
@@ -79,6 +79,10 @@
                     lastMessage[0].scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
             }
+
+            $('#mitta').on('click', function() {
+                window.location = "https://nbtx.ai";
+            });
         });
     </script>
 </body>

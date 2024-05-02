@@ -13,6 +13,8 @@ $configFilePath = ".\config.json"
 
 Write-Host "Starting management of convert-app..."
 
+$env:GOOGLE_APPLICATION_CREDENTIALS = "sloth-ai-cf1bf7d31a78.json"
+
 # Check if config file exists
 if (Test-Path -Path $configFilePath) {
     Write-Host "Config file found. Reading configuration..."
@@ -63,7 +65,7 @@ while ($true) {
 
         # Run the Docker container with a restart policy and port mapping
         # Run the Docker container with environment variables, a restart policy, and port mapping
-        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 -e MITTA_TOKEN=$env:MITTA_TOKEN -e MITTA_PIPELINE=$env:MITTA_PIPELINE -e MITTA_PROJECT=$env:MITTA_PROJECT -e MITTA_BUCKET=$env:MITTA_BUCKET -e MITTA_DEV=$env:MITTA_DEV -e GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/application_default_credentials.json -e GOOGLE_CLOUD_PROJECT=$env:MITTA_PROJECT -v ${env:APPDATA}\gcloud:/app/credentials $imageName
+        docker run --name $containerName -d --restart=on-failure:5 -p 5000:5000 -e MITTA_TOKEN=$env:MITTA_TOKEN -e MITTA_PIPELINE=$env:MITTA_PIPELINE -e MITTA_PROJECT=$env:MITTA_PROJECT -e MITTA_BUCKET=$env:MITTA_BUCKET -e MITTA_DEV=$env:MITTA_DEV -e GOOGLE_APPLICATION_CREDENTIALS=$env:GOOGLE_APPLICATION_CREDENTIALS -e GOOGLE_CLOUD_PROJECT=$env:MITTA_PROJECT -v ${env:APPDATA}\gcloud:/app/credentials $imageName
 
         Write-Host "Container rebuilt and restarted with port 5000 exposed."
     }

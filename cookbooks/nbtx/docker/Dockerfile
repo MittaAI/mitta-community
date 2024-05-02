@@ -14,12 +14,6 @@ RUN pip install google-cloud-ndb
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the JSON key file to the container
-COPY sloth-ai-cf1bf7d31a78.json /app/keyfile.json
-
-# Set the GOOGLE_APPLICATION_CREDENTIALS environment variable
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/keyfile.json
-
 # Copy the current directory contents into the container at /app
 COPY . /app
 
