@@ -4,6 +4,7 @@ secrets.sh
 credentials.json
 config.json
 config.sh
+sloth-*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

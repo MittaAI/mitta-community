@@ -49,7 +49,7 @@
           </div>
         </div>
         <button class="btn btn-primary" id="embark-button">Send</button>
-        <button class="btn btn-outline-dark" id="clear-history-button">Admin</button>
+        <button class="btn btn-outline-dark" id="admin-button">Admin</button>
       </div>
     </div>
   </div>
@@ -207,7 +207,7 @@ $(document).ready(function() {
       $('.convert').css('background', newBackground);
     }, 10);
   });
-
+  
   // User embarks on a new experience
   $('#embark-button').on('click', function() {
       // Retrieve the query from the input field
@@ -215,14 +215,14 @@ $(document).ready(function() {
 
       // Create a form element dynamically
       var form = $('<form>', {
-          'action': '/chat', // the endpoint to send data to
+          'action': '/chat', // the new endpoint
           'method': 'POST' // method of sending data
       });
 
       // Append a hidden input element to the form with the query
       form.append($('<input>', {
           'type': 'hidden',
-          'name': 'query', // variable name expected by the server
+          'name': 'home_query', // variable name expected by the server
           'value': query // the user's input
       }));
 

@@ -60,27 +60,31 @@ class URLs(ndb.Model):
     crawl_type = ndb.StringProperty(required=True)
     next_crawl_date = ndb.DateTimeProperty(required=True)
 
-# Function to store a URLs instance
+
+client = ndb.Client()
+
 def store_url(url, name, crawl_type, next_crawl_date):
     try:
-        # Create a new URLs instance
-        url_instance = URLs(
-            url=url,
-            name=name,
-            crawl_type=crawl_type,
-            next_crawl_date=next_crawl_date
-        )
-        
-        # Save the URLs instance to the Datastore
-        url_key = url_instance.put()
-        
-        logging.error(f"URLs instance stored successfully. Key: {url_key}")
-        
-        return url_key
-    
+        with client.context(namespace="nbtx"):
+            # Create a new URLs instance
+            url_instance = URLs(
+                url=url,
+                name=name,
+                crawl_type=crawl_type,
+                next_crawl_date=next_crawl_date
+            )
+
+            # Save the URLs instance to the Datastore
+            url_key = url_instance.put()
+
+            logging.info(f"URLs instance stored successfully. Key: {url_key}")
+
+            return url_key
+
     except Exception as e:
         logging.error(f"Error storing URLs instance: {str(e)}")
         return None
+
 
 # File storage handling
 async def upload_to_storage(uuid, filename=None, content=None, content_type=None):
@@ -368,22 +372,47 @@ async def convert():
     return await render_template('index.html', instructions=encoded_instructions, current_date=current_date)
 
 
-@app.route('/chat', methods=['POST'])
+@app.route('/chat', methods=['GET', 'POST'])
 async def chat():
-    form_data = await request.form  # Correctly await the form data
-    user_query = form_data.get('query', '')  # Now you can use .get() since form_data is not a coroutine
+    if request.method == 'GET':
+        return await render_template('chat.html')
+    elif request.method == 'POST':
+        form_data = await request.form
+        user_query = form_data.get('query', '')
+        if not user_query:
+            user_query = form_data.get('home_query', '')
+            return await render_template('chat.html', query=user_query)
+        
+        bot_response = await process_user_query(user_query)
+        return jsonify({'response': bot_response})
 
-    # Assuming a function that processes the user query and returns a bot response
-    # This function needs to be defined or imported
-    bot_response = await process_user_query(user_query)
-
-    # Render the chat page, passing the user query and the bot's response
-    return await render_template('chat.html', user_query=user_query, bot_response=bot_response)
 
 async def process_user_query(query):
-    # This is a placeholder function to simulate processing the query
-    # Replace this with actual logic to handle the user's query
+    # TODO: Implement the actual call to the pipeline
+    # Placeholder function to simulate processing the query
     return f"Simulated response to '{query}'"
+
+
+@app.route('/chat/stream')
+async def chat_stream():
+    async def stream():
+        while True:
+            # TODO: Implement the logic to send updates from the chat pipeline callback
+            # Placeholder SSE message
+            message = f"data: Simulated SSE message\n\n"
+            yield message
+            await asyncio.sleep(30)
+    return Response(stream(), mimetype='text/event-stream')
+
+
+@app.route('/chat/callback', methods=['POST'])
+async def chat_callback():
+    # TODO: Implement the logic to handle the chat pipeline callback
+    # Placeholder callback handling
+    callback_data = await request.get_json()
+    # Process the callback data and send the update to the client using SSE
+    # ...
+    return jsonify({'status': 'success'})
 
 
 @app.route('/upload', methods=['POST'])
@@ -458,55 +487,96 @@ async def upload():
 
 
 
-@app.route('/crawl', methods=['GET', 'POST'])
+# ... (previous code remains the same)
+
+@app.route('/admin', methods=['GET'])
+async def admin():
+    # Serve the HTML page when accessed via a GET request
+    logging.info("serving admin.html")
+    return await render_template('admin.html')
+
+@app.route('/crawl', methods=['GET', 'POST', 'DELETE'])
 async def crawl():
-
-    if request.method == 'GET':
-        # Serve the HTML page when accessed via a GET request
-        logging.info("serving admin.html")
-        return await render_template('admin.html')
-
-    # The following code handles the POST request:
     uuid = request.cookies.get('uuid', None)
     if uuid is None or not is_valid_uuid(uuid):
-        # If not, redirect to the login page
         return redirect(url_for('login'))
 
     uuid_in_session = session.get('uuid')
     if uuid != uuid_in_session:
         return redirect(url_for('login'))
 
-    data = await request.get_json()
+    if request.method == 'POST':
+        data = await request.get_json()
 
-    logging.info(data)
+        logging.info(data)
 
-    url = data.get('url')
-    name = data.get('name')
-    crawl_type = data.get('crawl_type')
-    frequency_hours = data.get('frequency_hours')
+        url = data.get('url')
+        name = data.get('name')
+        crawl_type = data.get('crawl_type')
+        frequency_hours = data.get('frequency_hours')
 
-    logging.info(frequency_hours)
+        logging.info(frequency_hours)
 
-    if frequency_hours is None:
-        return jsonify({"status": "error", "message": "Frequency hours must be provided."}), 400
+        if frequency_hours is None:
+            return jsonify({"status": "error", "message": "Frequency hours must be provided."}), 400
 
-    # Convert frequency_hours to an integer
-    try:
-        frequency_hours = int(frequency_hours)
-    except ValueError:
-        return jsonify({"status": "error", "message": "Frequency hours must be a valid integer."}), 400
+        try:
+            frequency_hours = int(frequency_hours)
+        except ValueError:
+            return jsonify({"status": "error", "message": "Frequency hours must be a valid integer."}), 400
 
-    # Calculate the next crawl date based on the current time and frequency
-    next_crawl_date = datetime.now() + timedelta(hours=frequency_hours)
+        next_crawl_date = datetime.now() + timedelta(hours=frequency_hours)
 
-    # Store the URLs instance
-    url_key = store_url(url, name, crawl_type, next_crawl_date)
+        url_key = store_url(url, name, crawl_type, next_crawl_date)
 
+        if url_key:
+            return jsonify({"status": "success", "message": "URL stored successfully."}), 200
+        else:
+            return jsonify({"status": "error", "message": "Failed to store URL."}), 500
 
-    if url_key:
-        return jsonify({"status": "success", "message": "URL stored successfully."}), 200
-    else:
-        return jsonify({"status": "error", "message": "Failed to store URL."}), 500
+    elif request.method == 'GET':
+        try:
+            with client.context(namespace="nbtx"):
+                query = URLs.query()
+                urls = query.fetch()
+
+                url_list = []
+                for url in urls:
+                    url_data = {
+                        "url": url.url,
+                        "name": url.name,
+                        "crawl_type": url.crawl_type,
+                        "next_crawl_date": url.next_crawl_date.isoformat()
+                    }
+                    url_list.append(url_data)
+
+                return jsonify({"status": "success", "urls": url_list}), 200
+
+        except Exception as e:
+            logging.error(f"Error retrieving URLs: {str(e)}")
+            return jsonify({"status": "error", "message": "Failed to retrieve URLs."}), 500
+
+    elif request.method == 'DELETE':
+        data = await request.get_json()
+        url = data.get('url')
+
+        if url:
+            try:
+                with client.context(namespace="nbtx"):
+                    query = URLs.query(URLs.url == url)
+                    url_instance = query.get()
+
+                    if url_instance:
+                        url_instance.key.delete()
+                        return jsonify({"status": "success", "message": "URL deleted successfully."}), 200
+                    else:
+                        return jsonify({"status": "error", "message": "URL not found."}), 404
+
+            except Exception as e:
+                logging.error(f"Error deleting URL: {str(e)}")
+                return jsonify({"status": "error", "message": "Failed to delete URL."}), 500
+        else:
+            return jsonify({"status": "error", "message": "URL not provided."}), 400
 
 
 @app.route('/callback', methods=['POST'])

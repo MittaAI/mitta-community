@@ -8,6 +8,8 @@
 </head>
 <body>
     <div class="container mt-5">
+        <h1>Admin</h1>
+        <hr/>
         <h2>Submit Crawling Request</h2>
         <form id="crawlForm">
             <div class="mb-3">
@@ -37,12 +39,79 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         <div id="responseMessage" class="mt-3"></div>
+
+        <hr/>
+        <h2>Manage URLs</h2>
+        <ul id="urlList" class="list-group"></ul>
     </div>
 
     <script>
         $(document).ready(function() {
+            // Function to fetch and display URLs
+            function fetchUrls() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/crawl',
+                    success: function(response) {
+                        var urls = response.urls;
+                        var urlList = $('#urlList');
+                        urlList.empty();
+
+                        if (urls.length === 0) {
+                            urlList.append('<li class="list-group-item">No URLs found.</li>');
+                        } else {
+                            urls.forEach(function(url) {
+                                var listItem = $('<li class="list-group-item"></li>');
+                                
+                                var urlInfo = $('<div></div>');
+                                urlInfo.append('<strong>URL:</strong> ' + url.url + '<br>');
+                                urlInfo.append('<strong>Category:</strong> ' + url.name + '<br>');
+                                urlInfo.append('<strong>Next Crawl Date:</strong> ' + formatDate(url.next_crawl_date));
+                                
+                                listItem.append(urlInfo);
+
+                                var deleteButton = $('<button class="btn btn-danger btn-sm float-end">Delete</button>');
+                                deleteButton.on('click', function() {
+                                    deleteUrl(url.url);
+                                });
+
+                                listItem.append(deleteButton);
+                                urlList.append(listItem);
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('#urlList').append('<li class="list-group-item">Error fetching URLs.</li>');
+                    }
+                });
+            }
+
+            // Function to format date
+            function formatDate(dateString) {
+                var options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+                var date = new Date(dateString);
+                return date.toLocaleDateString(undefined, options);
+            }
+
+            // Function to delete a URL
+            function deleteUrl(url) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/crawl',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ url: url }),
+                    success: function(response) {
+                        fetchUrls();
+                    },
+                    error: function() {
+                        alert('Error deleting the URL.');
+                    }
+                });
+            }
+
+            // Submit crawling request
             $('#crawlForm').on('submit', function(e) {
-                e.preventDefault(); // Prevent the default form submission
+                e.preventDefault();
 
                 var url = $('#urlInput').val();
                 var category = $('#categorySelect').val();
@@ -55,14 +124,17 @@
                     data: JSON.stringify({ url: url, name: category, crawl_type: "regular", frequency_hours: 24 * frequency }),
                     success: function(response) {
                         $('#responseMessage').html(`<div class="alert alert-success">Request submitted successfully!</div>`);
+                        fetchUrls();
                     },
                     error: function() {
                         $('#responseMessage').html(`<div class="alert alert-danger">Error submitting the request.</div>`);
                     }
                 });
             });
+
+            // Fetch URLs on page load
+            fetchUrls();
         });
     </script>
 </body>
 </html>
-

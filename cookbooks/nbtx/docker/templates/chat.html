@@ -3,44 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Braunfels AI</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Chat - NBTX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-    <div class="chat-container">
-        <h1>Welcome to NBTX!</h1>
-        <div class="conversation-container">
-            <div class="exchange">
-                <p class="user-message"><strong>User:</strong> {{user_query}}</p>
-                <p class="bot-reply"><strong>Bot:</strong> {{bot_response}}.</p>
-            </div>
+    <header class="header fixed-top">
+        <div class="container">
+            <h1 class="text-center">NBTX.AI Chat</h1>
         </div>
-        <div class="chat-box">
-            <input type="text" id="chatInput" class="chat-input" placeholder="Ask me anything...">
-            <button id="sendButton" class="send-button"><i class="fas fa-paper-plane"></i></button>
+    </header>
+    <div class="container mt-5 chat-container">
+        <div id="chatHistory">
+            <!-- Chat history will be dynamically populated here -->
         </div>
     </div>
+    <footer class="footer fixed-bottom">
+        <div class="container">
+            <div class="input-box input-group">
+                <input type="text" id="userInput" class="form-control" placeholder="Type your message..." value="{{ query }}">
+                <button id="sendButton" class="btn btn-primary">Send</button>
+            </div>
+        </div>
+    </footer>
 
     <script>
         $(document).ready(function() {
-            $('#sendButton').on('click', function() {
-                var query = $('#chatInput').val();
-                // Add functionality to handle the chat interaction
-                console.log("Query sent: ", query);
-                // Example of appending the user's query and a simulated response
-                $('.conversation-container').append('<p class="user-message"><strong>User:</strong> ' + query + '</p>');
-                // Simulate a bot response for demonstration
-                $('.conversation-container').append('<p class="bot-reply"><strong>Bot:</strong> Thank you for asking. Here is the information you requested.</p>');
-                $('#chatInput').val(''); // Clear the input field
-            });
+            var chatHistory = $('#chatHistory');
 
-            $('#chatInput').on('keypress', function(e) {
-                if (e.which === 13) {  // Enter key
-                    $('#sendButton').click();
+            // Establish SSE connection
+            var eventSource = new EventSource('/chat/stream');
+            eventSource.onmessage = function(event) {
+                var message = event.data;
+                chatHistory.append('<p class="chat-message"><strong>Bot:</strong> ' + message + '</p>');
+                scrollChatToBottom();
+            };
+
+            $('#sendButton').on('click', sendMessage);
+            $('#userInput').on('keypress', function(e) {
+                if (e.which === 13) {
+                    sendMessage();
                 }
             });
+
+            // Automatically click the Send button after loading the page
+            if ($('#userInput').val()) {
+                $('#sendButton').click();
+            }
+
+            function sendMessage() {
+                var userInput = $('#userInput');
+                var query = userInput.val();
+                userInput.val('');
+                chatHistory.append('<p class="chat-message"><strong>User:</strong> ' + query + '</p>');
+                scrollChatToBottom();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/chat',
+                    data: { query: query },
+                    success: function(response) {
+                        // The bot's response will be received via SSE
+                    },
+                    error: function() {
+                        chatHistory.append('<p class="chat-message"><strong>Error:</strong> Failed to send message.</p>');
+                        scrollChatToBottom();
+                    }
+                });
+            }
+
+            function scrollChatToBottom() {
+                var lastMessage = $('.chat-message').last();
+                if (lastMessage.length) {
+                    lastMessage[0].scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            }
         });
     </script>
 </body>

@@ -18,6 +18,10 @@ body {
   line-height: 1.5;
   text-align: left;
   margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   caret-color: transparent;
 }
 
@@ -75,10 +79,6 @@ input {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis; /* Adds an ellipsis (...) at the end of the text if it overflows */
-}
-
-.input-group-text {
-  cursor: pointer;
 }
 
 .input-group {
@@ -139,7 +139,6 @@ input {
 }
 
 
-
 .conversation-container {
     margin-bottom: 20px;
     background-color: #f0f0f0;
@@ -168,4 +167,69 @@ input {
 .bot-reply {
     background-color: #f8d7da;
     border-color: #f5c6cb;
+}
+
+/* Added styles for chat page */
+#chatHistory {
+  overflow-y:  auto;
+}
+
+.header {
+    background-color: #212529;
+    padding: 20px;
+    color: #fff;
+}
+
+.chat-container {
+    padding: 20px;
+    margin-bottom: 50px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+}
+
+.footer {
+    padding: 20px;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-message {
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.bot-reply {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.input-box {
+    margin-bottom: 32px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Styles for the scrollbar */
+#chatHistory::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+#chatHistory::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the track */
+    border-radius: 10px; /* Rounded corners */
+}
+
+#chatHistory::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the thumb */
+    border-radius: 10px; /* Rounded corners */
+}
+
+#chatHistory::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker color on hover */
 }
