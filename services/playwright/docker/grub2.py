@@ -79,7 +79,7 @@ def i_have_failed_my_purpose(error_reason: str) -> dict:
 
 
 @function_info_decorator
-async def take_screenshot_and_extract_links(url: str, filename: str = "example.png", full_screen: bool = False, extract_links: bool = False, link_selector: str = "a", extract_image: bool = False, img_isolate_selector: str = "img", button_with_text: str = "", click_button: bool = False, font_size: int = 16, contrast_ratio: float = 4.5) -> str:
+async def take_screenshot_and_extract_links(url: str, filename: str = "example.png", full_screen: bool = False, extract_links: bool = False, link_selector: str = "a", extract_image: bool = False, img_isolate_selector: str = "img", button_with_text: str = "", click_button: bool = False) -> str:
     """
     Takes a screenshot of the specified URL and saves it to the given filename asynchronously.
     Can capture either the full page or just the viewport based on the full_screen parameter.
@@ -87,7 +87,6 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     defaulting to 'a' tags if no link selector is provided.
     Optionally extracts an image from the page using a specified image selector.
     If a button_with_text is provided and click_button is True, attempts to click the specified button before taking a screenshot or extracting links or images.
-    Allows adjusting the font size and contrast ratio of the page before taking the screenshot.
 
     :param url: The website URL to capture.
     :type url: str
@@ -107,10 +106,6 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     :type button_with_text: str
     :param click_button: Determines whether to click a button identified by button_with-text. Defaults to False.
     :type click_button: bool
-    :param font_size: The font size (in pixels) to apply to the page before taking the screenshot. Defaults to 16.
-    :type font_size: int
-    :param contrast_ratio: The contrast ratio to apply to the page before taking the screenshot. Defaults to 4.5.
-    :type contrast_ratio: float
     :return: A JSON string containing the filename where the screenshot was saved, optionally a list of links with their texts, and optionally the path of the extracted image.
     :rtype: str
     """
@@ -120,28 +115,10 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
 
     async with async_playwright() as p:
         browser = await p.webkit.launch()
-        context = await browser.new_context(
-            viewport={'width': 1920, 'height': 1080},  # Set a larger viewport size if needed
-            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
-        )
-        page = await context.new_page()
-
-        # Increase font size and contrast ratio
-        await page.evaluate(f"""() => {{
-            const style = document.createElement('style');
-            style.innerHTML = `
-                * {{
-                    font-size: {font_size}px !important;
-                    color: black !important;
-                    background-color: white !important;
-                    filter: contrast({contrast_ratio}) !important;
-                }}
-            `;
-            document.head.appendChild(style);
-        }}""")
-
+        page = await browser.new_page()
+    
         await page.goto(url)
-
+    
         if click_button and button_with_text:
             # Find a button by its accessible name and click it
             await page.get_by_role('button', name=button_with_text).click()
@@ -152,7 +129,7 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
         if extract_links:
             # Preprocess link_selector to replace double quotes with single quotes
             sanitized_link_selector = link_selector.replace('"', "'")
-
+            
             links = await page.evaluate(f'''() => {{
                 const elements = Array.from(document.querySelectorAll("{sanitized_link_selector}"));
                 return elements.map(element => {{
@@ -174,7 +151,6 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
                 await img_element.screenshot(path=image_path)
                 image_from_page = image_path
 
-        await context.close()
         await browser.close()
 
     result = {
