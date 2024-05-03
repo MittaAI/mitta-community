@@ -216,73 +216,10 @@ if __name__ == '__main__':
 
 
 ########################
-# Event stream managment
+# Event stream management
 ########################
 
 connections = {}
-historic_queue = []
-
-# Client payload pickup and transfer
-async def notify_clients():
-    current_time = datetime.now()
-    for uuid, (queue, last_active) in list(connections.items()):
-        content = await fetch_data_json_from_storage(uuid)
-        message_id = None  # Initialize message_id outside the try-except block
-
-        # Attempt to decode the JSON content and extract the message_id
-        if content:
-            try:
-                message = json.loads(content)
-                message_id = message.get('message_id')
-            except json.JSONDecodeError as e:
-                logging.error(f"Error decoding JSON for UUID {uuid}: {e}")
-                content = None  # Invalidate content if there's a JSON error
-
-        # Remove the connection if it's inactive, and also clean up related historic_queue entries
-        if current_time - last_active > timedelta(minutes=5):
-            logging.info(f"Removing inactive connection {uuid}")
-            connections.pop(uuid)  # Remove the inactive connection
-            if message_id and message_id in historic_queue:
-                historic_queue.remove(message_id)  # Remove message_id from historic_queue if present
-            continue  # Skip further processing for this UUID
-
-        # Process and send the message if it's valid and not already in historic_queue
-        if content and message_id and message_id not in historic_queue:
-            logging.info("content uploaded to queue")
-            logging.info(content)
-            await queue.put(content)
-            historic_queue.append(message_id)
-    await asyncio.sleep(2)
-
-
-# Start and stop the queue fetch process
-@app.before_serving
-async def start_background_tasks():
-    async def broadcast():
-        while True:
-            await asyncio.sleep(2)
-            await notify_clients()
-    asyncio.create_task(broadcast())
-
-
-# Event stream
-async def event_stream(uuid):
-    queue = asyncio.Queue()
-    connections[uuid] = (queue, datetime.now())  # Store queue with current timestamp
-
-    try:
-        while True:
-            data = await queue.get()
-            # Refresh the timestamp each time data is sent
-            connections[uuid] = (queue, datetime.now())
-            data_json = json.dumps(data) if not isinstance(data, str) else data
-            yield f"id: {uuid}\nevent: message\ndata: {data_json}\n\n"
-            await asyncio.sleep(3)
-    except GeneratorExit:
-        logging.info(f"Client disconnect {uuid}")
-        connections.pop(uuid, None)
-        raise
-
 
 # Check for valid UUID
 def is_valid_uuid(uuid, version=4):
@@ -293,11 +230,25 @@ def is_valid_uuid(uuid, version=4):
         return False
 
 
-# Your updated /events route
+# Event stream
+async def event_stream(uuid):
+    queue = asyncio.Queue()
+    connections[uuid] = queue
+
+    try:
+        while True:
+            data = await queue.get()
+            data_json = json.dumps(data) if not isinstance(data, str) else data
+            yield f"data: {data_json}\n\n"
+    except GeneratorExit:
+        logging.info(f"Client disconnect {uuid}")
+        connections.pop(uuid, None)
+        raise
+
+
 @app.route('/events')
 async def events():
     uuid = request.args.get('uuid', None)
-    client_version = request.args.get('ver', None)
 
     if uuid and is_valid_uuid(uuid):
         logging.info(f"Establishing event stream for {uuid}")
@@ -307,17 +258,21 @@ async def events():
         return '', 400
 
 
+async def send_sse(uuid, message):
+    if uuid in connections:
+        queue = connections[uuid]
+        await queue.put(message)
+    else:
+        logging.error(f"Client with UUID {uuid} is not connected.")
+
+
 @app.route('/ack', methods=['GET', 'POST'])
 async def ack():
-    # Try to grab the UUID from the cookie
     uuid = request.cookies.get('uuid', None)
 
-    # Check if the UUID is valid
     if uuid is None or not is_valid_uuid(uuid):
-        # If not, redirect to the login page
         return redirect(url_for('login'))
 
-    # Check if the UUID is in a session
     uuid_in_session = session.get('uuid')
     if uuid != uuid_in_session:
         return redirect(url_for('login'))
@@ -328,23 +283,17 @@ async def ack():
 
 @app.route('/', methods=['GET', 'POST'])
 async def convert():
-    # Try to grab the UUID from the cookie
     uuid = request.cookies.get('uuid', None)
 
-    # Check if the UUID is valid
     if uuid is None or not is_valid_uuid(uuid):
-        # If not, redirect to the login page
         return redirect(url_for('login'))
 
-    # Check if the UUID is in a session
     uuid_in_session = session.get('uuid')
     if uuid != uuid_in_session:
         return redirect(url_for('login'))
 
-    # ensure we have a file for this uuid
     await upload_data_json_to_storage(uuid, {})
     
-    # Set the instruction list
     instructions = [
         "Where can I swim, float or paddle in New Braunfels?",
         "What restaurants do you recommend?",
@@ -360,14 +309,11 @@ async def convert():
         form_data = await request.form
         posted_instruction = form_data.get('instructions')
 
-        # If a new instruction is posted, add it to the top of the list
         if posted_instruction and posted_instruction not in instructions:
             instructions.insert(0, posted_instruction)
 
-    # encode instructions
     encoded_instructions = base64.b64encode(json.dumps(instructions).encode('utf-8')).decode('utf-8')
 
-    # Pass the (possibly updated) instructions list to the template
     current_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00") # card publish
     return await render_template('index.html', instructions=encoded_instructions, current_date=current_date)
 
@@ -392,28 +338,19 @@ async def chat():
 async def process_user_query(query):
     # TODO: Implement the actual call to the pipeline
     # Placeholder function to simulate processing the query
+    logging.info(f"user said {query}")
     return f"Simulated response to '{query}'"
-
-
-@app.route('/chat/stream')
-async def chat_stream():
-    async def stream():
-        while True:
-            # TODO: Implement the logic to send updates from the chat pipeline callback
-            # Placeholder SSE message
-            message = f"data: Simulated SSE message\n\n"
-            yield message
-            await asyncio.sleep(30)
-    return Response(stream(), mimetype='text/event-stream')
 
 
 @app.route('/chat/callback', methods=['POST'])
 async def chat_callback():
-    # TODO: Implement the logic to handle the chat pipeline callback
-    # Placeholder callback handling
     callback_data = await request.get_json()
-    # Process the callback data and send the update to the client using SSE
-    # ...
+    message = callback_data.get('message', '')
+    uuid = callback_data.get('uuid', '')
+    
+    if message and is_valid_uuid(uuid):
+        await send_sse(uuid, message)
+        
     return jsonify({'status': 'success'})
 
 
@@ -488,14 +425,12 @@ async def upload():
     return jsonify({"status": "error", "message": "No file received."}), 404
 
 
-
-# ... (previous code remains the same)
-
 @app.route('/admin', methods=['GET'])
 async def admin():
     # Serve the HTML page when accessed via a GET request
     logging.info("serving admin.html")
     return await render_template('admin.html')
+
 
 @app.route('/crawl', methods=['GET', 'POST', 'DELETE'])
 async def crawl():
