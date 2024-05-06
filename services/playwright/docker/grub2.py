@@ -114,67 +114,67 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     image_from_page = ""
 
     async with async_playwright() as p:
-            browser = await p.webkit.launch()
-            page = await browser.new_page()
-        
-            await page.goto(url)
-        
-            if click_button and button_with_text:
-                # Find a button by its accessible name and click it
-                await page.get_by_role('button', name=button_with_text).click()
-                await page.wait_for_timeout(1500)  # Additional waiting time after click action
+        browser = await p.webkit.launch()
+        page = await browser.new_page()
+    
+        await page.goto(url)
+    
+        if click_button and button_with_text:
+            # Find a button by its accessible name and click it
+            await page.get_by_role('button', name=button_with_text).click()
+            await page.wait_for_timeout(1500)  # Additional waiting time after click action
 
-            # Increase the font size for all elements
-            await page.evaluate('''() => {
-                const allElements = document.querySelectorAll('*');
-                allElements.forEach(element => {
-                    const currentFontSize = window.getComputedStyle(element).fontSize;
-                    const newFontSize = parseFloat(currentFontSize) * 1.5 + 'px';  # Increase by 1.5 times
-                    element.style.fontSize = newFontSize;
-                });
-            }''')
+        # Increase the font size for all elements
+        await page.evaluate('''() => {
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(element => {
+                const currentFontSize = window.getComputedStyle(element).fontSize;
+                const newFontSize = parseFloat(currentFontSize) * 1.5 + 'px';  # Increase by 1.5 times
+                element.style.fontSize = newFontSize;
+            });
+        }''')
 
-            await page.wait_for_timeout(1500)
+        await page.wait_for_timeout(1500)
 
-            if extract_links:
-                # Preprocess link_selector to replace double quotes with single quotes
-                sanitized_link_selector = link_selector.replace('"', "'")
-                
-                links = await page.evaluate(f'''() => {{
-                    const elements = Array.from(document.querySelectorAll("{sanitized_link_selector}"));
-                    return elements.map(element => {{
-                        return {{
-                            href: element.href,
-                            text: element.textContent || element.innerText
-                        }};
-                    }});
-                }}''')
-
-            # Take a screenshot after increasing the font size
-            await page.screenshot(path=filename, full_page=full_screen)
-
-            image_from_page = None
-            if extract_image:
-                img_element = await page.query_selector(img_isolate_selector)
-                if img_element:
-                    # Generate the filename for the image to be saved
-                    image_filename = "image_" + os.path.basename(filename)
-                    image_path = os.path.join(os.path.dirname(filename), image_filename)
-                    await img_element.screenshot(path=image_path)
-                    image_from_page = image_path
-
-            await browser.close()
-
-        result = {
-            "filename": filename,
-            "success": True
-        }
         if extract_links:
-            result["links"] = links
-        if image_from_page:
-            result["image_from_page"] = image_from_page  # Include the path of the image screenshot in the result
+            # Preprocess link_selector to replace double quotes with single quotes
+            sanitized_link_selector = link_selector.replace('"', "'")
+            
+            links = await page.evaluate(f'''() => {{
+                const elements = Array.from(document.querySelectorAll("{sanitized_link_selector}"));
+                return elements.map(element => {{
+                    return {{
+                        href: element.href,
+                        text: element.textContent || element.innerText
+                    }};
+                }});
+            }}''')
 
-        return json.dumps(result)  # Return JSON string with filename, links, and optionally the path of the image screenshot
+        # Take a screenshot after increasing the font size
+        await page.screenshot(path=filename, full_page=full_screen)
+
+        image_from_page = None
+        if extract_image:
+            img_element = await page.query_selector(img_isolate_selector)
+            if img_element:
+                # Generate the filename for the image to be saved
+                image_filename = "image_" + os.path.basename(filename)
+                image_path = os.path.join(os.path.dirname(filename), image_filename)
+                await img_element.screenshot(path=image_path)
+                image_from_page = image_path
+
+        await browser.close()
+
+    result = {
+        "filename": filename,
+        "success": True
+    }
+    if extract_links:
+        result["links"] = links
+    if image_from_page:
+        result["image_from_page"] = image_from_page  # Include the path of the image screenshot in the result
+
+    return json.dumps(result)  # Return JSON string with filename, links, and optionally the path of the image screenshot
 
 
 @retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
