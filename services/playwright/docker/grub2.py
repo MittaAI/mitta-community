@@ -136,6 +136,10 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
 
         await page.wait_for_timeout(1500)
 
+        # Log the height of the rendered page
+        page_height = await page.evaluate("() => document.body.scrollHeight")
+        logging.info(f"Page height before taking screenshot: {page_height} pixels")
+        
         if extract_links:
             # Preprocess link_selector to replace double quotes with single quotes
             sanitized_link_selector = link_selector.replace('"', "'")
