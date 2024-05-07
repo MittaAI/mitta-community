@@ -151,7 +151,7 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
             }}''')
 
         # Take a screenshot after increasing the font size
-        await page.screenshot(path=filename, full_page=full_screen)
+        await page.screenshot(path=filename, full_page=full_screen, device_scale_factor=2)
 
         image_from_page = None
         if extract_image:
