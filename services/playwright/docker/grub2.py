@@ -122,14 +122,14 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
         if click_button and button_with_text:
             # Find a button by its accessible name and click it
             await page.get_by_role('button', name=button_with_text).click()
-            await page.wait_for_timeout(1500)  # Additional waiting time after click action
+            await page.wait_for_timeout(1500)
 
         # Increase the font size for all elements
         await page.evaluate('''() => {
             const allElements = document.querySelectorAll('*');
             allElements.forEach(element => {
                 const currentFontSize = window.getComputedStyle(element).fontSize;
-                const newFontSize = parseFloat(currentFontSize) * 1.5 + 'px';  # Increase by 1.5 times
+                const newFontSize = parseFloat(currentFontSize) * 1.5 + 'px';
                 element.style.fontSize = newFontSize;
             });
         }''')
