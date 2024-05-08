@@ -114,8 +114,12 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     image_from_page = ""
 
     async with async_playwright() as p:
-        browser = await p.webkit.launch()
-        page = await browser.new_page()
+        browser_context = await p.webkit.launch_persistent_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+            viewport={"width": 2560, "height": 1440},
+            device_scale_factor=2,
+        )
+        page = await browser_context.new_page()
     
         await page.goto(url)
     
