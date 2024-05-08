@@ -122,24 +122,10 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
         if click_button and button_with_text:
             # Find a button by its accessible name and click it
             await page.get_by_role('button', name=button_with_text).click()
-            await page.wait_for_timeout(1500)
-
-        # Increase the font size for all elements
-        await page.evaluate('''() => {
-            const allElements = document.querySelectorAll('*');
-            allElements.forEach(element => {
-                const currentFontSize = window.getComputedStyle(element).fontSize;
-                const newFontSize = parseFloat(currentFontSize) * 1.5 + 'px';
-                element.style.fontSize = newFontSize;
-            });
-        }''')
+            await page.wait_for_timeout(1500)  # Additional waiting time after click action
 
         await page.wait_for_timeout(1500)
 
-        # Log the height of the rendered page
-        page_height = await page.evaluate("() => document.body.scrollHeight")
-        logging.info(f"Page height before taking screenshot: {page_height} pixels")
-        
         if extract_links:
             # Preprocess link_selector to replace double quotes with single quotes
             sanitized_link_selector = link_selector.replace('"', "'")
@@ -154,10 +140,8 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
                 }});
             }}''')
 
-        # Take a screenshot after increasing the font size
         await page.screenshot(path=filename, full_page=full_screen)
 
-        image_from_page = None
         if extract_image:
             img_element = await page.query_selector(img_isolate_selector)
             if img_element:
