@@ -76,7 +76,7 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
 
         try:
             # Perform text recognition
-            result = reader.readtext(image_bytes, paragraph=True, height_ths=5, width_ths=0.8, detail=1)
+            result = reader.readtext(image_bytes, paragraph=True, height_ths=2, width_ths=0.6, detail=1)
         except Exception as e:
             app.logger.error(f"Error occurred during OCR processing: {e}")
             if callback_url:
