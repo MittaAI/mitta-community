@@ -158,7 +158,7 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
                     await img_element.screenshot(path=image_path)
                     image_from_page = image_path
 
-            await browser.close()
+            await browser_context.close()
 
     result = {
         "filename": filename,
