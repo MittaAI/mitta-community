@@ -79,6 +79,7 @@ def i_have_failed_my_purpose(error_reason: str) -> dict:
 
 
 import tempfile
+import shutil
 
 @function_info_decorator
 async def take_screenshot_and_extract_links(url: str, filename: str = "example.png", full_screen: bool = False, extract_links: bool = False, link_selector: str = "a", extract_image: bool = False, img_isolate_selector: str = "img", button_with_text: str = "", click_button: bool = False) -> str:
@@ -160,10 +161,14 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
 
             await browser_context.close()
 
+        # Wipe the temporary directory after the function finishes
+        shutil.rmtree(temp_dir)
+
     result = {
         "filename": filename,
         "success": True
     }
+    
     if extract_links:
         result["links"] = links
     if image_from_page:
