@@ -124,41 +124,41 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
             )
             page = await browser_context.new_page()
     
-        await page.goto(url)
-    
-        if click_button and button_with_text:
-            # Find a button by its accessible name and click it
-            await page.get_by_role('button', name=button_with_text).click()
-            await page.wait_for_timeout(1500)  # Additional waiting time after click action
+            await page.goto(url)
+        
+            if click_button and button_with_text:
+                # Find a button by its accessible name and click it
+                await page.get_by_role('button', name=button_with_text).click()
+                await page.wait_for_timeout(1500)  # Additional waiting time after click action
 
-        await page.wait_for_timeout(1500)
+            await page.wait_for_timeout(1500)
 
-        if extract_links:
-            # Preprocess link_selector to replace double quotes with single quotes
-            sanitized_link_selector = link_selector.replace('"', "'")
-            
-            links = await page.evaluate(f'''() => {{
-                const elements = Array.from(document.querySelectorAll("{sanitized_link_selector}"));
-                return elements.map(element => {{
-                    return {{
-                        href: element.href,
-                        text: element.textContent || element.innerText
-                    }};
-                }});
-            }}''')
+            if extract_links:
+                # Preprocess link_selector to replace double quotes with single quotes
+                sanitized_link_selector = link_selector.replace('"', "'")
+                
+                links = await page.evaluate(f'''() => {{
+                    const elements = Array.from(document.querySelectorAll("{sanitized_link_selector}"));
+                    return elements.map(element => {{
+                        return {{
+                            href: element.href,
+                            text: element.textContent || element.innerText
+                        }};
+                    }});
+                }}''')
 
-        await page.screenshot(path=filename, full_page=full_screen)
+            await page.screenshot(path=filename, full_page=full_screen)
 
-        if extract_image:
-            img_element = await page.query_selector(img_isolate_selector)
-            if img_element:
-                # Generate the filename for the image to be saved
-                image_filename = "image_" + os.path.basename(filename)
-                image_path = os.path.join(os.path.dirname(filename), image_filename)
-                await img_element.screenshot(path=image_path)
-                image_from_page = image_path
+            if extract_image:
+                img_element = await page.query_selector(img_isolate_selector)
+                if img_element:
+                    # Generate the filename for the image to be saved
+                    image_filename = "image_" + os.path.basename(filename)
+                    image_path = os.path.join(os.path.dirname(filename), image_filename)
+                    await img_element.screenshot(path=image_path)
+                    image_from_page = image_path
 
-        await browser.close()
+            await browser.close()
 
     result = {
         "filename": filename,
