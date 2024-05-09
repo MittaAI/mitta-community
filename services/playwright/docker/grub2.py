@@ -117,9 +117,8 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
 
     with tempfile.TemporaryDirectory() as temp_dir:
         async with async_playwright() as p:
-            browser_context = await p.webkit.launch_persistent_context(
-                args=['--disable-http2'],
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+            browser_context = await p.chromium.launch_persistent_context(
+                user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
                 viewport={"width": 2560, "height": 1440},
                 device_scale_factor=2,
                 user_data_dir=temp_dir,
