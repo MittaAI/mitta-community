@@ -120,13 +120,13 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
             browser_context = await p.chromium.launch_persistent_context(
                 user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
                 viewport={"width": 2560, "height": 1440},
-                device_scale_factor=1.2,
+                device_scale_factor=1.0,
                 user_data_dir=temp_dir,
             )
             page = await browser_context.new_page()
-    
+
             await page.goto(url)
-        
+
             if click_button and button_with_text:
                 # Find a button by its accessible name and click it
                 await page.get_by_role('button', name=button_with_text).click()
@@ -134,10 +134,31 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
 
             await page.wait_for_timeout(1500)
 
+            # Remove images from the page
+            if not extract_image:
+                await page.evaluate("""
+                    const images = document.querySelectorAll('img');
+                    images.forEach(img => {
+                        img.src = '';
+                    });
+                """)
+
+            # Set font to Courier New and font size to 24px
+            await page.evaluate("""
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    * {
+                        font-family: "Courier New", Courier, monospace !important;
+                        font-size: 24px !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            """)
+
             if extract_links:
                 # Preprocess link_selector to replace double quotes with single quotes
                 sanitized_link_selector = link_selector.replace('"', "'")
-                
+
                 links = await page.evaluate(f'''() => {{
                     const elements = Array.from(document.querySelectorAll("{sanitized_link_selector}"));
                     return elements.map(element => {{
@@ -168,7 +189,6 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
         "filename": filename,
         "success": True
     }
-
     if extract_links:
         result["links"] = links
     if image_from_page:
