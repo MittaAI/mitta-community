@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Upgrade pip, setuptools, and wheel, and install required Python packages
 RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install openai openai[datalib] tenacity
+    pip install openai openai[datalib] tenacity playwright
 
 # Install Quart and Hypercorn
 RUN pip install --no-cache-dir quart httpx werkzeug hypercorn quart_cors
