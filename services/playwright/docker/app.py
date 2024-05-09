@@ -64,8 +64,15 @@ async def grub():
 
 
 async def process_query_background(username, query, openai_token, upload_dir, callback_url, document):
-    success, additional_data = await ai(username=username, query=query, openai_token=openai_token, upload_dir=upload_dir)
-    
+    try:
+        success, additional_data = await ai(username=username, query=query, openai_token=openai_token, upload_dir=upload_dir)
+    except Exception as e:
+        # Handle any exceptions raised by the ai function
+        logging.error(f"An error occurred while processing the query: {e}")
+        error_message = str(e)
+        await notify_failure(callback_url, document, error_message)
+        return
+
     if success:
         document.update(additional_data)  # Merge additional data into the payload
 
