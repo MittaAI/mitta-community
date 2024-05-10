@@ -150,7 +150,7 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
                     * {
                         font-family: "Consolas", monospace !important;
                         font-size: 18px !important;
-                        font-weight: 400 !important;
+                        font-weight: 500 !important;
                     }
                 `;
                 document.head.appendChild(style);
