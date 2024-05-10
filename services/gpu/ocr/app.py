@@ -90,10 +90,10 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
                 text_threshold=0.8,
                 detail=1
             )
-           
+
         except Exception as e:
             app.logger.error(f"Error occurred during OCR processing: {e}")
-            if callback_url
+            if callback_url:
                 await notify_failure(callback_url, f"Error occurred during OCR processing: {e}")
             continue
         finally:
