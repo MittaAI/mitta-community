@@ -143,13 +143,13 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
                     });
                 """)
 
-            # Set font to Courier New and font size to 24px
+            # Set font to Consolas, font size to 24px, and font weight to 600 (semi-bold)
             await page.evaluate("""
                 const style = document.createElement('style');
                 style.innerHTML = `
                     * {
-                        font-family: "Courier New", Courier, monospace !important;
-                        font-size: 16px !important;
+                        font-family: "Consolas", monospace !important;
+                        font-size: 24px !important;
                         font-weight: 600 !important;
                     }
                 `;
