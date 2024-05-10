@@ -84,10 +84,10 @@ async def process_ocr(mitta_uris, page_nums, callback_url=None):
                 allowlist=allowlist,
                 paragraph=True,
                 height_ths=2,
-                width_ths=0.8,
+                width_ths=0.9,
                 contrast_ths=0.01,
                 adjust_contrast=1.2,
-                text_threshold=0.7,  # Lowered from 0.8
+                text_threshold=0.4,  # Lowered from 0.8
                 detail=1
             )
 
