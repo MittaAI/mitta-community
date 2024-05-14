@@ -295,8 +295,8 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
 
         else:
             # Update the filename to include the full path within the user-specific directory
-            if 'filename' in arguments:
-                original_filename = arguments['filename']
+            if 'filenames' in arguments:
+                original_filename = arguments['filenames']
                 if not original_filename.endswith('.png') and '.' not in original_filename:
                     original_filename += '.png'
                 full_path_filename = os.path.join(user_dir, original_filename)
@@ -316,18 +316,8 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
         
     except Exception as ex:
         logging.info(ex)
-        extracted_urls = extract_urls(query)
-        if extracted_urls:
-            random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=13))
-            screenshot_filename = f"{username}_{random_string}.png"
-            
-            full_path_filename = os.path.join(user_dir, screenshot_filename)
-
-            await thumbnail(url=extracted_urls[0], filename=full_path_filename)
-            return full_path_screenshot
-        else:
-            # If no URLs are extracted and no function is suggested, return an error or a default response
-            return False, {'error': "No AI available, no URLs found in query."}
+        # Return False and the error message
+        return False, {'error': str(ex)}
 
 
 async def main():
