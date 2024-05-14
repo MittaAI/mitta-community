@@ -250,7 +250,7 @@ async def chat_completion_request_async(messages=None, openai_token=None, tools=
     try:
         return await client.chat.completions.create(model=model, messages=messages, tools=tools, tool_choice=tool_choice)
     except Exception as e:
-        print("Unable to generate ChatCompletion response:", e)
+        logging.info("Unable to generate ChatCompletion response:", e)
         return None
 
 
