@@ -82,7 +82,7 @@ import tempfile
 import shutil
 
 @function_info_decorator
-async def take_screenshot_and_extract_links(url: str, filename_prefix: str = "example", full_screen: bool = False, extract_links: bool = False, link_selector: str = "a", extract_image: bool = False, img_isolate_selector: str = "img", button_with_text: str = "", click_button: bool = False, ocr_readable: bool = False, dark_mode: bool = False, overlap_ratio: float = 0.1) -> str:
+async def take_screenshot_and_extract_links(url: str, filename_prefix: str = "example", full_screen: bool = False, extract_links: bool = False, link_selector: str = "a", extract_image: bool = False, img_isolate_selector: str = "img", button_with_text: str = "", click_button: bool = False, ocr_readable: bool = False, dark_mode: bool = False, overlap_ratio: int = 10) -> str:
  
     """
     Takes a screenshot of the specified URL and saves it to the given filename prefix asynchronously.
@@ -121,8 +121,8 @@ async def take_screenshot_and_extract_links(url: str, filename_prefix: str = "ex
     :type ocr_readable: bool
     :param dark_mode: Determines whether to enable dark mode. Defaults to False.
     :type dark_mode: bool
-    :param overlap_ratio: The ratio of overlap between consecutive screenshots. Defaults to 0.1 (10% overlap).
-    :type overlap_ratio: float
+    :param overlap_ratio: The ratio in percent of overlap between consecutive screenshots. Defaults to 10 (10% overlap).
+    :type overlap_ratio: int
     :return: A JSON string containing a list of filenames where the screenshots were saved, optionally a list of links with their texts, and optionally the path of the extracted image.
     :rtype: str
     """
@@ -204,7 +204,7 @@ async def take_screenshot_and_extract_links(url: str, filename_prefix: str = "ex
                 # Capture the full page by scrolling
                 page_height = await page.evaluate('document.body.scrollHeight')
                 viewport_height = await page.evaluate('window.innerHeight')
-                overlap_height = int(viewport_height * overlap_ratio)
+                overlap_height = int(viewport_height * (overlap_ratio/100.0))
                 effective_height = viewport_height - overlap_height
                 num_screenshots = math.ceil(page_height / effective_height)
 
