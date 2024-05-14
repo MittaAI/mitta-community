@@ -126,7 +126,7 @@ async def take_screenshot_and_extract_links(url: str, filename_prefix: str = "ex
     :return: A JSON string containing a list of filenames where the screenshots were saved, optionally a list of links with their texts, and optionally the path of the extracted image.
     :rtype: str
     """
-    
+
     links = []
     image_from_page = ""
 
@@ -199,32 +199,30 @@ async def take_screenshot_and_extract_links(url: str, filename_prefix: str = "ex
                     }});
                 }}''')
 
-            # scrolling screenshots
-            page_height = await page.evaluate('document.body.scrollHeight')
-            viewport_height = await page.evaluate('window.innerHeight')
-            overlap_height = int(viewport_height * overlap_ratio)
-            effective_height = viewport_height - overlap_height
-            num_screenshots = math.ceil(page_height / effective_height)
+            # screenshot, with optional scrolling to get the whole page
+            if full_screen:
+                # Capture the full page by scrolling
+                page_height = await page.evaluate('document.body.scrollHeight')
+                viewport_height = await page.evaluate('window.innerHeight')
+                overlap_height = int(viewport_height * overlap_ratio)
+                effective_height = viewport_height - overlap_height
+                num_screenshots = math.ceil(page_height / effective_height)
 
-            screenshot_filenames = []
+                screenshot_filenames = []
 
-            for i in range(num_screenshots):
-                scroll_position = i * effective_height
-                await page.evaluate(f'window.scrollTo(0, {scroll_position})')
-                await page.wait_for_timeout(500)  # Wait for the scroll to complete
+                for i in range(num_screenshots):
+                    scroll_position = i * effective_height
+                    await page.evaluate(f'window.scrollTo(0, {scroll_position})')
+                    await page.wait_for_timeout(500)  # Wait for the scroll to complete
 
-                screenshot_filename = f"{filename_prefix}_{i}.png"
+                    screenshot_filename = f"{filename_prefix}_{i}.png"
+                    await page.screenshot(path=screenshot_filename, full_page=False)
+                    screenshot_filenames.append(screenshot_filename)
+            else:
+                # Capture only the top shot
+                screenshot_filename = f"{filename_prefix}.png"
                 await page.screenshot(path=screenshot_filename, full_page=False)
-                screenshot_filenames.append(screenshot_filename)
-
-            if extract_image:
-                img_element = await page.query_selector(img_isolate_selector)
-                if img_element:
-                    # Generate the filename for the image to be saved
-                    image_filename = "image_" + os.path.basename(filename)
-                    image_path = os.path.join(os.path.dirname(filename), image_filename)
-                    await img_element.screenshot(path=image_path)
-                    image_from_page = image_path
+                screenshot_filenames = [screenshot_filename]
 
             await browser_context.close()
 
