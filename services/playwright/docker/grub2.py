@@ -82,20 +82,27 @@ import tempfile
 import shutil
 
 @function_info_decorator
-async def take_screenshot_and_extract_links(url: str, filename: str = "example.png", full_screen: bool = False, extract_links: bool = False, link_selector: str = "a", extract_image: bool = False, img_isolate_selector: str = "img", button_with_text: str = "", click_button: bool = False, ocr_readable: bool = False, dark_mode: bool = False) -> str:
+async def take_screenshot_and_extract_links(url: str, filename_prefix: str = "example", full_screen: bool = False, extract_links: bool = False, link_selector: str = "a", extract_image: bool = False, img_isolate_selector: str = "img", button_with_text: str = "", click_button: bool = False, ocr_readable: bool = False, dark_mode: bool = False, overlap_ratio: float = 0.1) -> str:
+ 
     """
-    Takes a screenshot of the specified URL and saves it to the given filename asynchronously.
+    Takes a screenshot of the specified URL and saves it to the given filename prefix asynchronously.
+    Captures multiple screenshots with overlapping sections to cover the full page height.
+
     Can capture either the full page or just the viewport based on the full_screen parameter.
+
     Optionally extracts links (both URL and text) from the page using a specified link selector,
     defaulting to 'a' tags if no link selector is provided.
+
     Optionally extracts an image from the page using a specified image selector.
-    If a button_with_text is provided and click_button is True, attempts to click the specified button before taking a screenshot or extracting links or images.
+
+    If a button_with_text is provided and click_button is True, attempts to click the specified button before taking screenshots or extracting links or images.
+
     Optionally sets the font to be OCR readable and enables dark mode.
 
     :param url: The website URL to capture.
     :type url: str
-    :param filename: The filename used to save the screenshot.
-    :type filename: str
+    :param filename_prefix: The prefix used to save the screenshot filenames.
+    :type filename_prefix: str
     :param full_screen: Determines whether to capture the full page or just the viewport. Defaults to False for viewport screenshot.
     :type full_screen: bool
     :param extract_links: Determines whether to extract all links from the page. Defaults to False.
@@ -114,9 +121,12 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     :type ocr_readable: bool
     :param dark_mode: Determines whether to enable dark mode. Defaults to False.
     :type dark_mode: bool
-    :return: A JSON string containing the filename where the screenshot was saved, optionally a list of links with their texts, and optionally the path of the extracted image.
+    :param overlap_ratio: The ratio of overlap between consecutive screenshots. Defaults to 0.1 (10% overlap).
+    :type overlap_ratio: float
+    :return: A JSON string containing a list of filenames where the screenshots were saved, optionally a list of links with their texts, and optionally the path of the extracted image.
     :rtype: str
     """
+    
     links = []
     image_from_page = ""
 
@@ -189,7 +199,23 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
                     }});
                 }}''')
 
-            await page.screenshot(path=filename, full_page=full_screen)
+            # scrolling screenshots
+            page_height = await page.evaluate('document.body.scrollHeight')
+            viewport_height = await page.evaluate('window.innerHeight')
+            overlap_height = int(viewport_height * overlap_ratio)
+            effective_height = viewport_height - overlap_height
+            num_screenshots = math.ceil(page_height / effective_height)
+
+            screenshot_filenames = []
+
+            for i in range(num_screenshots):
+                scroll_position = i * effective_height
+                await page.evaluate(f'window.scrollTo(0, {scroll_position})')
+                await page.wait_for_timeout(500)  # Wait for the scroll to complete
+
+                screenshot_filename = f"{filename_prefix}_{i}.png"
+                await page.screenshot(path=screenshot_filename, full_page=False)
+                screenshot_filenames.append(screenshot_filename)
 
             if extract_image:
                 img_element = await page.query_selector(img_isolate_selector)
@@ -206,9 +232,10 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
         shutil.rmtree(temp_dir)
 
     result = {
-        "filename": filename,
+        "filenames": screenshot_filenames,
         "success": True
     }
+
     if extract_links:
         result["links"] = links
     if image_from_page:
