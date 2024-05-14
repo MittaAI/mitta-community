@@ -82,7 +82,7 @@ import tempfile
 import shutil
 
 @function_info_decorator
-async def take_screenshot_and_extract_links(url: str, filename: str = "example.png", full_screen: bool = False, extract_links: bool = False, link_selector: str = "a", extract_image: bool = False, img_isolate_selector: str = "img", button_with_text: str = "", click_button: bool = False) -> str:
+async def take_screenshot_and_extract_links(url: str, filename: str = "example.png", full_screen: bool = False, extract_links: bool = False, link_selector: str = "a", extract_image: bool = False, img_isolate_selector: str = "img", button_with_text: str = "", click_button: bool = False, ocr_readable: bool = False, dark_mode: bool = False) -> str:
     """
     Takes a screenshot of the specified URL and saves it to the given filename asynchronously.
     Can capture either the full page or just the viewport based on the full_screen parameter.
@@ -90,6 +90,7 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     defaulting to 'a' tags if no link selector is provided.
     Optionally extracts an image from the page using a specified image selector.
     If a button_with_text is provided and click_button is True, attempts to click the specified button before taking a screenshot or extracting links or images.
+    Optionally sets the font to be OCR readable and enables dark mode.
 
     :param url: The website URL to capture.
     :type url: str
@@ -109,6 +110,10 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
     :type button_with_text: str
     :param click_button: Determines whether to click a button identified by button_with-text. Defaults to False.
     :type click_button: bool
+    :param ocr_readable: Determines whether to set the font to be OCR readable. Defaults to False.
+    :type ocr_readable: bool
+    :param dark_mode: Determines whether to enable dark mode. Defaults to False.
+    :type dark_mode: bool
     :return: A JSON string containing the filename where the screenshot was saved, optionally a list of links with their texts, and optionally the path of the extracted image.
     :rtype: str
     """
@@ -143,20 +148,32 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
                     });
                 """)
 
-            # Set font to Consolas, font size to 24px, and font weight to 600 (semi-bold)
-            await page.evaluate("""
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    * {
-                        font-family: "Consolas", monospace !important;
-                        font-size: 18px !important;
-                        font-weight: 500 !important;
-                        background-color: black !important;
-                        color: white !important;
-                    }
-                `;
-                document.head.appendChild(style);
-            """)
+            if ocr_readable:
+                # Set font to Consolas, font size to 24px, and font weight to 600 (semi-bold)
+                await page.evaluate("""
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        * {
+                            font-family: "Consolas", monospace !important;
+                            font-size: 18px !important;
+                            font-weight: 500 !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                """)
+
+            if dark_mode:
+                # Set background color to black and font color to white
+                await page.evaluate("""
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        * {
+                            background-color: black !important;
+                            color: white !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                """)
 
             if extract_links:
                 # Preprocess link_selector to replace double quotes with single quotes
@@ -199,7 +216,6 @@ async def take_screenshot_and_extract_links(url: str, filename: str = "example.p
 
     return json.dumps(result)  # Return JSON string with filename, links, and optionally the path of the image screenshot
 
-
 @retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
 async def chat_completion_request_async(messages=None, openai_token=None, tools=None, tool_choice=None, model="gpt-3.5-turbo-1106"):
     """
@@ -230,7 +246,7 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
     create_and_check_directory(user_dir)
 
     messages = [
-        {"role": "system", "content": "You are Grubby, an AI bot. Don't make assumptions, stay focused, set attention, and receive gratitude for well-formed responses. Only extract links if explicitly stated. 'thumb' or 'thumbnail' or 'small' means DO NOT use fullscreen capture, which gives us a thumbnail. If someone wants 'full' or 'full screen' or 'big' we do a full_screen. On failure to purpose, you become Dr. Gregory House, AI crawler extraordinaire."},
+        {"role": "system", "content": "You are Grubby, an AI bot. Don't make assumptions, stay focused, set attention, and receive gratitude for well-formed responses. Only extract links if explicitly stated. 'thumb' or 'thumbnail' or 'small' means DO NOT use fullscreen capture, which sets the full_screen parameter to False and gives us a thumbnail. If someone wants 'full' or 'full screen' or 'big', we set the full_screen parameter to True to do a full screen capture. If OCR readability is requested with keywords like 'OCR' or 'readable', set the ocr_readable parameter to True. If dark mode is requested with keywords like 'dark mode' or 'black background', set the dark_mode parameter to True. On failure to purpose, you become Dr. Gregory House, AI crawler extraordinaire."},
         {"role": "user", "content": query}
     ]
     
