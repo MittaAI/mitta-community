@@ -114,6 +114,8 @@ async def upload_file(callback_url, document):
     Uploads files specified in the document to the callback URL.
     Expects 'filename' and optionally 'image_from_page' in the document.
     """
+    logging.info("in upload file")
+    logging.info(document)
     files_to_upload = []
     # Prepare JSON data
     json_data = json.dumps(document).encode('utf-8')  # Encode document to JSON
