@@ -303,14 +303,22 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
                 random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=13))
                 filename_prefix = f"{username}_{random_string}"
 
-            # Update the filename_prefix to include the full path within the user-specific directory
-            arguments['filename_prefix'] = os.path.join(user_dir, filename_prefix)
+            # Update the filename_prefix in the arguments
+            arguments['filename_prefix'] = filename_prefix
 
             json_results_str = await execute_function_by_name(function_name, **arguments)
             results = json.loads(json_results_str) if not isinstance(json_results_str, dict) else json_results_str
 
             # Move 'arguments' into the 'results' dictionary
             results['arguments'] = arguments
+
+            # Extract filenames and content types from the results
+            filenames = results.get('filenames', [])
+            content_types = ['image/png'] * len(filenames)
+
+            # Update the results dictionary with the filenames and content types
+            results['filenames'] = filenames
+            results['content_types'] = content_types
 
             return True, results
         
