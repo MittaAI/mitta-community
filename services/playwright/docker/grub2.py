@@ -9,6 +9,7 @@ import os
 import logging
 import random
 import string
+import math
 
 # Import helper functions and decorators
 from function_wrapper import function_info_decorator, tools, callable_registry
