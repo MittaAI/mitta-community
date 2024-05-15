@@ -294,11 +294,15 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
             return False, results
 
         else:
-            # Generate a random prefix for the filename
-            random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=13))
-            filename_prefix = f"{username}_{random_string}"
+            # Check if filename_prefix is provided by the LLM
+            if 'filename_prefix' in arguments:
+                filename_prefix = arguments['filename_prefix']
+            else:
+                # Generate a random prefix for the filename
+                random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=13))
+                filename_prefix = f"{username}_{random_string}"
 
-            # Update the filename_prefix in the arguments
+            # Update the filename_prefix to include the full path within the user-specific directory
             arguments['filename_prefix'] = os.path.join(user_dir, filename_prefix)
 
             json_results_str = await execute_function_by_name(function_name, **arguments)
