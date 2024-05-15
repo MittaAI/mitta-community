@@ -124,8 +124,8 @@ async def upload_file(callback_url, document):
     files_to_upload.append(('json_data', ('json_data.json', json_data, 'application/json')))
     
     # Check and add 'filename' if it exists in document
-    if 'filename' in document:
-        file_path = document['filename']
+    if 'filenames' in document:
+        file_path = document['filenames']
         output_file = os.path.basename(file_path)
         mime_type, _ = mimetypes.guess_type(file_path)
         mime_type = mime_type or 'application/octet-stream'
