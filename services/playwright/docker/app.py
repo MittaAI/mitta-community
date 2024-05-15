@@ -112,25 +112,27 @@ async def notify_failure(callback_url, document, message=None):
 async def upload_file(callback_url, document):
     """
     Uploads files specified in the document to the callback URL.
-    Expects 'filename' and optionally 'image_from_page' in the document.
+    Expects 'filenames' as a list and optionally 'image_from_page' in the document.
     """
     logging.info("in upload file")
     logging.info(document)
+
     files_to_upload = []
+
     # Prepare JSON data
     json_data = json.dumps(document).encode('utf-8')  # Encode document to JSON
-    
+
     # Add JSON data to the files to upload
     files_to_upload.append(('json_data', ('json_data.json', json_data, 'application/json')))
-    
-    # Check and add 'filename' if it exists in document
+
+    # Check and add 'filenames' if it exists in document
     if 'filenames' in document:
-        file_path = document['filenames']
-        output_file = os.path.basename(file_path)
-        mime_type, _ = mimetypes.guess_type(file_path)
-        mime_type = mime_type or 'application/octet-stream'
-        files_to_upload.append(('file', (output_file, open(file_path, 'rb'), mime_type)))
-    
+        for file_path in document['filenames']:
+            output_file = os.path.basename(file_path)
+            mime_type, _ = mimetypes.guess_type(file_path)
+            mime_type = mime_type or 'application/octet-stream'
+            files_to_upload.append(('file', (output_file, open(file_path, 'rb'), mime_type)))
+
     # Check and add 'image_from_page' if it exists in document
     if 'image_from_page' in document:
         image_path = document['image_from_page']
@@ -138,19 +140,20 @@ async def upload_file(callback_url, document):
         mime_type, _ = mimetypes.guess_type(image_path)
         mime_type = mime_type or 'application/octet-stream'
         files_to_upload.append(('image', (image_file, open(image_path, 'rb'), mime_type)))
-    
+
     logging.info("posting to pipeline")
+
     # Perform the upload
     async with httpx.AsyncClient() as client:
         response = await client.post(callback_url, files=files_to_upload)
-    logging.info(f"back from upload: {response.status_code}")
-    
+        logging.info(f"back from upload: {response.status_code}")
+
     # Log the response and clean up
     if response.status_code == 200:
         logging.info("Files uploaded successfully.")
     else:
         logging.error(f"Failed to upload files: {response.text}")
-    
+
     for _, file_info in files_to_upload:
         # file_info is a tuple where the second element is another tuple containing the file name, file object, and MIME type
         if file_info[0] != 'json_data':  # 'json_data' does not refer to a file needing closing or removal
