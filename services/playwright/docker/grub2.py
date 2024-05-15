@@ -294,24 +294,19 @@ async def ai(username="anonymous", query="screenshot mitta.ai", openai_token="",
             return False, results
 
         else:
-            # Update the filename to include the full path within the user-specific directory
-            if 'filenames' in arguments:
-                original_filename = arguments['filenames']
-                if not original_filename.endswith('.png') and '.' not in original_filename:
-                    original_filename += '.png'
-                full_path_filename = os.path.join(user_dir, original_filename)
-                arguments['filename'] = full_path_filename
-            else:
-                random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=13))
-                screenshot_filename = f"{username}_{random_string}.png"
-                arguments['filename'] = os.path.join(user_dir, screenshot_filename)
+            # Generate a random prefix for the filename
+            random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=13))
+            filename_prefix = f"{username}_{random_string}"
+
+            # Update the filename_prefix in the arguments
+            arguments['filename_prefix'] = os.path.join(user_dir, filename_prefix)
 
             json_results_str = await execute_function_by_name(function_name, **arguments)
             results = json.loads(json_results_str) if not isinstance(json_results_str, dict) else json_results_str
 
             # Move 'arguments' into the 'results' dictionary
             results['arguments'] = arguments
-            
+
             return True, results
         
     except Exception as ex:
