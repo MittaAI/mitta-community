@@ -137,6 +137,11 @@ def chunk_with_page_filename(texts: Union[List[str], List[List[str]]],
         "filenames": filenames_out
     }
 
+# Add redirect for root path
+@app.route('/')
+def root_redirect():
+    return redirect('https://mitta.ai', code=302)
+
 @app.route('/chunk', methods=['POST'])
 def chunk():
     data = request.json
