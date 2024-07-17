@@ -27,7 +27,7 @@ import time
 from google.cloud import storage
 from google.api_core.exceptions import Forbidden
 
-from quart import Quart, render_template, request, redirect, jsonify, url_for, Response, stream_with_context, session, send_from_directory, send_file
+from quart import Quart, abort, render_template, request, redirect, jsonify, url_for, Response, stream_with_context, session, send_from_directory, send_file
 from quart_cors import cors
 
 # App definition
@@ -459,11 +459,12 @@ async def callback():
     if access_uri:
         access_uri = await move_to_storage(access_uri, uuid, filename)
 
-    # Get any valid access_uris
-    messages = data.get('message', [])
-    
-    if messages:
-        message = messages[0]
+    # Check for messages and determine if it's a string or a list
+    raw_messages = data.get('message', [])
+    if isinstance(raw_messages, list) and raw_messages:
+        message = raw_messages[0]  # Use the first message
+    elif isinstance(raw_messages, str):
+        message = raw_messages
     else:
         message = 'What can I convert for you?'
 
@@ -548,8 +549,6 @@ async def download_file(filename):
 
     # Serve the file from the local file system
     return await send_from_directory(os.path.dirname(download_path), os.path.basename(download_path), as_attachment=True, mimetype=content_type)
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
